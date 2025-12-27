@@ -55,14 +55,16 @@
       "id": "feat-002",
       "title": "Standard Gauge types + local JSON file storage",
       "description": "Implement local JSON persistence (no database) and minimal runtime validation/normalization for Standard Gauge service lines.",
-      "status": "implemented",
+      "status": "complete",
       "priority": "high",
       "complexity": "M",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {
         "planning": { "completedAt": "2025-12-27T00:00:00Z" },
         "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
-        "implemented": { "completedAt": "2025-12-27T00:00:00Z" }
+        "implemented": { "completedAt": "2025-12-27T00:00:00Z" },
+        "verified": { "completedAt": "2025-12-27T00:00:00Z" },
+        "committed": { "completedAt": "2025-12-27T00:00:00Z", "commitHash": "d9338f2" }
       },
       "files": [
         "data/service-lines/SL-360-CAMPAIGN.json",
@@ -80,14 +82,16 @@
       "id": "feat-007",
       "title": "Unit tests + workflow gate (Vitest)",
       "description": "Add unit test runner and require tests to pass as part of the standard implementation quality gates.",
-      "status": "implemented",
+      "status": "complete",
       "priority": "high",
       "complexity": "M",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {
         "planning": { "completedAt": "2025-12-27T00:00:00Z" },
         "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
-        "implemented": { "completedAt": "2025-12-27T00:00:00Z" }
+        "implemented": { "completedAt": "2025-12-27T00:00:00Z" },
+        "verified": { "completedAt": "2025-12-27T00:00:00Z" },
+        "committed": { "completedAt": "2025-12-27T00:00:00Z", "commitHash": "d9338f2" }
       },
       "files": [
         "vitest.config.ts",

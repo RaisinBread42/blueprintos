@@ -24,7 +24,7 @@
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 1          |
+| Features Completed    | 3          |
 | Currently In Progress | 0          |
 | Backlog Items         | 4          |
 | Last Updated          | 2025-12-27 |
@@ -96,9 +96,10 @@ Initial project setup with the full tech stack:
 
 ### feat-002: Local JSON persistence for Service Lines (no DB)
 
-**Status**: implemented  
+**Status**: complete ✅  
 **Complexity**: M  
-**Completed**: 2025-12-27
+**Completed**: 2025-12-27  
+**Commit**: `d9338f2`
 
 #### Summary
 
@@ -110,6 +111,43 @@ Added local JSON file storage for Standard Gauge `ServiceLine` objects plus mini
   * `GET/PUT/DELETE /api/service-lines/[id]`
 * Seed service lines in `data/service-lines/*.json`
 * Normalization keeps `labor_variance` and `updated_at` consistent on write
+
+#### Quality Gates Passed
+
+* ✅ `pnpm type-check` - No type errors
+* ✅ `pnpm lint` - No linting errors
+* ✅ `pnpm test` - All tests pass
+* ✅ `pnpm build` - Build successful
+
+---
+
+### feat-007: Unit tests + workflow gate (Vitest)
+
+**Status**: complete ✅  
+**Complexity**: M  
+**Completed**: 2025-12-27  
+**Commit**: `d9338f2`
+
+#### Summary
+
+Added Vitest unit test framework with quality gates enforced in the development workflow:
+
+* Vitest configuration with Node environment
+* `server-only` aliased to no-op for test compatibility
+* Unit tests for normalize, validate, and storage modules
+* Tests are required to pass before merging
+
+#### Files Created/Modified
+
+* `vitest.config.ts` - Vitest configuration
+* `src/test/noopServerOnly.ts` - server-only stub for tests
+* `src/lib/blueprint/normalize.test.ts` - Normalization tests
+* `src/lib/blueprint/validate.test.ts` - Validation tests
+* `src/lib/storage/serviceLines.test.ts` - Storage tests
+
+#### Quality Gates Passed
+
+* ✅ `pnpm test` - 12 tests pass
 
 ---
 
