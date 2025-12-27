@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChartComponent } from "@/components/charts/LineChartComponent";
-import { CheckCircle2, Code2, Palette, BarChart3, Zap, FileCode } from "lucide-react";
+import { CheckCircle2, Code2, Palette, BarChart3, Zap, FileCode, ArrowRight } from "lucide-react";
 
 const sampleChartData = [
   { name: "Jan", performance: 65, efficiency: 78 },
@@ -82,17 +83,24 @@ export default function Home() {
 
             <div className="mt-10 flex items-center justify-center gap-4">
               <Button
+                asChild
                 size="lg"
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
               >
-                Get Started
+                <Link href="/editor">
+                  Open Editor
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 size="lg"
                 className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
               >
-                View Documentation
+                <Link href="https://github.com/RaisinBread42/blueprintos" target="_blank">
+                  View on GitHub
+                </Link>
               </Button>
             </div>
           </div>
