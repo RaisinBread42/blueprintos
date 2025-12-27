@@ -6,7 +6,7 @@
 
 ## Current Focus
 
-**No active feature.** Next up: **feat-003 (Iron Horse: editable service line DAG)**.
+**Active feature:** **feat-003 (Iron Horse: editable service line DAG)** — PLANNING
 
 ### Roadmap (kept intentionally lightweight)
 
@@ -47,7 +47,187 @@ These rules are validated after every implementation:
 
 ## Active Feature
 
-_None currently active._
+### feat-003: Iron Horse — Editable Service Line DAG
+
+**Status**: planning  
+**Complexity**: L (4-8 hours)  
+**Priority**: High
+
+---
+
+#### Overview
+
+Build a visual DAG editor using React Flow that allows users to create, edit, and manage service lines. This is the core UX of BlueprintOS — the "blueprint" where users design their operational workflows.
+
+The editor will follow the **rail network metaphor**:
+- **Nodes** = Stations (departments/processing points)
+- **Edges** = Tracks (connections between stations with cost/time weights)
+- **Canvas** = The service line blueprint
+
+---
+
+#### User Stories
+
+1. **View**: User can see a visual DAG of an existing service line
+2. **Navigate**: User can pan/zoom the canvas
+3. **Add Station**: User can add new station nodes to the canvas
+4. **Edit Station**: User can click a station to edit its properties (name, department, data source)
+5. **Delete Station**: User can remove stations (and their connected edges)
+6. **Connect Stations**: User can draw edges between stations
+7. **Edit Edge**: User can set edge weights (cost, time)
+8. **Delete Edge**: User can remove edges
+9. **Save**: User can save the service line to the backend
+10. **Load**: User can load existing service lines from the backend
+11. **Create New**: User can create a new blank service line
+12. **Import/Export**: User can import/export service lines as JSON files
+
+---
+
+#### Technical Approach
+
+##### 1. Dependencies
+
+```bash
+pnpm add reactflow
+```
+
+React Flow v11+ is a mature library for building node-based editors. It handles:
+- Canvas pan/zoom
+- Node drag & drop
+- Edge connection drawing
+- Selection and deletion
+- Keyboard shortcuts
+
+##### 2. File Structure
+
+```
+src/
+├── app/
+│   └── editor/
+│       ├── page.tsx          # Main editor page
+│       └── layout.tsx        # Editor layout (no header)
+├── components/
+│   └── dag/
+│       ├── ServiceLineEditor.tsx   # Main React Flow wrapper
+│       ├── StationNode.tsx         # Custom node component
+│       ├── TrackEdge.tsx           # Custom edge component (optional)
+│       ├── EditorToolbar.tsx       # Top toolbar (save, load, export)
+│       └── StationPanel.tsx        # Side panel for station details
+├── hooks/
+│   └── useServiceLine.ts     # Hook for service line CRUD
+└── lib/
+    └── dag/
+        └── transforms.ts     # Convert ServiceLine <-> React Flow format
+```
+
+##### 3. Data Transform Layer
+
+React Flow uses its own node/edge format. We need bidirectional transforms:
+
+```typescript
+// ServiceLine → React Flow
+function toReactFlowNodes(stations: Station[]): Node[]
+function toReactFlowEdges(edges: TrackEdge[]): Edge[]
+
+// React Flow → ServiceLine
+function fromReactFlowNodes(nodes: Node[]): Station[]
+function fromReactFlowEdges(edges: Edge[]): TrackEdge[]
+```
+
+##### 4. Custom Node Design
+
+The `StationNode` component will display:
+- Station name (header)
+- Department badge
+- RAG status indicator (colored dot)
+- Data source indicator (mock/api)
+- Connection handles (top/bottom or left/right)
+
+Visual style: Rail station aesthetic with dark slate background, emerald accents.
+
+##### 5. Editor Page Layout
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  [Toolbar: New | Open | Save | Import | Export]              │
+├──────────────────────────────────────────────┬───────────────┤
+│                                              │               │
+│                                              │   Station     │
+│           React Flow Canvas                  │   Details     │
+│           (nodes + edges)                    │   Panel       │
+│                                              │               │
+│                                              │   (appears    │
+│                                              │    when node  │
+│                                              │    selected)  │
+│                                              │               │
+└──────────────────────────────────────────────┴───────────────┘
+```
+
+##### 6. State Management
+
+Use React state + the existing API:
+- `useServiceLine` hook for fetching/saving
+- React Flow's internal state for canvas interactions
+- `onNodesChange`, `onEdgesChange`, `onConnect` callbacks
+
+##### 7. Keyboard Shortcuts
+
+- `Delete` / `Backspace`: Remove selected nodes/edges
+- `Ctrl+S`: Save
+- `Ctrl+Z`: Undo (stretch goal)
+
+---
+
+#### Implementation Subtasks
+
+| # | Task | Est. Time |
+|---|------|-----------|
+| 1 | Install React Flow, set up `/editor` route | 15 min |
+| 2 | Create `transforms.ts` with bidirectional converters | 30 min |
+| 3 | Build `StationNode` custom node component | 45 min |
+| 4 | Build `ServiceLineEditor` with React Flow canvas | 45 min |
+| 5 | Build `EditorToolbar` (new, open, save, import, export) | 45 min |
+| 6 | Build `StationPanel` for editing selected node | 45 min |
+| 7 | Implement `useServiceLine` hook | 30 min |
+| 8 | Add node creation (click canvas to add) | 30 min |
+| 9 | Add edge creation (drag between handles) | 20 min |
+| 10 | Add delete functionality | 20 min |
+| 11 | Wire up save/load to API | 30 min |
+| 12 | Add import/export JSON | 30 min |
+| 13 | Polish styling + keyboard shortcuts | 30 min |
+| 14 | Write unit tests for transforms | 30 min |
+
+**Total Estimate**: ~6-7 hours
+
+---
+
+#### Risks & Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| React Flow learning curve | Use official examples; stick to core features |
+| Complex state sync | Keep transforms pure; single source of truth in React Flow |
+| Large service lines slow | React Flow handles 1000+ nodes; not a concern for MVP |
+
+---
+
+#### Success Criteria
+
+- [ ] Can view existing `SL-360-CAMPAIGN` as a visual DAG
+- [ ] Can add/edit/delete stations
+- [ ] Can connect/disconnect tracks between stations
+- [ ] Can save changes back to the JSON file via API
+- [ ] Can create a new blank service line
+- [ ] Can export/import service lines as JSON
+
+---
+
+#### Decision Points for Review
+
+1. **Side panel vs modal** for station editing — Planning for side panel (less disruptive)
+2. **Edge labels** — Show cost/time on edges? (Yes, via custom edge or edge labels)
+3. **New station defaults** — What default metrics? (Empty/zero values, user fills in)
+4. **Auto-layout** — Add a "tidy" button later? (Deferred to future enhancement)
 
 ---
 

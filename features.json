@@ -106,22 +106,34 @@
       ],
       "dependencies": ["vitest", "vite-tsconfig-paths", "server-only"],
       "notes": "Vitest runs in Node; `server-only` is aliased to a no-op in tests to avoid throwing."
-    }
-  ],
-  "backlog": [
+    },
     {
       "id": "feat-003",
       "title": "Iron Horse: editable service line DAG (React Flow)",
       "description": "Build a React Flow canvas to create/edit service lines: nodes (stations) + edges (tracks), with save/load/import/export.",
-      "status": "backlog",
+      "status": "planning",
       "priority": "high",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
-      "phases": {},
-      "files": [],
-      "dependencies": [],
-      "notes": "Primary UX: editing service lines (not just viewing)."
-    },
+      "phases": {
+        "planning": { "completedAt": "2025-12-27T00:00:00Z" }
+      },
+      "files": [
+        "src/app/editor/page.tsx",
+        "src/app/editor/layout.tsx",
+        "src/components/dag/ServiceLineEditor.tsx",
+        "src/components/dag/StationNode.tsx",
+        "src/components/dag/TrackEdge.tsx",
+        "src/components/dag/EditorToolbar.tsx",
+        "src/components/dag/StationPanel.tsx",
+        "src/lib/dag/transforms.ts",
+        "src/hooks/useServiceLine.ts"
+      ],
+      "dependencies": ["reactflow", "@reactflow/core"],
+      "notes": "Primary UX: editing service lines (not just viewing). Rail-network aesthetic with station nodes."
+    }
+  ],
+  "backlog": [
     {
       "id": "feat-004",
       "title": "Sensors + dashboards (RAG v1)",
