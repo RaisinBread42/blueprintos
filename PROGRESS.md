@@ -178,26 +178,144 @@ Use React state + the existing API:
 
 ---
 
-#### Implementation Subtasks
+#### Implementation Iterations
 
-| # | Task | Est. Time |
-|---|------|-----------|
-| 1 | Install React Flow, set up `/editor` route | 15 min |
-| 2 | Create `transforms.ts` with bidirectional converters | 30 min |
-| 3 | Build `StationNode` custom node component | 45 min |
-| 4 | Build `ServiceLineEditor` with React Flow canvas | 45 min |
-| 5 | Build `EditorToolbar` (new, open, save, import, export) | 45 min |
-| 6 | Build `StationPanel` for editing selected node | 45 min |
-| 7 | Implement `useServiceLine` hook | 30 min |
-| 8 | Add node creation (click canvas to add) | 30 min |
-| 9 | Add edge creation (drag between handles) | 20 min |
-| 10 | Add delete functionality | 20 min |
-| 11 | Wire up save/load to API | 30 min |
-| 12 | Add import/export JSON | 30 min |
-| 13 | Polish styling + keyboard shortcuts | 30 min |
-| 14 | Write unit tests for transforms | 30 min |
+Each iteration is a testable checkpoint. After each one, you verify it works before proceeding.
 
-**Total Estimate**: ~6-7 hours
+---
+
+##### Iteration 1: View-Only DAG ⏱️ ~1 hour
+
+**Goal**: Display an existing service line as a visual DAG.
+
+| Task | Description |
+|------|-------------|
+| Install React Flow | `pnpm add reactflow` |
+| Create `/editor` route | Basic page with React Flow canvas |
+| Build `transforms.ts` | Convert ServiceLine → React Flow nodes/edges |
+| Load `SL-360-CAMPAIGN` | Fetch from API on page load |
+| Render DAG | Display nodes and edges on canvas |
+
+**You can verify**:
+- Navigate to `/editor`
+- See the 5 stations from SL-360-CAMPAIGN as boxes
+- See the 4 edges connecting them
+- Pan and zoom the canvas
+
+---
+
+##### Iteration 2: Custom Nodes + Selection Panel ⏱️ ~1 hour
+
+**Goal**: Click a station to see its details in a side panel.
+
+| Task | Description |
+|------|-------------|
+| Build `StationNode` | Custom styled node (name, department, RAG dot) |
+| Build `StationPanel` | Side panel showing selected station details |
+| Wire selection | Click node → panel shows that station's info |
+
+**You can verify**:
+- Nodes look styled (not default React Flow boxes)
+- Click a station → side panel appears with its name, department, metrics
+- Click another station → panel updates
+
+---
+
+##### Iteration 3: Edit Station Properties ⏱️ ~45 min
+
+**Goal**: Modify station properties and see changes on canvas.
+
+| Task | Description |
+|------|-------------|
+| Add form inputs to panel | Edit name, department, data source |
+| Update node on change | Changes reflect immediately on the node |
+| Mark unsaved changes | Visual indicator that there are unsaved edits |
+
+**You can verify**:
+- Select a station
+- Change its name in the panel → node label updates
+- Change department → badge updates
+- See "unsaved changes" indicator
+
+---
+
+##### Iteration 4: Add & Delete Stations ⏱️ ~45 min
+
+**Goal**: Create new stations and remove existing ones.
+
+| Task | Description |
+|------|-------------|
+| Add "New Station" button | Creates a node at center of viewport |
+| Delete selected station | Button in panel or Delete key |
+| Handle orphaned edges | Remove edges when station is deleted |
+
+**You can verify**:
+- Click "Add Station" → new node appears
+- Select it, edit name
+- Select a station, press Delete → it's removed
+- Connected edges are also removed
+
+---
+
+##### Iteration 5: Edge Management ⏱️ ~45 min
+
+**Goal**: Connect stations and edit edge weights.
+
+| Task | Description |
+|------|-------------|
+| Enable edge connections | Drag from handle to handle to create edge |
+| Edge selection | Click edge to select it |
+| Edit edge weights | Panel or popover to set cost/time |
+| Delete edges | Delete key or button |
+
+**You can verify**:
+- Drag from one station to another → edge created
+- Click an edge → see its weight
+- Edit weight → edge updates
+- Delete edge → it's removed
+
+---
+
+##### Iteration 6: Save & Load ⏱️ ~45 min
+
+**Goal**: Persist changes and load different service lines.
+
+| Task | Description |
+|------|-------------|
+| Build `EditorToolbar` | Top bar with actions |
+| Save button | POST/PUT to API, clears unsaved indicator |
+| Open dropdown | List available service lines |
+| Load service line | Fetch and display selected one |
+| `useServiceLine` hook | Encapsulate fetch/save logic |
+
+**You can verify**:
+- Make changes, click Save
+- Refresh page → changes persisted
+- Open dropdown, select `SL-RADIO-SPOT` → loads different service line
+- Edit it, save, switch back → both persisted
+
+---
+
+##### Iteration 7: Create New & Import/Export ⏱️ ~45 min
+
+**Goal**: Start fresh and transfer service lines as JSON files.
+
+| Task | Description |
+|------|-------------|
+| "New" button | Prompts for ID/name, creates blank service line |
+| Export button | Downloads current service line as `.json` file |
+| Import button | File picker, loads JSON into editor |
+| Validation | Validate imported JSON matches schema |
+
+**You can verify**:
+- Click New → enter name → blank canvas
+- Add a few stations, save
+- Click Export → downloads JSON file
+- Edit JSON externally, Import → changes appear
+
+---
+
+**Total Estimate**: ~6 hours across 7 iterations
 
 ---
 
