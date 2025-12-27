@@ -6,7 +6,17 @@
 
 ## Current Focus
 
-**No active feature.** Use `/plan [description]` to start a new feature.
+**No active feature.** Next up: **feat-003 (Iron Horse: editable service line DAG)**.
+
+### Roadmap (kept intentionally lightweight)
+
+- **Foundations**: Standard Gauge schema/types + local JSON persistence (no DB)
+- **Phase 1 (Iron Horse)**: Editable service line DAG (React Flow) with save/load + import/export
+- **Phase 2**: Sensors + dashboards + RAG overlays
+- **Phase 3**: Synthetic data + sandbox simulation (scenarios)
+- **Phase 4**: Dispatcher v1 rule-based reports/alerts (**AI integration later**)
+
+> Note: as each phase is implemented, we’ll update docs (`VISION.md`, `PROGRESS.md`, and `features.json`) to reflect any scope/UX evolution so the repo stays current.
 
 ---
 
@@ -16,7 +26,7 @@
 | --------------------- | ---------- |
 | Features Completed    | 1          |
 | Currently In Progress | 0          |
-| Backlog Items         | 0          |
+| Backlog Items         | 4          |
 | Last Updated          | 2025-12-27 |
 
 ---
@@ -28,7 +38,7 @@ These rules are validated after every implementation:
 | Rule                    | Status              |
 | ----------------------- | ------------------- |
 | No TanStack/React Query | ✅ Validated        |
-| No Testing Libraries    | ✅ Validated        |
+| Unit Tests Required     | ✅ Enabled (Vitest) |
 | Recharts for Charts     | ✅ Validated        |
 | shadcn/ui Components    | ✅ Validated        |
 | Tailwind CSS v3.4.x     | ✅ Validated (v3.4.19) |
@@ -84,6 +94,25 @@ Initial project setup with the full tech stack:
 
 ---
 
+### feat-002: Local JSON persistence for Service Lines (no DB)
+
+**Status**: implemented  
+**Complexity**: M  
+**Completed**: 2025-12-27
+
+#### Summary
+
+Added local JSON file storage for Standard Gauge `ServiceLine` objects plus minimal validation/normalization:
+
+* Server-only filesystem helpers in `src/lib/storage/serviceLines.ts`
+* CRUD API routes:
+  * `GET/POST /api/service-lines`
+  * `GET/PUT/DELETE /api/service-lines/[id]`
+* Seed service lines in `data/service-lines/*.json`
+* Normalization keeps `labor_variance` and `updated_at` consistent on write
+
+---
+
 ## Session Notes
 
 ### Getting Started
@@ -116,7 +145,7 @@ Welcome to the project! Here's how to use the workflow:
 * **Data Fetching**: Use fetch, Server Actions, or SWR (not TanStack Query)
 * **UI Components**: Use shadcn/ui from `@/components/ui`
 * **Styling**: Tailwind CSS v3.4.x (not v4.x)
-* **No Tests**: This project doesn't use testing libraries
+* **Unit Tests**: Run `pnpm test` and do not proceed/merge with failing tests
 
 ---
 

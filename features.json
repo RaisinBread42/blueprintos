@@ -50,8 +50,113 @@
         "lucide-react"
       ],
       "notes": "Full tech stack setup per CLAUDE.md specifications"
+    },
+    {
+      "id": "feat-002",
+      "title": "Standard Gauge types + local JSON file storage",
+      "description": "Implement local JSON persistence (no database) and minimal runtime validation/normalization for Standard Gauge service lines.",
+      "status": "implemented",
+      "priority": "high",
+      "complexity": "M",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {
+        "planning": { "completedAt": "2025-12-27T00:00:00Z" },
+        "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
+        "implemented": { "completedAt": "2025-12-27T00:00:00Z" }
+      },
+      "files": [
+        "data/service-lines/SL-360-CAMPAIGN.json",
+        "data/service-lines/SL-RADIO-SPOT.json",
+        "src/lib/blueprint/normalize.ts",
+        "src/lib/blueprint/validate.ts",
+        "src/lib/storage/serviceLines.ts",
+        "src/app/api/service-lines/route.ts",
+        "src/app/api/service-lines/[id]/route.ts"
+      ],
+      "dependencies": [],
+      "notes": "IDs are sanitized; persistence is server-only; normalization keeps labor_variance and updated_at consistent."
+    },
+    {
+      "id": "feat-007",
+      "title": "Unit tests + workflow gate (Vitest)",
+      "description": "Add unit test runner and require tests to pass as part of the standard implementation quality gates.",
+      "status": "implemented",
+      "priority": "high",
+      "complexity": "M",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {
+        "planning": { "completedAt": "2025-12-27T00:00:00Z" },
+        "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
+        "implemented": { "completedAt": "2025-12-27T00:00:00Z" }
+      },
+      "files": [
+        "vitest.config.ts",
+        "src/test/noopServerOnly.ts",
+        "src/lib/blueprint/normalize.test.ts",
+        "src/lib/blueprint/validate.test.ts",
+        "src/lib/storage/serviceLines.test.ts",
+        "CLAUDE.md",
+        "PROGRESS.md",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "dependencies": ["vitest", "vite-tsconfig-paths", "server-only"],
+      "notes": "Vitest runs in Node; `server-only` is aliased to a no-op in tests to avoid throwing."
     }
   ],
-  "backlog": []
+  "backlog": [
+    {
+      "id": "feat-003",
+      "title": "Iron Horse: editable service line DAG (React Flow)",
+      "description": "Build a React Flow canvas to create/edit service lines: nodes (stations) + edges (tracks), with save/load/import/export.",
+      "status": "backlog",
+      "priority": "high",
+      "complexity": "L",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": [],
+      "notes": "Primary UX: editing service lines (not just viewing)."
+    },
+    {
+      "id": "feat-004",
+      "title": "Sensors + dashboards (RAG v1)",
+      "description": "Station metric editor, derived rollups, and basic Recharts dashboards; compute and display RAG overlays.",
+      "status": "backlog",
+      "priority": "medium",
+      "complexity": "L",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": [],
+      "notes": "Focus on making the JSON actionable before any AI narration."
+    },
+    {
+      "id": "feat-005",
+      "title": "Synthetic data generator + sandbox simulation",
+      "description": "Generate realistic mock station metrics and add scenario sliders to stress-test service lines; allow save/compare scenarios locally.",
+      "status": "backlog",
+      "priority": "medium",
+      "complexity": "L",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": [],
+      "notes": "Enables Phase 3 'Simulation & Sensor Suite' without live integrations."
+    },
+    {
+      "id": "feat-006",
+      "title": "Dispatcher v1 (rule-based reports + alerts)",
+      "description": "Generate deterministic dispatcher reports and global alerts from current JSON state; AI integration comes later.",
+      "status": "backlog",
+      "priority": "low",
+      "complexity": "M",
+      "createdAt": "2025-12-27T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": [],
+      "notes": "AI integration explicitly deferred; keep alerts decoupled and derived at runtime."
+    }
+  ]
 }
 

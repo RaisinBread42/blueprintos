@@ -68,12 +68,15 @@ Claude executes the plan with quality gates:
 □ Write/modify code files
 □ Run: pnpm lint --fix
 □ Run: pnpm tsc --noEmit (clear type errors)
+□ Run: pnpm test (unit tests must pass)
 □ Run: pnpm build (clear build errors)
 □ Fix any errors found (loop until clean)
 □ Validate Stack Rules (see below)
 □ Update features.json status to "implemented"
 □ Log implementation details in PROGRESS.md
 ```
+
+If `pnpm test` fails, Claude MUST stop and surface the failing output + recommended next steps for the developer before proceeding.
 
 ##### Stack Rules Validation (MANDATORY)
 
@@ -82,7 +85,7 @@ After implementation, Claude MUST verify:
 | Rule                        | Check                                                             | Fix If Violated                                          |
 | --------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
 | **No TanStack/React Query** | Search for @tanstack, react-query, useQuery, useMutation          | Remove and use native fetch/SWR or server actions        |
-| **No Testing Libraries**    | Search for jest, vitest, @testing-library, \*.test.\*, \*.spec.\* | Remove test files and dependencies                       |
+| **Unit Tests Required**     | Run `pnpm test`                                                   | Fix failing tests or adjust implementation; do not merge |
 | **Recharts for Graphs**     | Any chart/graph uses recharts                                     | Replace Chart.js, D3 direct, Victory, etc. with Recharts |
 | **shadcn/ui Components**    | UI components from @/components/ui                                | Install via npx shadcn@latest add \[component\]          |
 | **Tailwind CSS v3.4.x**     | Check tailwindcss version in package.json                         | Downgrade if v4.x detected                               |
@@ -205,7 +208,7 @@ These rules are enforced after every implementation:
 | Rule                        | Allowed                           | NOT Allowed                                    |
 | --------------------------- | --------------------------------- | ---------------------------------------------- |
 | **Data Fetching**           | fetch, Server Actions, SWR        | TanStack Query, React Query                    |
-| **Testing**                 | None (no tests in this project)   | Jest, Vitest, @testing-library                 |
+| **Testing**                 | Vitest unit tests (`pnpm test`)   | Skipping tests / merging with failing tests    |
 | **Charts**                  | Recharts                          | Chart.js, D3 direct, Victory, Nivo             |
 | **UI Components**           | shadcn/ui (@/components/ui)       | Material UI, Chakra, Ant Design                |
 | **Styling**                 | Tailwind CSS v3.4.x               | Tailwind v4.x, styled-components, CSS Modules  |
@@ -260,5 +263,8 @@ pnpm lint
 
 # Build
 pnpm build
+
+# Unit tests
+pnpm test
 ```
 
