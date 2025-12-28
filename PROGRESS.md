@@ -88,6 +88,8 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
   4) Dashboard resolves shared metrics; scenario mode overlays per-line deltas; rollups/charts use resolved data.
   5) Cleanup: enforce validation that service lines cannot embed metrics; add basic `/api/stations` list/check; handle missing stations gracefully.
 
+**Simulation/AI alignment:** Synthetic generation, capacity simulation, and AI what-if should operate on the shared station catalog as the base; per-line scenarios stay as overlays applied at view time. RAG/rollups compute on resolved metrics (shared + overlay).
+
 #### Success Criteria
 
 - [ ] Generate mock metrics per station with realistic ranges
