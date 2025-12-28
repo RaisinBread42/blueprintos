@@ -64,7 +64,7 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 | 1 | Synthetic generator core | ~45 min | ✅ complete (`d850235`) |
 | 2 | Scenario sliders (labor/time/quality) | ~45 min | ✅ complete (`15ffa7a`) |
 | 3 | Apply scenarios to service lines (in-memory) | ~45 min | ✅ complete (`709c90e`) |
-| 4 | Save/restore scenarios locally | ~45 min | 🚧 in progress |
+| 4 | Save/restore scenarios locally | ~45 min | ✅ complete (`ebbfe90`) |
 | 5 | Dashboard toggle (base vs scenario) | ~45 min | ⏳ pending |
 
 #### Progress
@@ -72,6 +72,7 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 - Iteration 1: Added synthetic station metric generator with overrides and tests.  
 - Iteration 2: Added additive scenario sliders (labor/time/quality) applied in-memory to view/RAG; base data untouched until save.
 - Iteration 3: Scenario export (view-only) and build fixes; scenario-adjusted snapshot download without persisting changes.
+- Iteration 4: Added local scenario save/load/reset (per service line) using browser storage; auto-loads per service line on switch.
 
 #### Success Criteria
 
