@@ -26,33 +26,15 @@ function defaultPayload(): ScenarioPayload {
   return { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
 }
 
-function normalizeFileData(raw: unknown): ScenarioFile {
-  // Legacy shape: { laborDelta, timeDelta, qualityDelta }
-  if (
-    raw &&
-    typeof raw === "object" &&
-    "laborDelta" in raw &&
-    "timeDelta" in raw &&
-    "qualityDelta" in raw &&
-    !("scenarios" in raw)
-  ) {
-    return { scenarios: { default: raw as ScenarioPayload } };
-  }
-
-  // New shape
-  if (raw && typeof raw === "object" && "scenarios" in raw) {
-    const scenarios = (raw as { scenarios: Record<string, ScenarioPayload> }).scenarios ?? {};
-    return { scenarios };
-  }
-
-  return { scenarios: {} };
-}
-
 async function readFile(id: string): Promise<ScenarioFile> {
   await ensureDir();
   const file = filePath(id);
   const content = await fs.readFile(file, "utf8");
-  return normalizeFileData(JSON.parse(content));
+  const parsed = JSON.parse(content) as Partial<ScenarioFile>;
+  if (!parsed.scenarios || typeof parsed.scenarios !== "object") {
+    return { scenarios: {} };
+  }
+  return { scenarios: parsed.scenarios };
 }
 
 async function writeFile(id: string, data: ScenarioFile) {
