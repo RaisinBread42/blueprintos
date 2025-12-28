@@ -34,7 +34,9 @@ function StationNodeComponent({ data, selected }: NodeProps<StationNodeData>) {
 
       {/* Header with RAG indicator */}
       <div className="flex items-center gap-2 border-b border-slate-800 px-3 py-2">
-        <div className={`h-2.5 w-2.5 rounded-full ${ragDisplay.bgSolid}`} />
+        <div
+          className={`h-3 w-3 rounded-full ${ragDisplay.bgSolid} ring-2 ring-slate-900 ring-offset-1 ring-offset-slate-950 shadow`}
+        />
         <span className="font-semibold text-white text-sm truncate flex-1">
           {data.name}
         </span>
