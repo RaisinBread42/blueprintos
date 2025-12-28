@@ -21,7 +21,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import type { ServiceLine, RAGStatus } from "@/types";
+import type { ServiceLine, RAGStatus, StationMetrics } from "@/types";
 import {
   serviceLineToFlow,
   flowToServiceLine,
@@ -116,6 +116,13 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
   // Open dropdown state
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
+
+  // Scenario sliders (in-memory only), additive deltas (no scaling)
+  const [scenario, setScenario] = useState({
+    laborDelta: 0, // +/- hours applied to actual_hrs
+    timeDelta: 0, // +/- hours applied to planned_hrs
+    qualityDelta: 0, // +/- points applied to QA/benchmark
+  });
 
   // New service line dialog state
   const [showNewDialog, setShowNewDialog] = useState(false);
@@ -356,14 +363,58 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     event.target.value = "";
   }, [onImport]);
 
-  // Map of node id -> computed RAG
+  // Apply scenario multipliers to metrics (in-memory, non-persistent)
+  const applyScenarioToMetrics = useCallback(
+    (metrics: StationMetrics): StationMetrics => {
+      const planned = Math.max(0, metrics.fair_pricing.planned_hrs + scenario.timeDelta);
+      const actual = Math.max(0, metrics.fair_pricing.actual_hrs + scenario.laborDelta);
+      const labor_variance = actual - planned;
+
+      const qa_score = Math.min(10, Math.max(0, metrics.world_class.internal_qa_score + scenario.qualityDelta));
+      const benchmark =
+        metrics.world_class.industry_benchmark !== undefined
+          ? Math.min(10, Math.max(0, metrics.world_class.industry_benchmark + scenario.qualityDelta))
+          : undefined;
+      const standard_met = benchmark === undefined ? metrics.world_class.standard_met : qa_score >= benchmark;
+
+      return {
+        fair_pricing: {
+          ...metrics.fair_pricing,
+          planned_hrs: planned,
+          actual_hrs: actual,
+          labor_variance,
+        },
+        world_class: {
+          ...metrics.world_class,
+          internal_qa_score: qa_score,
+          industry_benchmark: benchmark,
+          standard_met,
+        },
+        performance_proof: { ...metrics.performance_proof },
+      };
+    },
+    [scenario]
+  );
+
+  // Derived nodes with scenario applied (used for rendering only)
+  const nodesForView = useMemo(() => {
+    return nodes.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        metrics: applyScenarioToMetrics(node.data.metrics),
+      },
+    }));
+  }, [nodes, applyScenarioToMetrics]);
+
+  // Map of node id -> computed RAG (view)
   const nodeRagMap = useMemo(() => {
     const map = new Map<string, RAGStatus>();
-    nodes.forEach((node) => {
+    nodesForView.forEach((node) => {
       map.set(node.id, computeStationRag(node.data.metrics, node.data.rag_status));
     });
     return map;
-  }, [nodes]);
+  }, [nodesForView]);
 
   const ragColor = (status: RAGStatus) => {
     switch (status) {
@@ -396,19 +447,23 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   }, [edges, nodeRagMap]);
 
   // Service line rollup (totals, averages, overall rag)
-  const rollup = useMemo(() => computeServiceLineRollup({
-    ...serviceLine,
-    nodes: nodes.map((n) => ({
-      station_id: n.data.station_id,
-      name: n.data.name,
-      department: n.data.department,
-      data_source: n.data.data_source,
-      metrics: n.data.metrics,
-      rag_status: n.data.rag_status,
-      position: n.position,
-    })),
-    edges: [], // rollup currently only needs nodes
-  }), [serviceLine, nodes]);
+  const rollup = useMemo(
+    () =>
+      computeServiceLineRollup({
+        ...serviceLine,
+        nodes: nodesForView.map((n) => ({
+          station_id: n.data.station_id,
+          name: n.data.name,
+          department: n.data.department,
+          data_source: n.data.data_source,
+          metrics: n.data.metrics,
+          rag_status: n.data.rag_status,
+          position: n.position,
+        })),
+        edges: [], // rollup currently only needs nodes
+      }),
+    [serviceLine, nodesForView]
+  );
 
   return (
     <div className="flex h-full w-full">
@@ -486,7 +541,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
             {/* Dashboard link */}
             <Link
               href="/dashboard"
@@ -617,11 +672,44 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               <span>{edges.length} tracks</span>
             </div>
           </div>
+
+          {/* Scenario sliders */}
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
+          {[
+            { key: "laborDelta", label: "Labor Δ (actual hrs)", min: -20, max: 20, unit: "hrs" },
+            { key: "timeDelta", label: "Time Δ (planned hrs)", min: -20, max: 20, unit: "hrs" },
+            { key: "qualityDelta", label: "Quality Δ (QA pts)", min: -5, max: 5, unit: "pts" },
+          ].map((s) => (
+            <div key={s.key} className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-slate-200">{s.label}</span>
+                <span className="text-slate-400 font-mono">
+                  {scenario[s.key as keyof typeof scenario] >= 0 ? "+" : ""}
+                  {scenario[s.key as keyof typeof scenario]} {s.unit}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={s.min}
+                max={s.max}
+                step={1}
+                value={scenario[s.key as keyof typeof scenario] as number}
+                onChange={(e) =>
+                  setScenario((prev) => ({
+                    ...prev,
+                    [s.key]: parseInt(e.target.value, 10),
+                  }))
+                }
+                className="w-full accent-emerald-500"
+              />
+            </div>
+          ))}
+          </div>
         </div>
 
         {/* React Flow Canvas */}
         <ReactFlow
-          nodes={nodes}
+          nodes={nodesForView}
           edges={coloredEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
