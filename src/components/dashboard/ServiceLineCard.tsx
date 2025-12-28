@@ -8,9 +8,11 @@ import { getRagDisplay } from "@/lib/rag/compute";
 
 interface ServiceLineCardProps {
   serviceLine: ServiceLine;
+  expanded?: boolean;
+  onToggleBreakdown?: () => void;
 }
 
-export function ServiceLineCard({ serviceLine }: ServiceLineCardProps) {
+export function ServiceLineCard({ serviceLine, expanded, onToggleBreakdown }: ServiceLineCardProps) {
   const rollup = computeServiceLineRollup(serviceLine);
   const rag = getRagDisplay(rollup.overall_rag);
 
@@ -57,6 +59,14 @@ export function ServiceLineCard({ serviceLine }: ServiceLineCardProps) {
           Open Editor
           <ArrowRight className="h-4 w-4" />
         </Link>
+        {onToggleBreakdown && (
+          <button
+            onClick={onToggleBreakdown}
+            className="text-slate-400 hover:text-white text-xs border border-slate-700/50 rounded-md px-2 py-1 transition-colors hover:bg-slate-800"
+          >
+            {expanded ? "Hide breakdown" : "View breakdown"}
+          </button>
+        )}
       </div>
     </div>
   );

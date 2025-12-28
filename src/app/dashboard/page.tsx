@@ -6,11 +6,13 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
+import { useState, useMemo } from "react";
 
 export default function DashboardPage() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function load() {
@@ -73,16 +75,25 @@ export default function DashboardPage() {
           <p className="text-slate-400">No service lines found.</p>
         ) : (
           <>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-              {serviceLines.map((sl) => (
-                <ServiceLineCard key={sl.service_line_id} serviceLine={sl} />
-              ))}
-            </div>
-
-            <div className="grid gap-4">
-              {serviceLines.map((sl) => (
-                <VarianceChart key={`variance-${sl.service_line_id}`} serviceLine={sl} />
-              ))}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {serviceLines.map((sl) => {
+                const isOpen = expanded[sl.service_line_id] ?? false;
+                return (
+                  <div key={sl.service_line_id} className="space-y-3">
+                    <ServiceLineCard
+                      serviceLine={sl}
+                      expanded={isOpen}
+                      onToggleBreakdown={() =>
+                        setExpanded((prev) => ({
+                          ...prev,
+                          [sl.service_line_id]: !isOpen,
+                        }))
+                      }
+                    />
+                    {isOpen && <VarianceChart serviceLine={sl} height={160} title="Variance by Station" />}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

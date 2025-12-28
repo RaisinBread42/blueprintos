@@ -14,6 +14,8 @@ import { computeStationRag, getRagDisplay } from "@/lib/rag/compute";
 
 interface VarianceChartProps {
   serviceLine: ServiceLine;
+  height?: number;
+  title?: string;
 }
 
 const ragColor = (rag: string) => {
@@ -28,7 +30,7 @@ const ragColor = (rag: string) => {
   }
 };
 
-export function VarianceChart({ serviceLine }: VarianceChartProps) {
+export function VarianceChart({ serviceLine, height = 180, title = "Variance by Station" }: VarianceChartProps) {
   const data = serviceLine.nodes.map((node) => {
     const rag = computeStationRag(node.metrics, node.rag_status);
     return {
@@ -64,12 +66,12 @@ export function VarianceChart({ serviceLine }: VarianceChartProps) {
     <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-sm font-semibold text-white">Variance by Station</h3>
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
           <p className="text-xs text-slate-500">Labor variance (hours) colored by RAG</p>
         </div>
         <span className="text-xs text-slate-500">{serviceLine.name}</span>
       </div>
-      <div className="h-64">
+      <div style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: -10, bottom: 16 }}>
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
