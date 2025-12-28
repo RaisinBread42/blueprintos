@@ -12,6 +12,8 @@ function EditorPageInner() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [missingId, setMissingId] = useState<string | null>(null);
+  const [newNameInput, setNewNameInput] = useState("New Service Line");
 
   // Load all service lines for the dropdown
   const loadServiceLines = useCallback(async () => {
@@ -33,6 +35,11 @@ function EditorPageInner() {
     try {
       const response = await fetch(`/api/service-lines/${encodeURIComponent(id)}`);
       if (!response.ok) {
+        if (response.status === 404) {
+          setServiceLine(null);
+          setMissingId(id);
+          return;
+        }
         throw new Error(`Failed to load: ${response.statusText}`);
       }
       const json = await response.json();
@@ -40,6 +47,7 @@ function EditorPageInner() {
         throw new Error(json.error || "Invalid response");
       }
       setServiceLine(json.data);
+      setMissingId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load service line");
     } finally {
@@ -138,7 +146,53 @@ function EditorPageInner() {
   if (!serviceLine) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <p className="text-slate-400">No service line found</p>
+        <div className="rounded-lg border border-slate-700 bg-slate-900 px-6 py-5 shadow-lg text-slate-200 space-y-3 w-full max-w-md">
+          <div className="text-lg font-semibold text-white">No service line found</div>
+          <p className="text-sm text-slate-400">
+            {missingId
+              ? `Service line "${missingId}" does not exist yet. Create it to continue.`
+              : "No service line available. Create a new one to get started."}
+          </p>
+          <div className="space-y-2">
+            <label className="block text-sm text-slate-400">Service Line ID</label>
+            <input
+              type="text"
+              value={missingId ?? ""}
+              onChange={(e) => setMissingId(e.target.value)}
+              className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              placeholder="e.g. SL-MY-LINE"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm text-slate-400">Name</label>
+            <input
+              type="text"
+              value={newNameInput}
+              onChange={(e) => setNewNameInput(e.target.value)}
+              className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              placeholder="e.g. New Workflow"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => loadServiceLines().then(() => loadServiceLine(requestedId))}
+              className="text-sm text-slate-400 hover:text-white"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => {
+                const id = (missingId ?? "").trim();
+                const name = newNameInput.trim() || "New Service Line";
+                if (!id) return;
+                createServiceLine(id, name);
+              }}
+              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition"
+            >
+              Create & Open
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
