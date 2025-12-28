@@ -129,31 +129,32 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
   const [scenario, setScenario] = useState(defaultScenario);
 
-  const loadScenarioFromStorage = useCallback(
-    (id: string) => {
+  // Load scenario from local server storage
+  const loadScenarioFromServer = useCallback(
+    async (id: string) => {
       try {
-        const raw = localStorage.getItem(`scenario:${id}`);
-        if (raw) {
-          const parsed = JSON.parse(raw);
+        const res = await fetch(`/api/scenarios/${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error("not found");
+        const json = await res.json();
+        if (json.success && json.data) {
           setScenario({
-            laborDelta: parsed.laborDelta ?? 0,
-            timeDelta: parsed.timeDelta ?? 0,
-            qualityDelta: parsed.qualityDelta ?? 0,
+            laborDelta: json.data.laborDelta ?? 0,
+            timeDelta: json.data.timeDelta ?? 0,
+            qualityDelta: json.data.qualityDelta ?? 0,
           });
           return;
         }
       } catch {
-        // ignore parse/storage errors
+        setScenario(defaultScenario);
       }
-      setScenario(defaultScenario);
     },
     [defaultScenario]
   );
 
   // Reload scenario whenever the service line changes
   useEffect(() => {
-    loadScenarioFromStorage(serviceLine.service_line_id);
-  }, [serviceLine.service_line_id, loadScenarioFromStorage]);
+    loadScenarioFromServer(serviceLine.service_line_id);
+  }, [serviceLine.service_line_id, loadScenarioFromServer]);
 
   // New service line dialog state
   const [showNewDialog, setShowNewDialog] = useState(false);
@@ -776,17 +777,14 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               variant="ghost"
               size="sm"
               className="border border-emerald-700/60 text-emerald-100 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
-              onClick={() => {
-                try {
-                  localStorage.setItem(
-                    `scenario:${serviceLine.service_line_id}`,
-                    JSON.stringify(scenario)
-                  );
-                } catch {
-                  // ignore storage errors silently
-                }
+              onClick={async () => {
+                await fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(scenario),
+                });
               }}
-              title="Save scenario deltas locally (browser only)"
+              title="Save scenario deltas locally on server"
             >
               Save Scenario (local)
             </Button>
@@ -794,24 +792,8 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               variant="ghost"
               size="sm"
               className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
-              onClick={() => {
-                try {
-                  const raw = localStorage.getItem(`scenario:${serviceLine.service_line_id}`);
-                  if (raw) {
-                    const parsed = JSON.parse(raw);
-                    setScenario({
-                      laborDelta: parsed.laborDelta ?? 0,
-                      timeDelta: parsed.timeDelta ?? 0,
-                      qualityDelta: parsed.qualityDelta ?? 0,
-                    });
-                  } else {
-                    setScenario(defaultScenario);
-                  }
-                } catch {
-                  setScenario(defaultScenario);
-                }
-              }}
-              title="Load saved scenario deltas for this service line (browser only)"
+              onClick={() => loadScenarioFromServer(serviceLine.service_line_id)}
+              title="Load saved scenario deltas for this service line (server file)"
             >
               Load Scenario
             </Button>
@@ -821,11 +803,9 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
               onClick={() => {
                 setScenario(defaultScenario);
-                try {
-                  localStorage.removeItem(`scenario:${serviceLine.service_line_id}`);
-                } catch {
-                  // ignore
-                }
+                fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
+                  method: "DELETE",
+                });
               }}
               title="Reset scenario deltas to zero"
             >
