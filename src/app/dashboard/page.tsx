@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Loader2, ArrowLeft } from "lucide-react";
 import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 
@@ -58,6 +59,13 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-semibold text-white">Service Line Dashboard</h1>
             <p className="text-slate-400 text-sm">Overview of all service lines and their health</p>
           </div>
+          <Link
+            href="/editor"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-700/50 px-3 py-2 text-sm text-slate-300 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Editor
+          </Link>
         </div>
 
         {serviceLines.length === 0 ? (
