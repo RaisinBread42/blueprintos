@@ -10,6 +10,10 @@ type ScenarioPayload = {
   qualityDelta: number;
 };
 
+type ScenarioFile = {
+  scenarios: Record<string, ScenarioPayload>;
+};
+
 async function ensureDir() {
   await fs.mkdir(SCENARIO_DIR, { recursive: true });
 }
@@ -22,20 +26,51 @@ function defaultPayload(): ScenarioPayload {
   return { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
 }
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+async function readFile(id: string): Promise<ScenarioFile> {
+  await ensureDir();
+  const file = filePath(id);
+  const content = await fs.readFile(file, "utf8");
+  return JSON.parse(content) as ScenarioFile;
+}
+
+async function writeFile(id: string, data: ScenarioFile) {
+  await ensureDir();
+  const file = filePath(id);
+  await fs.writeFile(file, JSON.stringify(data, null, 2), "utf8");
+}
+
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    await ensureDir();
-    const file = filePath(params.id);
-    const content = await fs.readFile(file, "utf8");
-    const json = JSON.parse(content) as ScenarioPayload;
-    return NextResponse.json({ success: true, data: json });
-  } catch (err) {
-    // If missing, return default payload with success to avoid 404 noise client-side
-    type NodeErr = { code?: string };
-    const code = (err as NodeErr | undefined)?.code;
-    if (code === "ENOENT") {
-      return NextResponse.json({ success: true, data: defaultPayload() });
+    const url = new URL(req.url);
+    const name = url.searchParams.get("name");
+    let fileData: ScenarioFile | null = null;
+    try {
+      fileData = await readFile(params.id);
+    } catch (err) {
+      const code = (err as { code?: string } | undefined)?.code;
+      if (code === "ENOENT") {
+        return NextResponse.json({
+          success: true,
+          data: { scenario: defaultPayload(), names: [] },
+        });
+      }
+      throw err;
     }
+
+    const names = Object.keys(fileData.scenarios);
+    if (!name) {
+      return NextResponse.json({
+        success: true,
+        data: { scenario: null, names },
+      });
+    }
+
+    const scenario = fileData.scenarios[name] ?? defaultPayload();
+    return NextResponse.json({
+      success: true,
+      data: { scenario, names },
+    });
+  } catch (err) {
     const message = err instanceof Error ? err.message : "Not found";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
@@ -43,28 +78,68 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
+    const url = new URL(req.url);
+    const name = url.searchParams.get("name") || "default";
     const body = (await req.json()) as Partial<ScenarioPayload>;
     const payload: ScenarioPayload = {
       laborDelta: body.laborDelta ?? 0,
       timeDelta: body.timeDelta ?? 0,
       qualityDelta: body.qualityDelta ?? 0,
     };
-    await ensureDir();
-    const file = filePath(params.id);
-    await fs.writeFile(file, JSON.stringify(payload, null, 2), "utf8");
-    return NextResponse.json({ success: true, data: payload });
+
+    let fileData: ScenarioFile = { scenarios: {} };
+    try {
+      fileData = await readFile(params.id);
+    } catch (err) {
+      const code = (err as { code?: string } | undefined)?.code;
+      if (code !== "ENOENT") throw err;
+    }
+
+    fileData.scenarios[name] = payload;
+    await writeFile(params.id, fileData);
+
+    return NextResponse.json({
+      success: true,
+      data: { scenario: payload, names: Object.keys(fileData.scenarios) },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to save scenario";
     return NextResponse.json({ success: false, error: message }, { status: 400 });
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    await ensureDir();
-    const file = filePath(params.id);
-    await fs.rm(file, { force: true });
-    return NextResponse.json({ success: true, data: defaultPayload() });
+    const url = new URL(req.url);
+    const name = url.searchParams.get("name");
+
+    let fileData: ScenarioFile = { scenarios: {} };
+    try {
+      fileData = await readFile(params.id);
+    } catch (err) {
+      const code = (err as { code?: string } | undefined)?.code;
+      if (code !== "ENOENT") throw err;
+      return NextResponse.json({ success: true, data: { scenario: defaultPayload(), names: [] } });
+    }
+
+    if (name) {
+      delete fileData.scenarios[name];
+      if (Object.keys(fileData.scenarios).length === 0) {
+        await fs.rm(filePath(params.id), { force: true });
+        return NextResponse.json({
+          success: true,
+          data: { scenario: defaultPayload(), names: [] },
+        });
+      }
+      await writeFile(params.id, fileData);
+      return NextResponse.json({
+        success: true,
+        data: { scenario: defaultPayload(), names: Object.keys(fileData.scenarios) },
+      });
+    }
+
+    await fs.rm(filePath(params.id), { force: true });
+    return NextResponse.json({ success: true, data: { scenario: defaultPayload(), names: [] } });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to delete scenario";
     return NextResponse.json({ success: false, error: message }, { status: 400 });

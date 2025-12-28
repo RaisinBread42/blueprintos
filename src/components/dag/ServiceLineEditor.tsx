@@ -128,6 +128,10 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   );
 
   const [scenario, setScenario] = useState(defaultScenario);
+  const [scenarioNames, setScenarioNames] = useState<string[]>([]);
+  const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
+  const [scenarioModalMode, setScenarioModalMode] = useState<"save" | "load">("load");
+  const [scenarioNameInput, setScenarioNameInput] = useState("");
 
   // Load scenario from local server storage
   const loadScenarioFromServer = useCallback(
@@ -140,10 +144,14 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
         }
         const json = await res.json();
         if (json.success && json.data) {
+          if (Array.isArray(json.data.names)) {
+            setScenarioNames(json.data.names);
+          }
+          const sc = json.data.scenario ?? json.data;
           setScenario({
-            laborDelta: json.data.laborDelta ?? 0,
-            timeDelta: json.data.timeDelta ?? 0,
-            qualityDelta: json.data.qualityDelta ?? 0,
+            laborDelta: sc.laborDelta ?? 0,
+            timeDelta: sc.timeDelta ?? 0,
+            qualityDelta: sc.qualityDelta ?? 0,
           });
           return;
         }
@@ -743,35 +751,35 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
           {/* Scenario sliders */}
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
-          {[
-            { key: "laborDelta", label: "Labor Δ (actual hrs)", min: -20, max: 20, unit: "hrs" },
-            { key: "timeDelta", label: "Time Δ (planned hrs)", min: -20, max: 20, unit: "hrs" },
-            { key: "qualityDelta", label: "Quality Δ (QA pts)", min: -5, max: 5, unit: "pts" },
-          ].map((s) => (
-            <div key={s.key} className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-200">{s.label}</span>
-                <span className="text-slate-400 font-mono">
-                  {scenario[s.key as keyof typeof scenario] >= 0 ? "+" : ""}
-                  {scenario[s.key as keyof typeof scenario]} {s.unit}
-                </span>
+            {[
+              { key: "laborDelta", label: "Labor Δ (actual hrs)", min: -20, max: 20, unit: "hrs" },
+              { key: "timeDelta", label: "Time Δ (planned hrs)", min: -20, max: 20, unit: "hrs" },
+              { key: "qualityDelta", label: "Quality Δ (QA pts)", min: -5, max: 5, unit: "pts" },
+            ].map((s) => (
+              <div key={s.key} className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-200">{s.label}</span>
+                  <span className="text-slate-400 font-mono">
+                    {scenario[s.key as keyof typeof scenario] >= 0 ? "+" : ""}
+                    {scenario[s.key as keyof typeof scenario]} {s.unit}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={s.min}
+                  max={s.max}
+                  step={1}
+                  value={scenario[s.key as keyof typeof scenario] as number}
+                  onChange={(e) =>
+                    setScenario((prev) => ({
+                      ...prev,
+                      [s.key]: parseInt(e.target.value, 10),
+                    }))
+                  }
+                  className="w-full accent-emerald-500"
+                />
               </div>
-              <input
-                type="range"
-                min={s.min}
-                max={s.max}
-                step={1}
-                value={scenario[s.key as keyof typeof scenario] as number}
-                onChange={(e) =>
-                  setScenario((prev) => ({
-                    ...prev,
-                    [s.key]: parseInt(e.target.value, 10),
-                  }))
-                }
-                className="w-full accent-emerald-500"
-              />
-            </div>
-          ))}
+            ))}
           </div>
 
           {/* Scenario actions */}
@@ -780,12 +788,10 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               variant="ghost"
               size="sm"
               className="border border-emerald-700/60 text-emerald-100 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
-              onClick={async () => {
-                await fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(scenario),
-                });
+              onClick={() => {
+                setScenarioModalMode("save");
+                setScenarioNameInput("");
+                setScenarioModalOpen(true);
               }}
               title="Save scenario deltas locally on server"
             >
@@ -795,7 +801,11 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               variant="ghost"
               size="sm"
               className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
-              onClick={() => loadScenarioFromServer(serviceLine.service_line_id)}
+              onClick={() => {
+                setScenarioModalMode("load");
+                setScenarioNameInput(scenarioNames[0] ?? "");
+                setScenarioModalOpen(true);
+              }}
               title="Load saved scenario deltas for this service line (server file)"
             >
               Load Scenario
@@ -855,6 +865,118 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
           />
         </ReactFlow>
       </div>
+
+      {scenarioModalOpen && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-sm rounded-lg border border-slate-800 bg-slate-900 p-4 shadow-xl">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold text-white">
+                {scenarioModalMode === "save" ? "Save Scenario" : "Load Scenario"}
+              </div>
+              <button
+                onClick={() => setScenarioModalOpen(false)}
+                className="text-slate-400 hover:text-white text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2 text-sm text-slate-200">
+              {scenarioModalMode === "load" && scenarioNames.length === 0 && (
+                <p className="text-slate-400">No saved scenarios yet.</p>
+              )}
+              <label className="flex flex-col gap-1">
+                <span className="text-slate-400">Scenario name</span>
+                {scenarioModalMode === "load" ? (
+                  <select
+                    value={scenarioNameInput}
+                    onChange={(e) => setScenarioNameInput(e.target.value)}
+                    className="rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100"
+                  >
+                    {scenarioNames.length === 0 && <option value="">(none)</option>}
+                    {scenarioNames.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={scenarioNameInput}
+                    onChange={(e) => setScenarioNameInput(e.target.value)}
+                    placeholder="e.g. peak-load, qa-boost"
+                    className="rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100"
+                  />
+                )}
+              </label>
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
+                onClick={() => setScenarioModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              {scenarioModalMode === "save" ? (
+                <Button
+                  size="sm"
+                  className="border border-emerald-700/60 bg-emerald-900/50 text-emerald-100 hover:bg-emerald-800 hover:text-white"
+                  disabled={!scenarioNameInput.trim()}
+                  onClick={async () => {
+                    const name = scenarioNameInput.trim();
+                    if (!name) return;
+                    await fetch(
+                      `/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}?name=${encodeURIComponent(
+                        name
+                      )}`,
+                      {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(scenario),
+                      }
+                    );
+                    await loadScenarioFromServer(serviceLine.service_line_id);
+                    setScenarioModalOpen(false);
+                  }}
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="border border-emerald-700/60 bg-emerald-900/50 text-emerald-100 hover:bg-emerald-800 hover:text-white"
+                  disabled={!scenarioNameInput.trim()}
+                  onClick={async () => {
+                    const name = scenarioNameInput.trim();
+                    if (!name) return;
+                    const res = await fetch(
+                      `/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}?name=${encodeURIComponent(
+                        name
+                      )}`
+                    );
+                    if (res.ok) {
+                      const json = await res.json();
+                      if (json.success && json.data?.scenario) {
+                        setScenario({
+                          laborDelta: json.data.scenario.laborDelta ?? 0,
+                          timeDelta: json.data.scenario.timeDelta ?? 0,
+                          qualityDelta: json.data.scenario.qualityDelta ?? 0,
+                        });
+                      }
+                    }
+                    await loadScenarioFromServer(serviceLine.service_line_id);
+                    setScenarioModalOpen(false);
+                  }}
+                >
+                  Load
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Station Panel (shown when a station is selected) */}
       {selectedStation && (
