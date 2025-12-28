@@ -98,6 +98,16 @@ export default function Home() {
                 size="lg"
                 className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
               >
+                <Link href="/dashboard">
+                  Dashboard
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+              >
                 <Link href="https://github.com/RaisinBread42/blueprintos" target="_blank">
                   View on GitHub
                 </Link>

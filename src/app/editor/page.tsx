@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { ServiceLineEditor } from "@/components/dag/ServiceLineEditor";
 import type { ServiceLine } from "@/types";
 
 export default function EditorPage() {
+  const searchParams = useSearchParams();
+  const requestedId = searchParams.get("id") ?? "SL-360-CAMPAIGN";
   const [serviceLine, setServiceLine] = useState<ServiceLine | null>(null);
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,8 +110,8 @@ export default function EditorPage() {
   // Initial load
   useEffect(() => {
     loadServiceLines();
-    loadServiceLine("SL-360-CAMPAIGN");
-  }, [loadServiceLines, loadServiceLine]);
+    loadServiceLine(requestedId);
+  }, [loadServiceLines, loadServiceLine, requestedId]);
 
   if (loading) {
     return (

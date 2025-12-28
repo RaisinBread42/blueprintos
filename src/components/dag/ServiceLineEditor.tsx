@@ -487,6 +487,15 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Dashboard link */}
+            <Link
+              href="/dashboard"
+              className="hidden sm:inline-flex h-8 items-center justify-center rounded-lg border border-slate-700/50 px-3 text-sm text-slate-300 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-colors"
+              title="Open Dashboard"
+            >
+              Dashboard
+            </Link>
+
             {/* New button */}
             <Button
               onClick={() => setShowNewDialog(true)}
