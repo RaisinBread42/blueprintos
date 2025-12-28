@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Plus } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { Plus, Save, FolderOpen, Check, Loader2 } from "lucide-react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -24,6 +24,7 @@ import "reactflow/dist/style.css";
 import type { ServiceLine } from "@/types";
 import {
   serviceLineToFlow,
+  flowToServiceLine,
   type StationNodeData,
   type TrackEdgeData,
 } from "@/lib/dag/transforms";
@@ -65,9 +66,12 @@ function createDefaultStationData(id: string): StationNodeData {
 
 interface ServiceLineEditorInnerProps {
   serviceLine: ServiceLine;
+  serviceLines: ServiceLine[];
+  onSave: (sl: ServiceLine) => Promise<boolean>;
+  onLoad: (id: string) => Promise<void>;
 }
 
-function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
+function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: ServiceLineEditorInnerProps) {
   // React Flow instance for viewport operations
   const { getViewport } = useReactFlow();
 
@@ -85,6 +89,14 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
     initialFlow.edges
   );
 
+  // Reset nodes/edges when serviceLine changes (after load)
+  useEffect(() => {
+    const flow = serviceLineToFlow(serviceLine);
+    setNodes(flow.nodes);
+    setEdges(flow.edges);
+    setHasUnsavedChanges(false);
+  }, [serviceLine, setNodes, setEdges]);
+
   // Selected node ID (we track ID, then derive station data from nodes)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   
@@ -93,6 +105,12 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
 
   // Track unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Saving state
+  const [saving, setSaving] = useState(false);
+
+  // Open dropdown state
+  const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
 
   // Get the currently selected station data from nodes
   const selectedStation = useMemo(() => {
@@ -235,6 +253,33 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
     setSelectedEdgeId(null);
   }, []);
 
+  // Save handler
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    try {
+      const updatedServiceLine = flowToServiceLine(nodes, edges, {
+        service_line_id: serviceLine.service_line_id,
+        name: serviceLine.name,
+        description: serviceLine.description,
+        created_at: serviceLine.created_at,
+      });
+      const success = await onSave(updatedServiceLine);
+      if (success) {
+        setHasUnsavedChanges(false);
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [nodes, edges, serviceLine, onSave]);
+
+  // Load handler
+  const handleLoad = useCallback(async (id: string) => {
+    setOpenDropdownOpen(false);
+    if (id !== serviceLine.service_line_id) {
+      await onLoad(id);
+    }
+  }, [serviceLine.service_line_id, onLoad]);
+
   return (
     <div className="flex h-full w-full">
       {/* Main canvas area */}
@@ -290,7 +335,69 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Open dropdown */}
+            <div className="relative">
+              <Button
+                onClick={() => setOpenDropdownOpen(!openDropdownOpen)}
+                variant="outline"
+                size="sm"
+                className="border-slate-700 text-slate-300 hover:bg-slate-800"
+              >
+                <FolderOpen className="h-4 w-4 mr-1" />
+                Open
+              </Button>
+              {openDropdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-10" 
+                    onClick={() => setOpenDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1 z-20 w-64 rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl">
+                    {serviceLines.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-slate-500">No service lines found</div>
+                    ) : (
+                      serviceLines.map((sl) => (
+                        <button
+                          key={sl.service_line_id}
+                          onClick={() => handleLoad(sl.service_line_id)}
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-800 flex items-center justify-between ${
+                            sl.service_line_id === serviceLine.service_line_id
+                              ? "text-emerald-400"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          <div>
+                            <div className="font-medium">{sl.name}</div>
+                            <div className="text-xs text-slate-500">{sl.service_line_id}</div>
+                          </div>
+                          {sl.service_line_id === serviceLine.service_line_id && (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Save button */}
+            <Button
+              onClick={handleSave}
+              disabled={!hasUnsavedChanges || saving}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-1" />
+              )}
+              Save
+            </Button>
+
+            {/* Add Station button */}
             <Button
               onClick={handleAddStation}
               size="sm"
@@ -299,7 +406,8 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
               <Plus className="h-4 w-4 mr-1" />
               Add Station
             </Button>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+
+            <div className="flex items-center gap-2 text-xs text-slate-500 ml-2">
               <span>{nodes.length} stations</span>
               <span>•</span>
               <span>{edges.length} tracks</span>
@@ -374,12 +482,20 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
 
 interface ServiceLineEditorProps {
   serviceLine: ServiceLine;
+  serviceLines: ServiceLine[];
+  onSave: (sl: ServiceLine) => Promise<boolean>;
+  onLoad: (id: string) => Promise<void>;
 }
 
-export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
+export function ServiceLineEditor({ serviceLine, serviceLines, onSave, onLoad }: ServiceLineEditorProps) {
   return (
     <ReactFlowProvider>
-      <ServiceLineEditorInner serviceLine={serviceLine} />
+      <ServiceLineEditorInner 
+        serviceLine={serviceLine} 
+        serviceLines={serviceLines}
+        onSave={onSave}
+        onLoad={onLoad}
+      />
     </ReactFlowProvider>
   );
 }

@@ -2,17 +2,32 @@
   "service_line_id": "SL-RADIO-SPOT",
   "name": "Radio Spot",
   "description": "A sample service line for producing and delivering a radio spot.",
+  "created_at": "2025-12-27T00:00:00.000Z",
   "nodes": [
     {
       "station_id": "Intake",
       "name": "Intake",
       "department": "Operations",
       "data_source": "mock",
-      "position": { "x": 0, "y": 0 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 2, "actual_hrs": 2, "labor_variance": 0, "market_value": 300 },
-        "world_class": { "internal_qa_score": 8.1, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "12h" }
+        "fair_pricing": {
+          "planned_hrs": 2,
+          "actual_hrs": 2,
+          "labor_variance": 0,
+          "market_value": 300
+        },
+        "world_class": {
+          "internal_qa_score": 8.1,
+          "standard_met": true,
+          "industry_benchmark": 7.5
+        },
+        "performance_proof": {
+          "client_approval_speed": "12h"
+        }
+      },
+      "position": {
+        "x": 0,
+        "y": 0
       }
     },
     {
@@ -20,11 +35,25 @@
       "name": "Script",
       "department": "Creative",
       "data_source": "mock",
-      "position": { "x": 260, "y": 0 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 6, "actual_hrs": 7, "labor_variance": 1, "market_value": 900 },
-        "world_class": { "internal_qa_score": 7.9, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "24h" }
+        "fair_pricing": {
+          "planned_hrs": 6,
+          "actual_hrs": 7,
+          "labor_variance": 1,
+          "market_value": 900
+        },
+        "world_class": {
+          "internal_qa_score": 7.9,
+          "standard_met": true,
+          "industry_benchmark": 7.5
+        },
+        "performance_proof": {
+          "client_approval_speed": "24h"
+        }
+      },
+      "position": {
+        "x": 260,
+        "y": 0
       }
     },
     {
@@ -32,11 +61,25 @@
       "name": "Voice",
       "department": "Production",
       "data_source": "mock",
-      "position": { "x": 520, "y": -80 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 4, "actual_hrs": 5, "labor_variance": 1, "market_value": 600 },
-        "world_class": { "internal_qa_score": 7.4, "standard_met": false, "industry_benchmark": 7.6 },
-        "performance_proof": { "engagement_rate": 0.028 }
+        "fair_pricing": {
+          "planned_hrs": 4,
+          "actual_hrs": 5,
+          "labor_variance": 1,
+          "market_value": 600
+        },
+        "world_class": {
+          "internal_qa_score": 7.4,
+          "standard_met": false,
+          "industry_benchmark": 7.6
+        },
+        "performance_proof": {
+          "engagement_rate": 0.028
+        }
+      },
+      "position": {
+        "x": 520,
+        "y": -80
       }
     },
     {
@@ -44,11 +87,25 @@
       "name": "Mixing",
       "department": "Production",
       "data_source": "mock",
-      "position": { "x": 520, "y": 80 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 3, "actual_hrs": 3, "labor_variance": 0, "market_value": 450 },
-        "world_class": { "internal_qa_score": 8.0, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "24h" }
+        "fair_pricing": {
+          "planned_hrs": 3,
+          "actual_hrs": 3,
+          "labor_variance": 0,
+          "market_value": 450
+        },
+        "world_class": {
+          "internal_qa_score": 8,
+          "standard_met": true,
+          "industry_benchmark": 7.5
+        },
+        "performance_proof": {
+          "client_approval_speed": "24h"
+        }
+      },
+      "position": {
+        "x": 520,
+        "y": 80
       }
     },
     {
@@ -56,23 +113,25 @@
       "name": "QA",
       "department": "Operations",
       "data_source": "mock",
-      "position": { "x": 780, "y": 0 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 2, "actual_hrs": 2, "labor_variance": 0, "market_value": 300 },
-        "world_class": { "internal_qa_score": 8.4, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "12h" }
-      }
-    },
-    {
-      "station_id": "Delivery",
-      "name": "Delivery",
-      "department": "Client Success",
-      "data_source": "mock",
-      "position": { "x": 1040, "y": 0 },
-      "metrics": {
-        "fair_pricing": { "planned_hrs": 1, "actual_hrs": 1, "labor_variance": 0, "market_value": 150 },
-        "world_class": { "internal_qa_score": 8.1, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "roi": 1.12 }
+        "fair_pricing": {
+          "planned_hrs": 2,
+          "actual_hrs": 2,
+          "labor_variance": 0,
+          "market_value": 300
+        },
+        "world_class": {
+          "internal_qa_score": 8.4,
+          "standard_met": true,
+          "industry_benchmark": 7.5
+        },
+        "performance_proof": {
+          "client_approval_speed": "12h"
+        }
+      },
+      "position": {
+        "x": 780,
+        "y": 0
       }
     }
   ],
@@ -81,41 +140,47 @@
       "id": "Intake->Script",
       "source_station_id": "Intake",
       "target_station_id": "Script",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": {
+        "cost": 1,
+        "time": 1
+      }
     },
     {
       "id": "Script->Voice",
       "source_station_id": "Script",
       "target_station_id": "Voice",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": {
+        "cost": 1,
+        "time": 1
+      }
     },
     {
       "id": "Script->Mixing",
       "source_station_id": "Script",
       "target_station_id": "Mixing",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": {
+        "cost": 1,
+        "time": 1
+      }
     },
     {
       "id": "Voice->QA",
       "source_station_id": "Voice",
       "target_station_id": "QA",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": {
+        "cost": 1,
+        "time": 1
+      }
     },
     {
       "id": "Mixing->QA",
       "source_station_id": "Mixing",
       "target_station_id": "QA",
-      "weight": { "cost": 1, "time": 1 }
-    },
-    {
-      "id": "QA->Delivery",
-      "source_station_id": "QA",
-      "target_station_id": "Delivery",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": {
+        "cost": 1,
+        "time": 1
+      }
     }
   ],
-  "created_at": "2025-12-27T00:00:00.000Z",
-  "updated_at": "2025-12-27T00:00:00.000Z"
+  "updated_at": "2025-12-28T00:26:08.691Z"
 }
-
-

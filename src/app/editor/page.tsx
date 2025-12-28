@@ -1,36 +1,77 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ServiceLineEditor } from "@/components/dag/ServiceLineEditor";
 import type { ServiceLine } from "@/types";
 
 export default function EditorPage() {
   const [serviceLine, setServiceLine] = useState<ServiceLine | null>(null);
+  const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadServiceLine() {
-      try {
-        // Load the default service line
-        const response = await fetch("/api/service-lines/SL-360-CAMPAIGN");
-        if (!response.ok) {
-          throw new Error(`Failed to load: ${response.statusText}`);
-        }
-        const json = await response.json();
-        if (!json.success || !json.data) {
-          throw new Error(json.error || "Invalid response");
-        }
-        setServiceLine(json.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load service line");
-      } finally {
-        setLoading(false);
+  // Load all service lines for the dropdown
+  const loadServiceLines = useCallback(async () => {
+    try {
+      const response = await fetch("/api/service-lines");
+      const json = await response.json();
+      if (json.success && json.data) {
+        setServiceLines(json.data);
       }
+    } catch {
+      // Silently fail - dropdown just won't show other options
     }
-
-    loadServiceLine();
   }, []);
+
+  // Load a specific service line
+  const loadServiceLine = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/service-lines/${encodeURIComponent(id)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load: ${response.statusText}`);
+      }
+      const json = await response.json();
+      if (!json.success || !json.data) {
+        throw new Error(json.error || "Invalid response");
+      }
+      setServiceLine(json.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load service line");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Save a service line
+  const saveServiceLine = useCallback(async (sl: ServiceLine): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/service-lines/${encodeURIComponent(sl.service_line_id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sl),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.success) {
+        throw new Error(json.error || "Failed to save");
+      }
+      // Update local state with saved version
+      setServiceLine(json.data);
+      // Refresh the list in case name changed
+      loadServiceLines();
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save");
+      return false;
+    }
+  }, [loadServiceLines]);
+
+  // Initial load
+  useEffect(() => {
+    loadServiceLines();
+    loadServiceLine("SL-360-CAMPAIGN");
+  }, [loadServiceLines, loadServiceLine]);
 
   if (loading) {
     return (
@@ -62,6 +103,12 @@ export default function EditorPage() {
     );
   }
 
-  return <ServiceLineEditor serviceLine={serviceLine} />;
+  return (
+    <ServiceLineEditor
+      serviceLine={serviceLine}
+      serviceLines={serviceLines}
+      onSave={saveServiceLine}
+      onLoad={loadServiceLine}
+    />
+  );
 }
-
