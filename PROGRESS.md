@@ -6,7 +6,7 @@
 
 ## Current Focus
 
-**Active feature:** **feat-003 (Iron Horse: editable service line DAG)** — PLANNING
+**No active feature.** Phase 1 (Iron Horse) complete! Next up: **feat-004 (Sensors + dashboards with RAG overlays)**.
 
 ### Roadmap (kept intentionally lightweight)
 
@@ -24,7 +24,7 @@
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 3          |
+| Features Completed    | 4          |
 | Currently In Progress | 0          |
 | Backlog Items         | 4          |
 | Last Updated          | 2025-12-27 |
@@ -47,11 +47,70 @@ These rules are validated after every implementation:
 
 ## Active Feature
 
+_None currently active._
+
+---
+
+## Completed Features
+
 ### feat-003: Iron Horse — Editable Service Line DAG
 
-**Status**: planning  
+**Status**: complete ✅  
 **Complexity**: L (4-8 hours)  
-**Priority**: High
+**Completed**: 2025-12-27  
+**Commits**: `cad0528`, `35c4ba6`, `4c3f590`, `1792334`, `3dd8ba4`, `1a2d2c5`, `cc8a293`
+
+#### Summary
+
+Built a full visual DAG editor using React Flow for creating and editing service lines:
+
+* **View**: Display service lines as interactive node graphs
+* **Custom Nodes**: Styled StationNode with RAG indicators, metrics, department badges
+* **Selection Panel**: Side panel showing full station/edge details
+* **Editing**: Edit station name, department, data source in real-time
+* **Add/Delete**: Create new stations, remove with button or keyboard
+* **Edge Management**: Draw connections, edit weights, delete tracks
+* **Save/Load**: Persist to API, switch between service lines
+* **Create/Import/Export**: New blank service lines, JSON file I/O
+
+#### Iterations Completed
+
+| # | Feature | Commit |
+|---|---------|--------|
+| 1 | View-Only DAG | `cad0528` |
+| 2 | Custom Nodes + Selection | `35c4ba6` |
+| 3 | Edit Station Properties | `4c3f590` |
+| 4 | Add & Delete Stations | `1792334` |
+| 5 | Edge Management | `3dd8ba4` |
+| 6 | Save & Load | `1a2d2c5` |
+| 7 | Create New & Import/Export | `cc8a293` |
+
+#### Files Created
+
+* `src/app/editor/page.tsx` - Editor page
+* `src/app/editor/layout.tsx` - Full-screen layout
+* `src/components/dag/ServiceLineEditor.tsx` - Main React Flow wrapper
+* `src/components/dag/StationNode.tsx` - Custom station node
+* `src/components/dag/StationPanel.tsx` - Station details panel
+* `src/components/dag/EdgePanel.tsx` - Edge details panel
+* `src/lib/dag/transforms.ts` - ServiceLine ↔ React Flow conversion
+* `src/hooks/useServiceLine.ts` - API operations hook
+
+#### Quality Gates Passed
+
+* ✅ `pnpm type-check` - No type errors
+* ✅ `pnpm lint` - No linting errors
+* ✅ `pnpm test` - All tests pass
+* ✅ `pnpm build` - Build successful
+
+---
+
+### feat-007: Unit tests + workflow gate (Vitest)
+
+**Status**: complete ✅  
+**Complexity**: M  
+**Completed**: 2025-12-27  
+**Commit**: `d9338f2`
 
 ---
 

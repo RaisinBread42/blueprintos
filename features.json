@@ -111,26 +111,29 @@
       "id": "feat-003",
       "title": "Iron Horse: editable service line DAG (React Flow)",
       "description": "Build a React Flow canvas to create/edit service lines: nodes (stations) + edges (tracks), with save/load/import/export.",
-      "status": "planning",
+      "status": "complete",
       "priority": "high",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {
-        "planning": { "completedAt": "2025-12-27T00:00:00Z" }
+        "planning": { "completedAt": "2025-12-27T00:00:00Z" },
+        "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
+        "implemented": { "completedAt": "2025-12-27T00:00:00Z" },
+        "verified": { "completedAt": "2025-12-27T00:00:00Z" },
+        "committed": { "completedAt": "2025-12-27T00:00:00Z", "commitHash": "cc8a293" }
       },
       "files": [
         "src/app/editor/page.tsx",
         "src/app/editor/layout.tsx",
         "src/components/dag/ServiceLineEditor.tsx",
         "src/components/dag/StationNode.tsx",
-        "src/components/dag/TrackEdge.tsx",
-        "src/components/dag/EditorToolbar.tsx",
         "src/components/dag/StationPanel.tsx",
+        "src/components/dag/EdgePanel.tsx",
         "src/lib/dag/transforms.ts",
         "src/hooks/useServiceLine.ts"
       ],
-      "dependencies": ["reactflow", "@reactflow/core"],
-      "notes": "Primary UX: editing service lines (not just viewing). Rail-network aesthetic with station nodes."
+      "dependencies": ["reactflow"],
+      "notes": "Completed in 7 iterations: view DAG, custom nodes, edit properties, add/delete stations, edge management, save/load, create/import/export."
     }
   ],
   "backlog": [
