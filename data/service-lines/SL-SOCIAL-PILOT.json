@@ -46,7 +46,7 @@
     }
   ],
   "edges": [
-    { "track_id": "PLAN->CREATIVE", "source": "ST-PLAN", "target": "ST-CREATIVE", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" },
-    { "track_id": "CREATIVE->DISTRO", "source": "ST-CREATIVE", "target": "ST-DISTRO", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" }
+    { "id": "PLAN->CREATIVE", "source_station_id": "ST-PLAN", "target_station_id": "ST-CREATIVE", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" },
+    { "id": "CREATIVE->DISTRO", "source_station_id": "ST-CREATIVE", "target_station_id": "ST-DISTRO", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" }
   ]
 }
