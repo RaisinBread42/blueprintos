@@ -33,6 +33,8 @@ import { StationNode } from "./StationNode";
 import { StationPanel } from "./StationPanel";
 import { EdgePanel } from "./EdgePanel";
 import { Button } from "@/components/ui/button";
+import { computeServiceLineRollup } from "@/lib/rag/rollup";
+import { getRagDisplay } from "@/lib/rag/compute";
 
 const nodeTypes: NodeTypes = {
   stationNode: StationNode,
@@ -393,6 +395,21 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     });
   }, [edges, nodeRagMap]);
 
+  // Service line rollup (totals, averages, overall rag)
+  const rollup = useMemo(() => computeServiceLineRollup({
+    ...serviceLine,
+    nodes: nodes.map((n) => ({
+      station_id: n.data.station_id,
+      name: n.data.name,
+      department: n.data.department,
+      data_source: n.data.data_source,
+      metrics: n.data.metrics,
+      rag_status: n.data.rag_status,
+      position: n.position,
+    })),
+    edges: [], // rollup currently only needs nodes
+  }), [serviceLine, nodes]);
+
   return (
     <div className="flex h-full w-full">
       {/* Main canvas area */}
@@ -446,6 +463,27 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 )}
               </div>
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                <span>
+                  Total:{" "}
+                  <span className="text-slate-200 font-medium">
+                    {Math.round(rollup.total_planned_hrs * 10) / 10}h planned /{" "}
+                    {Math.round(rollup.total_actual_hrs * 10) / 10}h actual
+                  </span>
+                  {" "}(
+                  <span className={rollup.variance_pct > 0 ? "text-amber-300" : "text-emerald-300"}>
+                    {rollup.variance_pct > 0 ? "+" : ""}
+                    {Math.round(rollup.variance_pct * 10) / 10}%
+                  </span>
+                  )
+                </span>
+                <span>Avg QA: <span className="text-slate-200 font-medium">{rollup.avg_qa_score.toFixed(2)}</span></span>
+                <span>Standard: <span className="text-slate-200 font-medium">{rollup.stations_at_standard}/{rollup.total_stations}</span></span>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] ${getRagDisplay(rollup.overall_rag).bg} ${getRagDisplay(rollup.overall_rag).color}`}>
+                  <span className={`h-2 w-2 rounded-full ${getRagDisplay(rollup.overall_rag).bgSolid}`} />
+                  {getRagDisplay(rollup.overall_rag).label}
+                </span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
