@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { ServiceLine } from "@/types";
-import { computeStationRag } from "@/lib/rag/compute";
+import { computeStationRag, getRagDisplay } from "@/lib/rag/compute";
 
 interface VarianceChartProps {
   serviceLine: ServiceLine;
@@ -39,6 +39,27 @@ export function VarianceChart({ serviceLine }: VarianceChartProps) {
     };
   });
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const entry = payload[0].payload;
+    const rag = getRagDisplay(entry.rag);
+    return (
+      <div className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 shadow-lg text-slate-200 text-sm">
+        <div className="font-semibold text-white">{label}</div>
+        <div className="text-slate-300">
+          Variance: <span className={entry.variance > 0 ? "text-amber-300" : "text-emerald-300"}>
+            {entry.variance > 0 ? "+" : ""}
+            {entry.variance}h
+          </span>
+        </div>
+        <div className="inline-flex items-center gap-1 text-xs mt-1 px-1.5 py-0.5 rounded-full bg-slate-800">
+          <span className={`h-2 w-2 rounded-full ${rag.bgSolid}`} />
+          <span className={rag.color}>{rag.label}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
       <div className="flex items-center justify-between mb-3">
@@ -54,10 +75,7 @@ export function VarianceChart({ serviceLine }: VarianceChartProps) {
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
             <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
             <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1f2937", color: "#e2e8f0" }}
-              labelStyle={{ color: "#e2e8f0" }}
-            />
+            <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="variance" radius={[4, 4, 4, 4]}>
               {data.map((entry, index) => (
                 <cell key={`cell-${index}`} fill={entry.fill} />
