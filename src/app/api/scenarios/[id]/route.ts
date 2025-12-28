@@ -26,11 +26,33 @@ function defaultPayload(): ScenarioPayload {
   return { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
 }
 
+function normalizeFileData(raw: unknown): ScenarioFile {
+  // Legacy shape: { laborDelta, timeDelta, qualityDelta }
+  if (
+    raw &&
+    typeof raw === "object" &&
+    "laborDelta" in raw &&
+    "timeDelta" in raw &&
+    "qualityDelta" in raw &&
+    !("scenarios" in raw)
+  ) {
+    return { scenarios: { default: raw as ScenarioPayload } };
+  }
+
+  // New shape
+  if (raw && typeof raw === "object" && "scenarios" in raw) {
+    const scenarios = (raw as { scenarios: Record<string, ScenarioPayload> }).scenarios ?? {};
+    return { scenarios };
+  }
+
+  return { scenarios: {} };
+}
+
 async function readFile(id: string): Promise<ScenarioFile> {
   await ensureDir();
   const file = filePath(id);
   const content = await fs.readFile(file, "utf8");
-  return JSON.parse(content) as ScenarioFile;
+  return normalizeFileData(JSON.parse(content));
 }
 
 async function writeFile(id: string, data: ScenarioFile) {
@@ -58,14 +80,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     const names = Object.keys(fileData.scenarios);
-    if (!name) {
-      return NextResponse.json({
-        success: true,
-        data: { scenario: null, names },
-      });
+    let scenario: ScenarioPayload;
+    if (name) {
+      scenario = fileData.scenarios[name] ?? defaultPayload();
+    } else if (names.length > 0) {
+      scenario = fileData.scenarios[names[0]] ?? defaultPayload();
+    } else {
+      scenario = defaultPayload();
     }
 
-    const scenario = fileData.scenarios[name] ?? defaultPayload();
     return NextResponse.json({
       success: true,
       data: { scenario, names },
@@ -80,7 +103,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     const url = new URL(req.url);
     const name = url.searchParams.get("name") || "default";
-    const body = (await req.json()) as Partial<ScenarioPayload>;
+    const body = (await req.json().catch(() => ({}))) as Partial<ScenarioPayload>;
     const payload: ScenarioPayload = {
       laborDelta: body.laborDelta ?? 0,
       timeDelta: body.timeDelta ?? 0,
