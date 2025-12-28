@@ -8,18 +8,12 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const ids = await listServiceLineIds();
-  const data: Pick<ServiceLine, "service_line_id" | "name" | "description" | "created_at" | "updated_at">[] = [];
+  const data: ServiceLine[] = [];
 
   for (const id of ids) {
     const sl = await readServiceLine(id);
     if (!sl) continue;
-    data.push({
-      service_line_id: sl.service_line_id,
-      name: sl.name,
-      description: sl.description,
-      created_at: sl.created_at,
-      updated_at: sl.updated_at,
-    });
+    data.push(sl);
   }
 
   const res: ApiResponse<typeof data> = { success: true, data };
