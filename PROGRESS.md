@@ -25,7 +25,7 @@
 | Metric                | Value      |
 | --------------------- | ---------- |
 | Features Completed    | 5          |
-| Currently In Progress | 0          |
+| Currently In Progress | 1          |
 | Backlog Items         | 2          |
 | Last Updated          | 2025-12-28 |
 
@@ -49,7 +49,7 @@ These rules are validated after every implementation:
 
 ### feat-005: Synthetic data generator + sandbox simulation
 
-**Status**: planning  
+**Status**: in_progress  
 **Complexity**: L (6-8 hours)  
 **Started**: 2025-12-28
 
@@ -61,11 +61,16 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 
 | # | Iteration | Est. Time | Status |
 |---|-----------|-----------|--------|
-| 1 | Synthetic generator core | ~45 min | 🔜 pending |
-| 2 | Scenario sliders (labor/time/quality) | ~45 min | ⏳ pending |
-| 3 | Apply scenarios to service lines (in-memory) | ~45 min | ⏳ pending |
+| 1 | Synthetic generator core | ~45 min | ✅ complete (`d850235`) |
+| 2 | Scenario sliders (labor/time/quality) | ~45 min | ✅ complete (`15ffa7a`) |
+| 3 | Apply scenarios to service lines (in-memory) | ~45 min | 🚧 in progress |
 | 4 | Save/restore scenarios locally | ~45 min | ⏳ pending |
 | 5 | Dashboard toggle (base vs scenario) | ~45 min | ⏳ pending |
+
+#### Progress
+
+- Iteration 1: Added synthetic station metric generator with overrides and tests.  
+- Iteration 2: Added additive scenario sliders (labor/time/quality) applied in-memory to view/RAG; base data untouched until save.
 
 #### Success Criteria
 
