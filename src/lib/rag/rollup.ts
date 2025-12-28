@@ -18,7 +18,22 @@ export interface ServiceLineRollup {
 export function computeServiceLineRollup(
   serviceLine: ServiceLine
 ): ServiceLineRollup {
-  const totals = serviceLine.nodes.reduce(
+  const nodes = serviceLine?.nodes ?? [];
+
+  if (nodes.length === 0) {
+    return {
+      total_planned_hrs: 0,
+      total_actual_hrs: 0,
+      total_variance_hrs: 0,
+      variance_pct: 0,
+      avg_qa_score: 0,
+      stations_at_standard: 0,
+      total_stations: 0,
+      overall_rag: "green",
+    };
+  }
+
+  const totals = nodes.reduce(
     (acc, node) => {
       const m: StationMetrics = node.metrics;
       acc.total_planned_hrs += m.fair_pricing.planned_hrs;
@@ -47,7 +62,7 @@ export function computeServiceLineRollup(
         100;
 
   // Overall RAG is the worst station RAG
-  const overall_rag = serviceLine.nodes.reduce<RAGStatus>(
+  const overall_rag = nodes.reduce<RAGStatus>(
     (acc, node) => {
       const nodeRag = computeStationRag(node.metrics, node.rag_status);
       return worstRag(acc, nodeRag);
