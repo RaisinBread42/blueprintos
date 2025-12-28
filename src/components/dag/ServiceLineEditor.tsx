@@ -134,7 +134,10 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     async (id: string) => {
       try {
         const res = await fetch(`/api/scenarios/${encodeURIComponent(id)}`);
-        if (!res.ok) throw new Error("not found");
+        if (!res.ok) {
+          setScenario(defaultScenario);
+          return;
+        }
         const json = await res.json();
         if (json.success && json.data) {
           setScenario({

@@ -18,6 +18,10 @@ function filePath(id: string) {
   return path.join(SCENARIO_DIR, `${id}.json`);
 }
 
+function defaultPayload(): ScenarioPayload {
+  return { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
+}
+
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   try {
     await ensureDir();
@@ -26,8 +30,14 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     const json = JSON.parse(content) as ScenarioPayload;
     return NextResponse.json({ success: true, data: json });
   } catch (err) {
+    // If missing, return default payload with success to avoid 404 noise client-side
+    type NodeErr = { code?: string };
+    const code = (err as NodeErr | undefined)?.code;
+    if (code === "ENOENT") {
+      return NextResponse.json({ success: true, data: defaultPayload() });
+    }
     const message = err instanceof Error ? err.message : "Not found";
-    return NextResponse.json({ success: false, error: message }, { status: 404 });
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
 
@@ -54,7 +64,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     await ensureDir();
     const file = filePath(params.id);
     await fs.rm(file, { force: true });
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data: defaultPayload() });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to delete scenario";
     return NextResponse.json({ success: false, error: message }, { status: 400 });
