@@ -67,6 +67,43 @@ export default function EditorPage() {
     }
   }, [loadServiceLines]);
 
+  // Create a new service line
+  const createServiceLine = useCallback(async (id: string, name: string): Promise<boolean> => {
+    const newServiceLine: ServiceLine = {
+      service_line_id: id,
+      name: name,
+      description: "",
+      nodes: [],
+      edges: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch("/api/service-lines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newServiceLine),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.success) {
+        throw new Error(json.error || "Failed to create");
+      }
+      setServiceLine(json.data);
+      loadServiceLines();
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create service line");
+      return false;
+    }
+  }, [loadServiceLines]);
+
+  // Import a service line from JSON
+  const importServiceLine = useCallback((sl: ServiceLine) => {
+    setServiceLine(sl);
+    setLoading(false);
+  }, []);
+
   // Initial load
   useEffect(() => {
     loadServiceLines();
@@ -109,6 +146,8 @@ export default function EditorPage() {
       serviceLines={serviceLines}
       onSave={saveServiceLine}
       onLoad={loadServiceLine}
+      onCreate={createServiceLine}
+      onImport={importServiceLine}
     />
   );
 }

@@ -112,8 +112,8 @@ export function EdgePanel({ edgeId, source, target, data, onClose, onUpdate, onD
       <div className="border-t border-slate-800 px-4 py-3 space-y-3">
         <Button
           onClick={onDelete}
-          variant="outline"
-          className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/50"
+          variant="ghost"
+          className="w-full border border-slate-700/50 text-slate-400 bg-transparent hover:bg-red-600 hover:text-white hover:border-red-600 transition-all"
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Delete Track

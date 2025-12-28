@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Save, FolderOpen, Check, Loader2 } from "lucide-react";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { Plus, Save, FolderOpen, Check, Loader2, FilePlus, Download, Upload } from "lucide-react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -69,9 +69,11 @@ interface ServiceLineEditorInnerProps {
   serviceLines: ServiceLine[];
   onSave: (sl: ServiceLine) => Promise<boolean>;
   onLoad: (id: string) => Promise<void>;
+  onCreate: (id: string, name: string) => Promise<boolean>;
+  onImport: (sl: ServiceLine) => void;
 }
 
-function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: ServiceLineEditorInnerProps) {
+function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onCreate, onImport }: ServiceLineEditorInnerProps) {
   // React Flow instance for viewport operations
   const { getViewport } = useReactFlow();
 
@@ -111,6 +113,15 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
 
   // Open dropdown state
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
+
+  // New service line dialog state
+  const [showNewDialog, setShowNewDialog] = useState(false);
+  const [newId, setNewId] = useState("");
+  const [newName, setNewName] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  // File input ref for import
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get the currently selected station data from nodes
   const selectedStation = useMemo(() => {
@@ -280,6 +291,68 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
     }
   }, [serviceLine.service_line_id, onLoad]);
 
+  // Create new handler
+  const handleCreate = useCallback(async () => {
+    if (!newId.trim() || !newName.trim()) return;
+    setCreating(true);
+    try {
+      const success = await onCreate(newId.trim(), newName.trim());
+      if (success) {
+        setShowNewDialog(false);
+        setNewId("");
+        setNewName("");
+      }
+    } finally {
+      setCreating(false);
+    }
+  }, [newId, newName, onCreate]);
+
+  // Export handler
+  const handleExport = useCallback(() => {
+    const currentServiceLine = flowToServiceLine(nodes, edges, {
+      service_line_id: serviceLine.service_line_id,
+      name: serviceLine.name,
+      description: serviceLine.description,
+      created_at: serviceLine.created_at,
+    });
+    
+    const blob = new Blob([JSON.stringify(currentServiceLine, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${serviceLine.service_line_id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [nodes, edges, serviceLine]);
+
+  // Import handler
+  const handleImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const imported = JSON.parse(content) as ServiceLine;
+        // Basic validation
+        if (!imported.service_line_id || !imported.nodes || !imported.edges) {
+          throw new Error("Invalid service line format");
+        }
+        onImport(imported);
+        setHasUnsavedChanges(true);
+      } catch (err) {
+        alert("Failed to import: " + (err instanceof Error ? err.message : "Invalid JSON"));
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset the input so the same file can be selected again
+    event.target.value = "";
+  }, [onImport]);
+
   return (
     <div className="flex h-full w-full">
       {/* Main canvas area */}
@@ -335,14 +408,25 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* New button */}
+            <Button
+              onClick={() => setShowNewDialog(true)}
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all"
+            >
+              <FilePlus className="h-4 w-4 mr-1" />
+              New
+            </Button>
+
             {/* Open dropdown */}
             <div className="relative">
               <Button
                 onClick={() => setOpenDropdownOpen(!openDropdownOpen)}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
               >
                 <FolderOpen className="h-4 w-4 mr-1" />
                 Open
@@ -382,12 +466,44 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
               )}
             </div>
 
+            {/* Import button */}
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+            >
+              <Upload className="h-4 w-4 mr-1" />
+              Import
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+
+            {/* Export button */}
+            <Button
+              onClick={handleExport}
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Export
+            </Button>
+
+            <div className="w-px h-6 bg-slate-700/50" />
+
             {/* Save button */}
             <Button
               onClick={handleSave}
               disabled={!hasUnsavedChanges || saving}
+              variant="ghost"
               size="sm"
-              className="bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-blue-600 hover:text-white hover:border-blue-600 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:border-slate-700/50 disabled:hover:text-slate-400 transition-all"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -400,8 +516,9 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
             {/* Add Station button */}
             <Button
               onClick={handleAddStation}
+              variant="ghost"
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all"
             >
               <Plus className="h-4 w-4 mr-1" />
               Add Station
@@ -476,6 +593,64 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad }: S
           onDelete={handleDeleteEdge}
         />
       )}
+
+      {/* New Service Line Dialog */}
+      {showNewDialog && (
+        <>
+          <div 
+            className="fixed inset-0 z-40 bg-black/50" 
+            onClick={() => setShowNewDialog(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-96 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-slate-700 bg-slate-900 p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-white mb-4">Create New Service Line</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Service Line ID</label>
+                <input
+                  type="text"
+                  value={newId}
+                  onChange={(e) => setNewId(e.target.value.toUpperCase().replace(/[^A-Z0-9-_]/g, ""))}
+                  placeholder="e.g., SL-NEW-PROJECT"
+                  className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+                <p className="text-xs text-slate-500 mt-1">Uppercase letters, numbers, hyphens, underscores only</p>
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="e.g., New Project Workflow"
+                  className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                onClick={() => setShowNewDialog(false)}
+                variant="ghost"
+                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={!newId.trim() || !newName.trim() || creating}
+                variant="ghost"
+                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-emerald-600 hover:text-white hover:border-emerald-600 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-all"
+              >
+                {creating ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <FilePlus className="h-4 w-4 mr-1" />
+                )}
+                Create
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -485,9 +660,11 @@ interface ServiceLineEditorProps {
   serviceLines: ServiceLine[];
   onSave: (sl: ServiceLine) => Promise<boolean>;
   onLoad: (id: string) => Promise<void>;
+  onCreate: (id: string, name: string) => Promise<boolean>;
+  onImport: (sl: ServiceLine) => void;
 }
 
-export function ServiceLineEditor({ serviceLine, serviceLines, onSave, onLoad }: ServiceLineEditorProps) {
+export function ServiceLineEditor({ serviceLine, serviceLines, onSave, onLoad, onCreate, onImport }: ServiceLineEditorProps) {
   return (
     <ReactFlowProvider>
       <ServiceLineEditorInner 
@@ -495,6 +672,8 @@ export function ServiceLineEditor({ serviceLine, serviceLines, onSave, onLoad }:
         serviceLines={serviceLines}
         onSave={onSave}
         onLoad={onLoad}
+        onCreate={onCreate}
+        onImport={onImport}
       />
     </ReactFlowProvider>
   );
