@@ -134,22 +134,25 @@
       ],
       "dependencies": ["reactflow"],
       "notes": "Completed in 7 iterations: view DAG, custom nodes, edit properties, add/delete stations, edge management, save/load, create/import/export."
-    }
-  ],
-  "backlog": [
+    },
     {
       "id": "feat-004",
       "title": "Sensors + dashboards (RAG v1)",
       "description": "Station metric editor, derived rollups, and basic Recharts dashboards; compute and display RAG overlays.",
-      "status": "backlog",
-      "priority": "medium",
+      "status": "implementing",
+      "priority": "high",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
-      "phases": {},
+      "phases": {
+        "planning": { "completedAt": "2025-12-27T00:00:00Z" },
+        "accepted": { "completedAt": "2025-12-27T00:00:00Z" }
+      },
       "files": [],
       "dependencies": [],
-      "notes": "Focus on making the JSON actionable before any AI narration."
-    },
+      "notes": "7 iterations: metric editor, RAG computation, edge styling, rollups, dashboard, variance chart, QA chart."
+    }
+  ],
+  "backlog": [
     {
       "id": "feat-005",
       "title": "Synthetic data generator + sandbox simulation",

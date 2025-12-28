@@ -21,13 +21,14 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import type { ServiceLine } from "@/types";
+import type { ServiceLine, RAGStatus } from "@/types";
 import {
   serviceLineToFlow,
   flowToServiceLine,
   type StationNodeData,
   type TrackEdgeData,
 } from "@/lib/dag/transforms";
+import { computeStationRag, worstRag } from "@/lib/rag/compute";
 import { StationNode } from "./StationNode";
 import { StationPanel } from "./StationPanel";
 import { EdgePanel } from "./EdgePanel";
@@ -353,6 +354,45 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     event.target.value = "";
   }, [onImport]);
 
+  // Map of node id -> computed RAG
+  const nodeRagMap = useMemo(() => {
+    const map = new Map<string, RAGStatus>();
+    nodes.forEach((node) => {
+      map.set(node.id, computeStationRag(node.data.metrics, node.data.rag_status));
+    });
+    return map;
+  }, [nodes]);
+
+  const ragColor = (status: RAGStatus) => {
+    switch (status) {
+      case "red":
+        return "#ef4444";
+      case "amber":
+        return "#f59e0b";
+      case "green":
+      default:
+        return "#10b981";
+    }
+  };
+
+  // Apply RAG styling to edges
+  const coloredEdges = useMemo(() => {
+    return edges.map((edge) => {
+      const sourceRag = nodeRagMap.get(edge.source) ?? "green";
+      const targetRag = nodeRagMap.get(edge.target) ?? "green";
+      const edgeRag = worstRag(sourceRag, targetRag);
+      return {
+        ...edge,
+        data: { ...edge.data, rag_status: edgeRag },
+        style: {
+          ...(edge.style ?? {}),
+          stroke: ragColor(edgeRag),
+          strokeWidth: 2.5,
+        },
+      };
+    });
+  }, [edges, nodeRagMap]);
+
   return (
     <div className="flex h-full w-full">
       {/* Main canvas area */}
@@ -535,7 +575,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
         {/* React Flow Canvas */}
         <ReactFlow
           nodes={nodes}
-          edges={edges}
+          edges={coloredEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

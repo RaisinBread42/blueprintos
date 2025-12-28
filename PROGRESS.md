@@ -6,7 +6,9 @@
 
 ## Current Focus
 
-**No active feature.** Phase 1 (Iron Horse) complete! Next up: **feat-004 (Sensors + dashboards with RAG overlays)**.
+**Active Feature**: `feat-004` — Sensors + Dashboards (RAG v1)
+
+**Next Up**: Iteration 3 (Edge RAG Styling)
 
 ### Roadmap (kept intentionally lightweight)
 
@@ -25,8 +27,8 @@
 | Metric                | Value      |
 | --------------------- | ---------- |
 | Features Completed    | 4          |
-| Currently In Progress | 0          |
-| Backlog Items         | 4          |
+| Currently In Progress | 1          |
+| Backlog Items         | 3          |
 | Last Updated          | 2025-12-27 |
 
 ---
@@ -47,7 +49,200 @@ These rules are validated after every implementation:
 
 ## Active Feature
 
-_None currently active._
+### feat-004: Sensors + Dashboards (RAG v1)
+
+**Status**: in progress  
+**Complexity**: L (5-6 hours)  
+**Started**: 2025-12-27
+
+#### Summary
+
+Transform the DAG editor into a live operational dashboard where users can:
+- Edit station sensor data (all metrics)
+- See computed RAG status propagate through the graph
+- View aggregate dashboards with Recharts visualizations
+
+---
+
+#### Implementation Iterations
+
+| # | Iteration | Est. Time | Status |
+|---|-----------|-----------|--------|
+| 1 | Metric Editor Panel | ~45 min | ✅ complete |
+| 2 | RAG Computation Library | ~45 min | ✅ complete |
+| 3 | Edge RAG Styling | ~30 min | 🔜 next |
+| 4 | Service Line Rollups | ~45 min | ⏳ pending |
+| 5 | Dashboard + Summary Cards | ~1 hour | ⏳ pending |
+| 6 | Variance Bar Chart | ~45 min | ⏳ pending |
+| 7 | QA Distribution Chart | ~30 min | ⏳ pending |
+
+---
+
+##### Iteration 1: Metric Editor Panel ⏱️ ~45 min
+
+**Goal**: Allow editing all station metrics in the side panel.
+
+| Task | Description |
+|------|-------------|
+| Expand `StationPanel` | Add form fields for `fair_pricing` (planned_hrs, actual_hrs, market_value) |
+| Add World Class fields | Edit `internal_qa_score`, `standard_met`, `industry_benchmark` |
+| Add Performance Proof | Dynamic key-value editor for flexible fields |
+| Wire up `onUpdate` | Changes to metrics update the node in real-time |
+
+**Verification**:
+- Select a station in the editor
+- See all metrics displayed in editable fields
+- Edit `planned_hrs` → value updates on the node
+- Change `actual_hrs` → variance recalculates automatically
+- Toggle `standard_met` → RAG dot changes color
+- Save → metrics persist to JSON file
+
+---
+
+##### Iteration 2: RAG Computation Library ⏱️ ~45 min
+
+**Goal**: Formalize RAG logic in a tested, reusable module.
+
+| Task | Description |
+|------|-------------|
+| Create `src/lib/rag/compute.ts` | Pure functions with clear interfaces |
+| `computeStationRag()` | Returns RAG based on fair_pricing + world_class thresholds |
+| Define thresholds | variance > 20% = red, > 10% = amber; QA < benchmark = red |
+| Unit tests | Test edge cases: exactly on threshold, negative variance |
+| Refactor `StationNode` | Use new `computeStationRag()` instead of inline logic |
+
+**Verification**:
+- Run `pnpm test` → RAG tests pass
+- Station with variance > 20% shows red dot
+- Station with variance 15% shows amber dot
+- Station at/under budget with good QA shows green
+
+---
+
+##### Iteration 3: Edge RAG Styling ⏱️ ~30 min
+
+**Goal**: Color edges based on the RAG status of connected stations.
+
+| Task | Description |
+|------|-------------|
+| Compute edge RAG | Edge inherits worst RAG of source/target stations |
+| Custom edge styles | Use React Flow's style prop for stroke colors |
+| Color mapping | Green → emerald, Amber → amber, Red → red stroke |
+
+**Verification**:
+- Edge between two green stations is emerald
+- Edge connecting to a red station turns red
+- Change station metrics → connected edges update
+
+---
+
+##### Iteration 4: Service Line Rollups ⏱️ ~45 min
+
+**Goal**: Aggregate metrics across all stations in a service line.
+
+| Task | Description |
+|------|-------------|
+| Create `src/lib/rag/rollup.ts` | Aggregation functions |
+| `computeServiceLineRollup()` | total_planned, total_actual, avg_qa, variance_pct |
+| `computeServiceLineRag()` | red if any station red, amber if any amber |
+| Add rollup display | Summary stats in editor header |
+| Unit tests | Test with various station combinations |
+
+**Verification**:
+- Editor header shows "Total: 63h planned / 66h actual (+5%)"
+- Shows "4/5 stations at standard"
+- Overall RAG badge reflects worst station
+
+---
+
+##### Iteration 5: Dashboard + Summary Cards ⏱️ ~1 hour
+
+**Goal**: Create a dedicated dashboard page with RAG summary cards.
+
+| Task | Description |
+|------|-------------|
+| Create `/dashboard` route | New page with list of service lines |
+| Fetch all service lines | Use existing API |
+| RAG Summary Cards | Card per service line with key stats |
+| Navigation | Link from home page + editor header |
+
+**Verification**:
+- Navigate to `/dashboard`
+- See cards for each service line
+- Cards show overall RAG status
+- Click card → opens editor with that service line
+
+---
+
+##### Iteration 6: Variance Bar Chart ⏱️ ~45 min
+
+**Goal**: Add a Recharts bar chart showing variance by station.
+
+| Task | Description |
+|------|-------------|
+| Create `VarianceChart.tsx` | Recharts BarChart component |
+| Show variance per station | X = station names, Y = variance hours |
+| Color bars by RAG | Red/amber/green based on station RAG |
+
+**Verification**:
+- Dashboard shows bar chart
+- Bars are colored by RAG
+- Hover shows tooltip with exact values
+
+---
+
+##### Iteration 7: QA Distribution Chart ⏱️ ~30 min
+
+**Goal**: Add a chart showing QA scores vs benchmark.
+
+| Task | Description |
+|------|-------------|
+| Create `QADistributionChart.tsx` | Recharts AreaChart or BarChart |
+| Plot QA scores | Each station's score vs benchmark line |
+| Reference line | Horizontal line at industry benchmark |
+
+**Verification**:
+- Chart shows QA scores for all stations
+- Benchmark line visible
+- Stations below benchmark stand out
+
+---
+
+#### Files to be Created/Modified
+
+```
+src/
+├── lib/
+│   └── rag/
+│       ├── compute.ts          # RAG computation (Iteration 2)
+│       ├── compute.test.ts     # Unit tests (Iteration 2)
+│       ├── rollup.ts           # Aggregation (Iteration 4)
+│       └── rollup.test.ts      # Tests (Iteration 4)
+├── app/
+│   └── dashboard/
+│       ├── page.tsx            # Dashboard (Iteration 5)
+│       └── layout.tsx          # Layout (Iteration 5)
+├── components/
+│   ├── dag/
+│   │   ├── StationPanel.tsx    # Expand metrics (Iteration 1)
+│   │   └── ServiceLineEditor.tsx  # Edge styles, header (Iterations 3, 4)
+│   └── dashboard/
+│       ├── ServiceLineCard.tsx # Summary card (Iteration 5)
+│       ├── VarianceChart.tsx   # Bar chart (Iteration 6)
+│       └── QADistributionChart.tsx  # QA chart (Iteration 7)
+```
+
+---
+
+#### Success Criteria
+
+- [ ] Can edit all station metrics in the side panel
+- [ ] RAG status computed with formal, tested logic
+- [ ] Edges colored based on station RAG
+- [ ] Service line rollups visible in editor
+- [ ] Dashboard page with summary cards
+- [ ] Variance bar chart with RAG coloring
+- [ ] QA distribution chart with benchmark line
 
 ---
 

@@ -3,29 +3,16 @@
 import { memo } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import type { StationNodeData } from "@/lib/dag/transforms";
+import { computeStationRag, getRagDisplay } from "@/lib/rag/compute";
 
 /**
  * Custom node component for stations in the service line DAG.
  * Displays station name, department, data source, and RAG status.
  */
 function StationNodeComponent({ data, selected }: NodeProps<StationNodeData>) {
-  // RAG color mapping
-  const ragColors = {
-    green: "bg-emerald-500",
-    amber: "bg-amber-500",
-    red: "bg-red-500",
-  };
-
-  // Calculate RAG status from metrics if not explicitly set
-  const computedRag = (() => {
-    if (data.rag_status) return data.rag_status;
-    const { fair_pricing, world_class } = data.metrics;
-    if (fair_pricing.labor_variance > 5 || !world_class.standard_met) return "red";
-    if (fair_pricing.labor_variance > 2) return "amber";
-    return "green";
-  })();
-
-  const computedRagColor = ragColors[computedRag];
+  // Calculate RAG status using the formal computation
+  const computedRag = computeStationRag(data.metrics, data.rag_status);
+  const ragDisplay = getRagDisplay(computedRag);
 
   return (
     <div
@@ -47,7 +34,7 @@ function StationNodeComponent({ data, selected }: NodeProps<StationNodeData>) {
 
       {/* Header with RAG indicator */}
       <div className="flex items-center gap-2 border-b border-slate-800 px-3 py-2">
-        <div className={`h-2.5 w-2.5 rounded-full ${computedRagColor}`} />
+        <div className={`h-2.5 w-2.5 rounded-full ${ragDisplay.bgSolid}`} />
         <span className="font-semibold text-white text-sm truncate flex-1">
           {data.name}
         </span>
