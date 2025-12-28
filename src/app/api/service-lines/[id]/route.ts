@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { ApiResponse, ServiceLine } from "@/types";
 import { isServiceLine } from "@/lib/blueprint/validate";
 import { deleteServiceLine, readServiceLine, writeServiceLine } from "@/lib/storage/serviceLines";
+import { readStation, writeStation } from "@/lib/storage/stations";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,25 @@ export async function GET(_: Request, ctx: { params: { id: string } }) {
     const res: ApiResponse<null> = { success: false, data: null, error: "Service line not found." };
     return NextResponse.json(res, { status: 404 });
   }
-  const res: ApiResponse<ServiceLine> = { success: true, data: sl };
+
+  const hydratedNodes = await Promise.all(
+    sl.nodes.map(async (node) => {
+      const station = await readStation(node.station_id);
+      if (station) {
+        return {
+          ...node,
+          name: node.name ?? station.name,
+          department: node.department ?? station.department,
+          data_source: station.data_source,
+          rag_status: station.rag_status,
+          metrics: station.metrics,
+        };
+      }
+      return node;
+    })
+  );
+
+  const res: ApiResponse<ServiceLine> = { success: true, data: { ...sl, nodes: hydratedNodes } };
   return NextResponse.json(res);
 }
 
@@ -38,6 +57,21 @@ export async function PUT(req: Request, ctx: { params: { id: string } }) {
     };
     return NextResponse.json(res, { status: 400 });
   }
+
+  // Persist stations globally (no per-line overrides)
+  await Promise.all(
+    body.nodes.map((node) =>
+      writeStation({
+        station_id: node.station_id,
+        name: node.name,
+        department: node.department,
+        data_source: node.data_source,
+        metrics: node.metrics,
+        rag_status: node.rag_status,
+        position: node.position,
+      })
+    )
+  );
 
   const saved = await writeServiceLine(body);
   const res: ApiResponse<ServiceLine> = { success: true, data: saved, message: "Service line updated." };

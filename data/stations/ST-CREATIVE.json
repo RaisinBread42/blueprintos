@@ -1,0 +1,13 @@
+{
+  "station_id": "ST-CREATIVE",
+  "name": "Creative Production",
+  "department": "Creative",
+  "data_source": "mock",
+  "rag_status": "amber",
+  "position": { "x": 240, "y": 40 },
+  "metrics": {
+    "fair_pricing": { "planned_hrs": 24, "actual_hrs": 28, "labor_variance": 4, "market_value": 2200 },
+    "world_class": { "internal_qa_score": 7.4, "industry_benchmark": 8.2, "standard_met": false },
+    "performance_proof": { "engagement_rate": 0.045, "conversion_rate": 0.018, "roi": 1.3 }
+  }
+}

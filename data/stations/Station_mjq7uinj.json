@@ -1,0 +1,12 @@
+{
+  "station_id": "Station_mjq7uinj",
+  "name": "New Station",
+  "data_source": "mock",
+  "rag_status": "green",
+  "position": { "x": 400, "y": 300 },
+  "metrics": {
+    "fair_pricing": { "planned_hrs": 0, "actual_hrs": 0, "labor_variance": 0 },
+    "world_class": { "internal_qa_score": 0, "industry_benchmark": 0, "standard_met": false },
+    "performance_proof": {}
+  }
+}
