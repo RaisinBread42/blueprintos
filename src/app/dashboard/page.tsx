@@ -22,8 +22,8 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<"base" | "scenario">("base");
-  const [scenarioNameInput, setScenarioNameInput] = useState("default");
   const [scenarioName, setScenarioName] = useState("default");
+  const [scenarioOptions, setScenarioOptions] = useState<string[]>(["default"]);
   const [scenarioData, setScenarioData] = useState<Record<string, ScenarioPayload>>({});
   const [scenarioLoading, setScenarioLoading] = useState(false);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
@@ -103,15 +103,25 @@ export default function DashboardPage() {
               }
               const json = await res.json();
               if (json.success && json.data?.scenario) {
-                return [sl.service_line_id, json.data.scenario as ScenarioPayload] as const;
+                return [sl.service_line_id, json.data.scenario as ScenarioPayload, json.data.names ?? []] as const;
               }
             } catch {
               // ignore
             }
-            return [sl.service_line_id, defaultScenario] as const;
+            return [sl.service_line_id, defaultScenario, []] as const;
           })
         );
-        setScenarioData(Object.fromEntries(entries));
+        const scenarioEntries = entries.map(([id, payload]) => [id, payload]);
+        const namesUnion = new Set<string>();
+        entries.forEach(([, , names]) => {
+          if (Array.isArray(names)) names.forEach((n) => namesUnion.add(n));
+        });
+        setScenarioOptions((prev) => {
+          const merged = new Set(prev);
+          namesUnion.forEach((n) => merged.add(n));
+          return Array.from(merged).sort();
+        });
+        setScenarioData(Object.fromEntries(scenarioEntries));
       } catch (err) {
         setScenarioError(err instanceof Error ? err.message : "Failed to load scenarios");
       } finally {
@@ -126,6 +136,12 @@ export default function DashboardPage() {
       loadScenarioForAll(scenarioName || "default");
     }
   }, [viewMode, scenarioName, loadScenarioForAll]);
+
+  useEffect(() => {
+    if (viewMode === "scenario" && scenarioOptions.length > 0 && !scenarioOptions.includes(scenarioName)) {
+      setScenarioName(scenarioOptions[0]);
+    }
+  }, [viewMode, scenarioOptions, scenarioName]);
 
   const serviceLinesForView = useMemo(() => {
     if (viewMode !== "scenario") return serviceLines;
@@ -189,18 +205,18 @@ export default function DashboardPage() {
           </div>
           <div className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2">
             <span className="text-slate-400">Scenario name</span>
-            <input
-              value={scenarioNameInput}
-              onChange={(e) => setScenarioNameInput(e.target.value)}
-              className="w-40 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-sm"
-              placeholder="default"
-            />
-            <button
-              onClick={() => setScenarioName(scenarioNameInput.trim() || "default")}
-              className="rounded-md bg-emerald-700 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-600"
+            <select
+              value={scenarioName}
+              onChange={(e) => setScenarioName(e.target.value)}
+              className="w-44 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-sm"
             >
-              Apply
-            </button>
+              {scenarioOptions.length === 0 && <option value="default">default</option>}
+              {scenarioOptions.map((opt) => (
+                <option key={opt || "default"} value={opt || "default"}>
+                  {opt || "default"}
+                </option>
+              ))}
+            </select>
             {scenarioLoading && <Loader2 className="h-4 w-4 animate-spin text-emerald-300" />}
           </div>
           {scenarioError && <span className="text-xs text-red-400">Scenario error: {scenarioError}</span>}
