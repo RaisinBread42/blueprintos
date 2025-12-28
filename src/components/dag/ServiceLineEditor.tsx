@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import ReactFlow, {
   Background,
@@ -8,8 +9,11 @@ import ReactFlow, {
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   type NodeTypes,
   type OnSelectionChangeFunc,
+  type Node,
   BackgroundVariant,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -22,16 +26,47 @@ import {
 } from "@/lib/dag/transforms";
 import { StationNode } from "./StationNode";
 import { StationPanel } from "./StationPanel";
+import { Button } from "@/components/ui/button";
 
 const nodeTypes: NodeTypes = {
   stationNode: StationNode,
 };
 
-interface ServiceLineEditorProps {
+// Generate a unique station ID
+function generateStationId(): string {
+  return `Station_${Date.now().toString(36)}`;
+}
+
+// Create default station data for a new node
+function createDefaultStationData(id: string): StationNodeData {
+  return {
+    station_id: id,
+    name: "New Station",
+    department: undefined,
+    data_source: "mock",
+    metrics: {
+      fair_pricing: {
+        planned_hrs: 0,
+        actual_hrs: 0,
+        labor_variance: 0,
+      },
+      world_class: {
+        internal_qa_score: 0,
+        standard_met: false,
+      },
+      performance_proof: {},
+    },
+  };
+}
+
+interface ServiceLineEditorInnerProps {
   serviceLine: ServiceLine;
 }
 
-export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
+function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
+  // React Flow instance for viewport operations
+  const { getViewport } = useReactFlow();
+
   // Convert service line to React Flow format
   const initialFlow = useMemo(
     () => serviceLineToFlow(serviceLine),
@@ -42,7 +77,7 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<StationNodeData>(
     initialFlow.nodes
   );
-  const [edges, , onEdgesChange] = useEdgesState<TrackEdgeData>(
+  const [edges, setEdges, onEdgesChange] = useEdgesState<TrackEdgeData>(
     initialFlow.edges
   );
 
@@ -89,6 +124,43 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
 
     setHasUnsavedChanges(true);
   }, [selectedNodeId, setNodes]);
+
+  // Add new station
+  const handleAddStation = useCallback(() => {
+    const viewport = getViewport();
+    const id = generateStationId();
+    
+    // Position new node at center of current viewport
+    const newNode: Node<StationNodeData> = {
+      id,
+      type: "stationNode",
+      position: {
+        x: (-viewport.x + 400) / viewport.zoom,
+        y: (-viewport.y + 300) / viewport.zoom,
+      },
+      data: createDefaultStationData(id),
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+    setSelectedNodeId(id);
+    setHasUnsavedChanges(true);
+  }, [getViewport, setNodes]);
+
+  // Delete selected station
+  const handleDeleteStation = useCallback(() => {
+    if (!selectedNodeId) return;
+
+    // Remove the node
+    setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
+    
+    // Remove edges connected to this node
+    setEdges((eds) => eds.filter(
+      (edge) => edge.source !== selectedNodeId && edge.target !== selectedNodeId
+    ));
+
+    setSelectedNodeId(null);
+    setHasUnsavedChanges(true);
+  }, [selectedNodeId, setNodes, setEdges]);
 
   // Close panel handler
   const handleClosePanel = useCallback(() => {
@@ -150,10 +222,20 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span>{nodes.length} stations</span>
-            <span>•</span>
-            <span>{edges.length} tracks</span>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={handleAddStation}
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Station
+            </Button>
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span>{nodes.length} stations</span>
+              <span>•</span>
+              <span>{edges.length} tracks</span>
+            </div>
           </div>
         </div>
 
@@ -170,6 +252,7 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
           className="bg-slate-950"
           minZoom={0.1}
           maxZoom={2}
+          deleteKeyCode={["Backspace", "Delete"]}
           defaultEdgeOptions={{
             style: { stroke: "#475569", strokeWidth: 2 },
             animated: false,
@@ -198,8 +281,21 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
           station={selectedStation}
           onClose={handleClosePanel}
           onUpdate={handleStationUpdate}
+          onDelete={handleDeleteStation}
         />
       )}
     </div>
+  );
+}
+
+interface ServiceLineEditorProps {
+  serviceLine: ServiceLine;
+}
+
+export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
+  return (
+    <ReactFlowProvider>
+      <ServiceLineEditorInner serviceLine={serviceLine} />
+    </ReactFlowProvider>
   );
 }

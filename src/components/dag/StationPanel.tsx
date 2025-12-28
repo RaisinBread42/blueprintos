@@ -1,20 +1,22 @@
 "use client";
 
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import type { StationNodeData } from "@/lib/dag/transforms";
 
 interface StationPanelProps {
   station: StationNodeData;
   onClose: () => void;
   onUpdate: (updates: Partial<StationNodeData>) => void;
+  onDelete: () => void;
 }
 
 /**
  * Side panel for viewing and editing station details.
  */
-export function StationPanel({ station, onClose, onUpdate }: StationPanelProps) {
+export function StationPanel({ station, onClose, onUpdate, onDelete }: StationPanelProps) {
   const { fair_pricing, world_class, performance_proof } = station.metrics;
 
   // Compute RAG status
@@ -213,10 +215,18 @@ export function StationPanel({ station, onClose, onUpdate }: StationPanelProps) 
         </section>
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-slate-800 px-4 py-3">
+      {/* Footer with delete */}
+      <div className="border-t border-slate-800 px-4 py-3 space-y-3">
+        <Button
+          onClick={onDelete}
+          variant="outline"
+          className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/50"
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete Station
+        </Button>
         <p className="text-xs text-slate-500 text-center">
-          Changes update the canvas in real-time
+          Or press Delete/Backspace with station selected
         </p>
       </div>
     </div>
