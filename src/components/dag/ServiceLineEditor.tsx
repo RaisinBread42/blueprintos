@@ -118,11 +118,42 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
 
   // Scenario sliders (in-memory only), additive deltas (no scaling)
-  const [scenario, setScenario] = useState({
-    laborDelta: 0, // +/- hours applied to actual_hrs
-    timeDelta: 0, // +/- hours applied to planned_hrs
-    qualityDelta: 0, // +/- points applied to QA/benchmark
-  });
+  const defaultScenario = useMemo(
+    () => ({
+      laborDelta: 0, // +/- hours applied to actual_hrs
+      timeDelta: 0, // +/- hours applied to planned_hrs
+      qualityDelta: 0, // +/- points applied to QA/benchmark
+    }),
+    []
+  );
+
+  const [scenario, setScenario] = useState(defaultScenario);
+
+  const loadScenarioFromStorage = useCallback(
+    (id: string) => {
+      try {
+        const raw = localStorage.getItem(`scenario:${id}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          setScenario({
+            laborDelta: parsed.laborDelta ?? 0,
+            timeDelta: parsed.timeDelta ?? 0,
+            qualityDelta: parsed.qualityDelta ?? 0,
+          });
+          return;
+        }
+      } catch {
+        // ignore parse/storage errors
+      }
+      setScenario(defaultScenario);
+    },
+    [defaultScenario]
+  );
+
+  // Reload scenario whenever the service line changes
+  useEffect(() => {
+    loadScenarioFromStorage(serviceLine.service_line_id);
+  }, [serviceLine.service_line_id, loadScenarioFromStorage]);
 
   // New service line dialog state
   const [showNewDialog, setShowNewDialog] = useState(false);
@@ -737,6 +768,69 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               />
             </div>
           ))}
+          </div>
+
+          {/* Scenario actions */}
+          <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="border border-emerald-700/60 text-emerald-100 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
+              onClick={() => {
+                try {
+                  localStorage.setItem(
+                    `scenario:${serviceLine.service_line_id}`,
+                    JSON.stringify(scenario)
+                  );
+                } catch {
+                  // ignore storage errors silently
+                }
+              }}
+              title="Save scenario deltas locally (browser only)"
+            >
+              Save Scenario (local)
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
+              onClick={() => {
+                try {
+                  const raw = localStorage.getItem(`scenario:${serviceLine.service_line_id}`);
+                  if (raw) {
+                    const parsed = JSON.parse(raw);
+                    setScenario({
+                      laborDelta: parsed.laborDelta ?? 0,
+                      timeDelta: parsed.timeDelta ?? 0,
+                      qualityDelta: parsed.qualityDelta ?? 0,
+                    });
+                  } else {
+                    setScenario(defaultScenario);
+                  }
+                } catch {
+                  setScenario(defaultScenario);
+                }
+              }}
+              title="Load saved scenario deltas for this service line (browser only)"
+            >
+              Load Scenario
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
+              onClick={() => {
+                setScenario(defaultScenario);
+                try {
+                  localStorage.removeItem(`scenario:${serviceLine.service_line_id}`);
+                } catch {
+                  // ignore
+                }
+              }}
+              title="Reset scenario deltas to zero"
+            >
+              Reset
+            </Button>
           </div>
         </div>
 
