@@ -11,9 +11,12 @@ import ReactFlow, {
   useEdgesState,
   useReactFlow,
   ReactFlowProvider,
+  addEdge,
   type NodeTypes,
   type OnSelectionChangeFunc,
+  type OnConnect,
   type Node,
+  type Edge,
   BackgroundVariant,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -26,6 +29,7 @@ import {
 } from "@/lib/dag/transforms";
 import { StationNode } from "./StationNode";
 import { StationPanel } from "./StationPanel";
+import { EdgePanel } from "./EdgePanel";
 import { Button } from "@/components/ui/button";
 
 const nodeTypes: NodeTypes = {
@@ -83,6 +87,9 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
 
   // Selected node ID (we track ID, then derive station data from nodes)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  
+  // Selected edge ID
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
 
   // Track unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -94,14 +101,42 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
     return node?.data ?? null;
   }, [nodes, selectedNodeId]);
 
-  // Handle selection changes
-  const onSelectionChange: OnSelectionChangeFunc = useCallback(({ nodes: selectedNodes }) => {
+  // Get the currently selected edge
+  const selectedEdge = useMemo(() => {
+    if (!selectedEdgeId) return null;
+    return edges.find((e) => e.id === selectedEdgeId) ?? null;
+  }, [edges, selectedEdgeId]);
+
+  // Handle selection changes (nodes and edges)
+  const onSelectionChange: OnSelectionChangeFunc = useCallback(({ nodes: selectedNodes, edges: selectedEdges }) => {
     if (selectedNodes.length === 1) {
       setSelectedNodeId(selectedNodes[0].id);
+      setSelectedEdgeId(null);
+    } else if (selectedEdges.length === 1) {
+      setSelectedEdgeId(selectedEdges[0].id);
+      setSelectedNodeId(null);
     } else {
       setSelectedNodeId(null);
+      setSelectedEdgeId(null);
     }
   }, []);
+
+  // Handle new edge connections
+  const onConnect: OnConnect = useCallback((connection) => {
+    if (!connection.source || !connection.target) return;
+    
+    const newEdge: Edge<TrackEdgeData> = {
+      id: `${connection.source}->${connection.target}`,
+      source: connection.source,
+      target: connection.target,
+      data: {
+        weight: { cost: 1, time: 1 },
+      },
+    };
+
+    setEdges((eds) => addEdge(newEdge, eds));
+    setHasUnsavedChanges(true);
+  }, [setEdges]);
 
   // Handle station updates from the panel
   const handleStationUpdate = useCallback((updates: Partial<StationNodeData>) => {
@@ -125,6 +160,28 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
     setHasUnsavedChanges(true);
   }, [selectedNodeId, setNodes]);
 
+  // Handle edge updates from the panel
+  const handleEdgeUpdate = useCallback((updates: Partial<TrackEdgeData>) => {
+    if (!selectedEdgeId) return;
+
+    setEdges((eds) =>
+      eds.map((edge) => {
+        if (edge.id === selectedEdgeId) {
+          return {
+            ...edge,
+            data: {
+              ...edge.data,
+              ...updates,
+            } as TrackEdgeData,
+          };
+        }
+        return edge;
+      })
+    );
+
+    setHasUnsavedChanges(true);
+  }, [selectedEdgeId, setEdges]);
+
   // Add new station
   const handleAddStation = useCallback(() => {
     const viewport = getViewport();
@@ -143,6 +200,7 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
 
     setNodes((nds) => [...nds, newNode]);
     setSelectedNodeId(id);
+    setSelectedEdgeId(null);
     setHasUnsavedChanges(true);
   }, [getViewport, setNodes]);
 
@@ -162,9 +220,19 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
     setHasUnsavedChanges(true);
   }, [selectedNodeId, setNodes, setEdges]);
 
+  // Delete selected edge
+  const handleDeleteEdge = useCallback(() => {
+    if (!selectedEdgeId) return;
+
+    setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
+    setSelectedEdgeId(null);
+    setHasUnsavedChanges(true);
+  }, [selectedEdgeId, setEdges]);
+
   // Close panel handler
   const handleClosePanel = useCallback(() => {
     setSelectedNodeId(null);
+    setSelectedEdgeId(null);
   }, []);
 
   return (
@@ -245,6 +313,7 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
           fitView
@@ -257,6 +326,8 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
             style: { stroke: "#475569", strokeWidth: 2 },
             animated: false,
           }}
+          edgesUpdatable
+          edgesFocusable
         >
           <Background
             variant={BackgroundVariant.Dots}
@@ -282,6 +353,19 @@ function ServiceLineEditorInner({ serviceLine }: ServiceLineEditorInnerProps) {
           onClose={handleClosePanel}
           onUpdate={handleStationUpdate}
           onDelete={handleDeleteStation}
+        />
+      )}
+
+      {/* Edge Panel (shown when an edge is selected) */}
+      {selectedEdge && (
+        <EdgePanel
+          edgeId={selectedEdge.id}
+          source={selectedEdge.source}
+          target={selectedEdge.target}
+          data={selectedEdge.data}
+          onClose={handleClosePanel}
+          onUpdate={handleEdgeUpdate}
+          onDelete={handleDeleteEdge}
         />
       )}
     </div>
