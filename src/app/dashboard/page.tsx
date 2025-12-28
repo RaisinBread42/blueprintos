@@ -6,7 +6,6 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
-import { useState, useMemo } from "react";
 
 export default function DashboardPage() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
@@ -90,7 +89,7 @@ export default function DashboardPage() {
                         }))
                       }
                     />
-                    {isOpen && <VarianceChart serviceLine={sl} height={160} title="Variance by Station" />}
+                    {isOpen && <VarianceChart serviceLine={sl} title="Variance by Station" />}
                   </div>
                 );
               })}

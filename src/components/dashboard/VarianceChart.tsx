@@ -30,7 +30,7 @@ const ragColor = (rag: string) => {
   }
 };
 
-export function VarianceChart({ serviceLine, height = 180, title = "Variance by Station" }: VarianceChartProps) {
+export function VarianceChart({ serviceLine, height = 256, title = "Variance by Station" }: VarianceChartProps) {
   const data = serviceLine.nodes.map((node) => {
     const rag = computeStationRag(node.metrics, node.rag_status);
     return {
