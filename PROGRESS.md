@@ -49,7 +49,7 @@ These rules are validated after every implementation:
 
 ### feat-005: Synthetic data generator + sandbox simulation
 
-**Status**: in_progress  
+**Status**: complete  
 **Complexity**: L (6-8 hours)  
 **Started**: 2025-12-28
 
@@ -65,7 +65,7 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 | 2 | Scenario sliders (labor/time/quality) | ~45 min | ✅ complete (`15ffa7a`) |
 | 3 | Apply scenarios to service lines (in-memory) | ~45 min | ✅ complete (`709c90e`) |
 | 4 | Save/restore scenarios locally | ~45 min | ✅ complete (`0cba096`) |
-| 5 | Dashboard toggle (base vs scenario) | ~45 min | ⏳ pending |
+| 5 | Dashboard toggle (base vs scenario) | ~45 min | ✅ complete (`4639ca3`) |
 
 #### Progress
 
@@ -73,6 +73,7 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 - Iteration 2: Added additive scenario sliders (labor/time/quality) applied in-memory to view/RAG; base data untouched until save.
 - Iteration 3: Scenario export (view-only) and build fixes; scenario-adjusted snapshot download without persisting changes.
 - Iteration 4: Added local scenario save/load/reset (per service line) stored on server (no browser storage); auto-loads per service line on switch.
+- Iteration 5: Dashboard toggle for base vs scenario view with named scenario selector; loads slider-delta scenarios per service line and overlays on cards/charts.
 
 #### Success Criteria
 
