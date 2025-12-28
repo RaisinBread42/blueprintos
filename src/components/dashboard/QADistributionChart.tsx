@@ -115,6 +115,16 @@ export function QADistributionChart({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500" />
+          QA Score
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 rounded-sm bg-indigo-500" />
+          Benchmark
+        </span>
+      </div>
     </div>
   );
 }

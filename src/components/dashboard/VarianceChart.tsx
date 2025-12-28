@@ -86,6 +86,20 @@ export function VarianceChart({ serviceLine, height = 256, title = "Variance by 
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+          Healthy
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+          Warning
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+          Critical
+        </span>
+      </div>
     </div>
   );
 }
