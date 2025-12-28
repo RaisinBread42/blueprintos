@@ -1,18 +1,20 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Pencil } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { StationNodeData } from "@/lib/dag/transforms";
 
 interface StationPanelProps {
   station: StationNodeData;
   onClose: () => void;
+  onUpdate: (updates: Partial<StationNodeData>) => void;
 }
 
 /**
- * Side panel showing details of the selected station.
- * Read-only in Iteration 2; editing comes in Iteration 3.
+ * Side panel for viewing and editing station details.
  */
-export function StationPanel({ station, onClose }: StationPanelProps) {
+export function StationPanel({ station, onClose, onUpdate }: StationPanelProps) {
   const { fair_pricing, world_class, performance_proof } = station.metrics;
 
   // Compute RAG status
@@ -35,7 +37,10 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
     <div className="flex h-full w-80 flex-col border-l border-slate-800 bg-slate-950">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-        <h2 className="text-lg font-semibold text-white truncate">{station.name}</h2>
+        <div className="flex items-center gap-2">
+          <Pencil className="h-4 w-4 text-emerald-500" />
+          <h2 className="text-lg font-semibold text-white">Edit Station</h2>
+        </div>
         <button
           onClick={onClose}
           className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
@@ -46,28 +51,77 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {/* Station Info */}
+        {/* Editable Station Info */}
         <section>
           <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500 mb-3">
             Station Info
           </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-slate-400">ID</span>
-              <span className="text-sm text-slate-200 font-mono">{station.station_id}</span>
+          <div className="space-y-4">
+            {/* Station ID (read-only) */}
+            <div className="space-y-1.5">
+              <Label className="text-slate-400 text-xs">Station ID</Label>
+              <div className="text-sm text-slate-300 font-mono bg-slate-900 px-3 py-2 rounded-md border border-slate-800">
+                {station.station_id}
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-slate-400">Department</span>
-              <span className="text-sm text-slate-200">{station.department || "—"}</span>
+
+            {/* Name (editable) */}
+            <div className="space-y-1.5">
+              <Label htmlFor="station-name" className="text-slate-400 text-xs">
+                Name
+              </Label>
+              <Input
+                id="station-name"
+                value={station.name}
+                onChange={(e) => onUpdate({ name: e.target.value })}
+                className="bg-slate-900 border-slate-700 text-white focus:border-emerald-500 focus:ring-emerald-500/20"
+              />
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-slate-400">Data Source</span>
-              <span className={`text-sm ${station.data_source === "api" ? "text-blue-400" : "text-slate-400"}`}>
-                {station.data_source.toUpperCase()}
-              </span>
+
+            {/* Department (editable) */}
+            <div className="space-y-1.5">
+              <Label htmlFor="station-dept" className="text-slate-400 text-xs">
+                Department
+              </Label>
+              <Input
+                id="station-dept"
+                value={station.department || ""}
+                onChange={(e) => onUpdate({ department: e.target.value || undefined })}
+                placeholder="e.g., Creative, Operations"
+                className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-emerald-500 focus:ring-emerald-500/20"
+              />
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400">Status</span>
+
+            {/* Data Source (editable) */}
+            <div className="space-y-1.5">
+              <Label className="text-slate-400 text-xs">Data Source</Label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onUpdate({ data_source: "mock" })}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    station.data_source === "mock"
+                      ? "bg-slate-700 text-white"
+                      : "bg-slate-900 text-slate-400 hover:bg-slate-800"
+                  }`}
+                >
+                  Mock
+                </button>
+                <button
+                  onClick={() => onUpdate({ data_source: "api" })}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    station.data_source === "api"
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-900 text-slate-400 hover:bg-slate-800"
+                  }`}
+                >
+                  API
+                </button>
+              </div>
+            </div>
+
+            {/* Status (read-only, computed) */}
+            <div className="flex justify-between items-center pt-2">
+              <span className="text-xs text-slate-500">Computed Status</span>
               <span className={`text-sm px-2 py-0.5 rounded-full ${rag.bg} ${rag.color}`}>
                 {rag.label}
               </span>
@@ -75,7 +129,7 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
           </div>
         </section>
 
-        {/* Fair Pricing Metrics */}
+        {/* Fair Pricing Metrics (read-only for now) */}
         <section>
           <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500 mb-3">
             Fair Pricing
@@ -111,7 +165,7 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
           </div>
         </section>
 
-        {/* World Class Metrics */}
+        {/* World Class Metrics (read-only for now) */}
         <section>
           <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500 mb-3">
             World Class
@@ -136,7 +190,7 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
           </div>
         </section>
 
-        {/* Performance Proof Metrics */}
+        {/* Performance Proof Metrics (read-only for now) */}
         <section>
           <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500 mb-3">
             Performance Proof
@@ -159,13 +213,12 @@ export function StationPanel({ station, onClose }: StationPanelProps) {
         </section>
       </div>
 
-      {/* Footer hint */}
+      {/* Footer */}
       <div className="border-t border-slate-800 px-4 py-3">
         <p className="text-xs text-slate-500 text-center">
-          Click another station to switch, or click canvas to deselect
+          Changes update the canvas in real-time
         </p>
       </div>
     </div>
   );
 }
-

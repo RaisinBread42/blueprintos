@@ -39,28 +39,60 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
   );
 
   // React Flow state hooks
-  const [nodes, , onNodesChange] = useNodesState<StationNodeData>(
+  const [nodes, setNodes, onNodesChange] = useNodesState<StationNodeData>(
     initialFlow.nodes
   );
   const [edges, , onEdgesChange] = useEdgesState<TrackEdgeData>(
     initialFlow.edges
   );
 
-  // Selected station state
-  const [selectedStation, setSelectedStation] = useState<StationNodeData | null>(null);
+  // Selected node ID (we track ID, then derive station data from nodes)
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
+  // Track unsaved changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Get the currently selected station data from nodes
+  const selectedStation = useMemo(() => {
+    if (!selectedNodeId) return null;
+    const node = nodes.find((n) => n.id === selectedNodeId);
+    return node?.data ?? null;
+  }, [nodes, selectedNodeId]);
 
   // Handle selection changes
   const onSelectionChange: OnSelectionChangeFunc = useCallback(({ nodes: selectedNodes }) => {
     if (selectedNodes.length === 1) {
-      setSelectedStation(selectedNodes[0].data as StationNodeData);
+      setSelectedNodeId(selectedNodes[0].id);
     } else {
-      setSelectedStation(null);
+      setSelectedNodeId(null);
     }
   }, []);
 
+  // Handle station updates from the panel
+  const handleStationUpdate = useCallback((updates: Partial<StationNodeData>) => {
+    if (!selectedNodeId) return;
+
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === selectedNodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...updates,
+            },
+          };
+        }
+        return node;
+      })
+    );
+
+    setHasUnsavedChanges(true);
+  }, [selectedNodeId, setNodes]);
+
   // Close panel handler
   const handleClosePanel = useCallback(() => {
-    setSelectedStation(null);
+    setSelectedNodeId(null);
   }, []);
 
   return (
@@ -105,9 +137,16 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
               </svg>
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-white">
-                {serviceLine.name}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-semibold text-white">
+                  {serviceLine.name}
+                </h1>
+                {hasUnsavedChanges && (
+                  <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
+                    Unsaved
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
             </div>
           </div>
@@ -158,6 +197,7 @@ export function ServiceLineEditor({ serviceLine }: ServiceLineEditorProps) {
         <StationPanel
           station={selectedStation}
           onClose={handleClosePanel}
+          onUpdate={handleStationUpdate}
         />
       )}
     </div>
