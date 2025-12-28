@@ -793,9 +793,9 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 setScenarioNameInput("");
                 setScenarioModalOpen(true);
               }}
-              title="Save scenario deltas locally on server"
+              title="Save slider deltas as a named scenario on the server"
             >
-              Save Scenario (local)
+              Save Slider Scenario
             </Button>
             <Button
               variant="ghost"
@@ -806,9 +806,9 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 setScenarioNameInput(scenarioNames[0] ?? "");
                 setScenarioModalOpen(true);
               }}
-              title="Load saved scenario deltas for this service line (server file)"
+              title="Load a saved slider scenario for this service line"
             >
-              Load Scenario
+              Load Slider Scenario
             </Button>
             <Button
               variant="ghost"
