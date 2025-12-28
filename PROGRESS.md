@@ -6,9 +6,7 @@
 
 ## Current Focus
 
-**Active Feature**: `feat-004` — Sensors + Dashboards (RAG v1)
-
-**Next Up**: Iteration 3 (Edge RAG Styling)
+**Active Feature**: `feat-005` — Synthetic data generator + sandbox simulation (planning)
 
 ### Roadmap (kept intentionally lightweight)
 
@@ -26,10 +24,10 @@
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 4          |
-| Currently In Progress | 1          |
-| Backlog Items         | 3          |
-| Last Updated          | 2025-12-27 |
+| Features Completed    | 5          |
+| Currently In Progress | 0          |
+| Backlog Items         | 2          |
+| Last Updated          | 2025-12-28 |
 
 ---
 
@@ -49,32 +47,73 @@ These rules are validated after every implementation:
 
 ## Active Feature
 
-### feat-004: Sensors + Dashboards (RAG v1)
+### feat-005: Synthetic data generator + sandbox simulation
 
-**Status**: in progress  
-**Complexity**: L (5-6 hours)  
-**Started**: 2025-12-27
+**Status**: planning  
+**Complexity**: L (6-8 hours)  
+**Started**: 2025-12-28
 
 #### Summary
 
-Transform the DAG editor into a live operational dashboard where users can:
-- Edit station sensor data (all metrics)
-- See computed RAG status propagate through the graph
-- View aggregate dashboards with Recharts visualizations
+Generate realistic mock station metrics and provide sandbox sliders to stress-test service lines. Allow saving and comparing scenarios locally.
 
----
-
-#### Implementation Iterations
+#### Planned Iterations (proposed)
 
 | # | Iteration | Est. Time | Status |
 |---|-----------|-----------|--------|
-| 1 | Metric Editor Panel | ~45 min | ✅ complete |
-| 2 | RAG Computation Library | ~45 min | ✅ complete |
-| 3 | Edge RAG Styling | ~30 min | ✅ complete |
-| 4 | Service Line Rollups | ~45 min | ✅ complete |
-| 5 | Dashboard + Summary Cards | ~1 hour | ✅ complete |
-| 6 | Variance Bar Chart | ~45 min | ✅ complete |
-| 7 | QA Distribution Chart | ~30 min | ✅ complete |
+| 1 | Synthetic generator core | ~45 min | 🔜 pending |
+| 2 | Scenario sliders (labor/time/quality) | ~45 min | ⏳ pending |
+| 3 | Apply scenarios to service lines (in-memory) | ~45 min | ⏳ pending |
+| 4 | Save/restore scenarios locally | ~45 min | ⏳ pending |
+| 5 | Dashboard toggle (base vs scenario) | ~45 min | ⏳ pending |
+
+#### Success Criteria
+
+- [ ] Generate mock metrics per station with realistic ranges
+- [ ] Scenario sliders adjust labor/time/quality and recompute RAG
+- [ ] Scenarios do not mutate persisted data unless saved explicitly
+- [ ] Can save/restore scenarios locally (per browser)
+- [ ] Dashboard can toggle between base data and scenario view
+
+---
+
+## Completed Feature
+
+### feat-004: Sensors + Dashboards (RAG v1)
+
+**Status**: complete ✅  
+**Complexity**: L (5-6 hours)  
+**Completed**: 2025-12-28
+
+#### Summary
+
+Delivered sensor editing, RAG computation, edge styling, rollups, and dashboards:
+
+* Metric editing for all station metrics
+* Formal RAG computation + edge coloring
+* Rollup stats in editor header
+* Dashboard with summary cards
+* Variance bar chart with RAG coloring
+* QA distribution chart with benchmark overlay
+
+#### Files Created/Modified
+
+* `src/lib/rag/compute.ts` / `compute.test.ts`
+* `src/lib/rag/rollup.ts` / `rollup.test.ts`
+* `src/components/dag/ServiceLineEditor.tsx`
+* `src/components/dag/StationNode.tsx`
+* `src/components/dag/StationPanel.tsx`
+* `src/app/dashboard/page.tsx`
+* `src/components/dashboard/ServiceLineCard.tsx`
+* `src/components/dashboard/VarianceChart.tsx`
+* `src/components/dashboard/QADistributionChart.tsx`
+
+#### Quality Gates Passed
+
+* ✅ `pnpm type-check`
+* ✅ `pnpm lint`
+* ✅ `pnpm test`
+* ✅ `pnpm build`
 
 ---
 
