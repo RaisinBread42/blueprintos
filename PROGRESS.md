@@ -75,6 +75,19 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 - Iteration 4: Added local scenario save/load/reset (per service line) stored on server (no browser storage); auto-loads per service line on switch.
 - Iteration 5: Dashboard toggle for base vs scenario view with named scenario selector; loads slider-delta scenarios per service line and overlays on cards/charts.
 
+#### Upcoming architecture change (shared stations)
+
+- Stations become global resources (single catalog). Service lines reference station_ids and layout; metrics/RAG remain global (no per-line overrides).
+- No concurrency handling needed; last write is fine.
+- Scenarios remain per-service-line overlays: deltas apply at view time on top of shared station metrics; shared store untouched.
+- No migration script; regenerate sample data as needed to align with catalog model.
+- Planned phases:
+  1) Add station catalog + API/storage; service lines hold references only; reject embedded metrics.
+  2) Editor resolves shared stations; editing writes to catalog; per-line props limited to layout/labels.
+  3) Scenarios overlay per-line deltas atop shared base in editor/dashboard; exports resolve shared + overlay.
+  4) Dashboard resolves shared metrics; scenario mode overlays per-line deltas; rollups/charts use resolved data.
+  5) Cleanup: enforce validation that service lines cannot embed metrics; add basic `/api/stations` list/check; handle missing stations gracefully.
+
 #### Success Criteria
 
 - [ ] Generate mock metrics per station with realistic ranges
