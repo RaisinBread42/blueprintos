@@ -71,10 +71,10 @@ Transform the DAG editor into a live operational dashboard where users can:
 | 1 | Metric Editor Panel | ~45 min | ✅ complete |
 | 2 | RAG Computation Library | ~45 min | ✅ complete |
 | 3 | Edge RAG Styling | ~30 min | ✅ complete |
-| 4 | Service Line Rollups | ~45 min | ⏳ pending |
-| 5 | Dashboard + Summary Cards | ~1 hour | ⏳ pending |
-| 6 | Variance Bar Chart | ~45 min | ⏳ pending |
-| 7 | QA Distribution Chart | ~30 min | ⏳ pending |
+| 4 | Service Line Rollups | ~45 min | ✅ complete |
+| 5 | Dashboard + Summary Cards | ~1 hour | ✅ complete |
+| 6 | Variance Bar Chart | ~45 min | ✅ complete |
+| 7 | QA Distribution Chart | ~30 min | ✅ complete |
 
 ---
 
@@ -650,7 +650,7 @@ Initial project setup with the full tech stack:
 
 **Status**: complete ✅  
 **Complexity**: M  
-**Completed**: 2025-12-27  
+**Completed**: 2025-12-27
 **Commit**: `d9338f2`
 
 #### Summary
