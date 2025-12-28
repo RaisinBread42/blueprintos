@@ -407,6 +407,28 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     }));
   }, [nodes, applyScenarioToMetrics]);
 
+  // Export handler for scenario-applied view (non-persistent)
+  const handleExportScenario = useCallback(() => {
+    const scenarioServiceLine = flowToServiceLine(nodesForView, edges, {
+      service_line_id: `${serviceLine.service_line_id}-scenario`,
+      name: `${serviceLine.name} (scenario)`,
+      description: serviceLine.description,
+      created_at: serviceLine.created_at,
+    });
+
+    const blob = new Blob([JSON.stringify(scenarioServiceLine, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${serviceLine.service_line_id}-scenario.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [nodesForView, edges, serviceLine]);
+
   // Map of node id -> computed RAG (view)
   const nodeRagMap = useMemo(() => {
     const map = new Map<string, RAGStatus>();
@@ -635,6 +657,17 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
             >
               <Download className="h-4 w-4 mr-1" />
               Export
+            </Button>
+            {/* Export scenario view */}
+            <Button
+              onClick={handleExportScenario}
+              variant="ghost"
+              size="sm"
+              className="border border-emerald-700/60 text-emerald-200 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
+              title="Download scenario-adjusted snapshot (does not persist)"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Export Scenario
             </Button>
 
             <div className="w-px h-6 bg-slate-700/50" />

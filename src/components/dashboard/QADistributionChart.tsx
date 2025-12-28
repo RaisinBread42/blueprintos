@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import type { ServiceLine } from "@/types";
+import type { ServiceLine, RAGStatus } from "@/types";
 import { computeStationRag, getRagDisplay } from "@/lib/rag/compute";
 
 interface QADistributionChartProps {
@@ -18,7 +18,21 @@ interface QADistributionChartProps {
   title?: string;
 }
 
-const ragColor = (rag: string) => {
+type QADatum = {
+  name: string;
+  qa: number;
+  benchmark: number;
+  rag: RAGStatus;
+  fill: string;
+};
+
+type QATooltipProps = {
+  active?: boolean;
+  payload?: { payload: QADatum }[];
+  label?: string;
+};
+
+const ragColor = (rag: string): string => {
   switch (rag) {
     case "red":
       return "#ef4444";
@@ -53,9 +67,9 @@ export function QADistributionChart({
     };
   });
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: QATooltipProps) => {
     if (!active || !payload || !payload.length) return null;
-    const entry = payload[0].payload;
+    const entry = payload[0].payload as QADatum;
     const rag = getRagDisplay(entry.rag);
     return (
       <div className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 shadow-lg text-slate-200 text-sm">
