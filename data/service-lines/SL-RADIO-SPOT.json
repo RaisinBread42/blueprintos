@@ -38,8 +38,8 @@
       "metrics": {
         "fair_pricing": {
           "planned_hrs": 6,
-          "actual_hrs": 7,
-          "labor_variance": 1,
+          "actual_hrs": 6.5,
+          "labor_variance": 0.5,
           "market_value": 900
         },
         "world_class": {
@@ -64,13 +64,13 @@
       "metrics": {
         "fair_pricing": {
           "planned_hrs": 4,
-          "actual_hrs": 5,
-          "labor_variance": 1,
+          "actual_hrs": 4,
+          "labor_variance": 0,
           "market_value": 600
         },
         "world_class": {
-          "internal_qa_score": 7.4,
-          "standard_met": false,
+          "internal_qa_score": 8,
+          "standard_met": true,
           "industry_benchmark": 7.6
         },
         "performance_proof": {
@@ -183,5 +183,5 @@
       }
     }
   ],
-  "updated_at": "2025-12-28T02:09:42.625Z"
+  "updated_at": "2025-12-28T15:21:39.993Z"
 }
