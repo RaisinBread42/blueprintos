@@ -21,7 +21,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import type { ServiceLine, RAGStatus, StationMetrics } from "@/types";
+import type { ServiceLine, RAGStatus, StationMetrics, Station } from "@/types";
 import {
   serviceLineToFlow,
   flowToServiceLine,
@@ -100,6 +100,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     setNodes(flow.nodes);
     setEdges(flow.edges);
     setHasUnsavedChanges(false);
+
   }, [serviceLine, setNodes, setEdges]);
 
   // Selected node ID (we track ID, then derive station data from nodes)
@@ -221,26 +222,49 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   }, [setEdges]);
 
   // Handle station updates from the panel
-  const handleStationUpdate = useCallback((updates: Partial<StationNodeData>) => {
-    if (!selectedNodeId) return;
+  const handleStationUpdate = useCallback(
+    (updates: Partial<StationNodeData>) => {
+      if (!selectedNodeId) return;
 
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === selectedNodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...updates,
-            },
-          };
-        }
-        return node;
-      })
-    );
+      let updatedStation: Station | null = null;
 
-    setHasUnsavedChanges(true);
-  }, [selectedNodeId, setNodes]);
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNodeId) {
+            const nextData = { ...node.data, ...updates };
+            updatedStation = {
+              station_id: nextData.station_id,
+              name: nextData.name,
+              department: nextData.department,
+              data_source: nextData.data_source,
+              metrics: nextData.metrics,
+              rag_status: nextData.rag_status,
+              position: node.position,
+            };
+            return {
+              ...node,
+              data: nextData,
+            };
+          }
+          return node;
+        })
+      );
+
+      if (updatedStation) {
+        const st: Station = updatedStation;
+        fetch(`/api/stations/${encodeURIComponent(st.station_id)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(st),
+        }).catch(() => {
+          /* ignore network errors */
+        });
+      }
+
+      setHasUnsavedChanges(true);
+    },
+    [selectedNodeId, setNodes]
+  );
 
   // Handle edge updates from the panel
   const handleEdgeUpdate = useCallback((updates: Partial<TrackEdgeData>) => {
