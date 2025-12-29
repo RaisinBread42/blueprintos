@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import type { ApiResponse, ServiceLine } from "@/types";
+import type { ApiResponse, ServiceLine, Station } from "@/types";
 import { isServiceLine } from "@/lib/blueprint/validate";
 import { listServiceLineIds, readServiceLine, writeServiceLine } from "@/lib/storage/serviceLines";
 import { readStation, writeStation } from "@/lib/storage/stations";
@@ -15,7 +15,7 @@ export async function GET() {
     const sl = await readServiceLine(id);
     if (!sl) continue;
 
-    const hydratedNodes = await Promise.all(
+    const hydratedNodes: Station[] = await Promise.all(
       sl.nodes.map(async (node) => {
         const station = await readStation(node.station_id);
         if (station) {
@@ -26,9 +26,23 @@ export async function GET() {
             data_source: station.data_source,
             rag_status: station.rag_status,
             metrics: station.metrics,
+            missing: station.missing,
           };
         }
-        return node;
+        // Missing station: mark and provide safe defaults
+        return {
+          ...node,
+          name: node.name ?? "(missing station)",
+          department: node.department,
+          data_source: "mock",
+          rag_status: "red",
+          missing: true,
+          metrics: {
+            fair_pricing: { planned_hrs: 0, actual_hrs: 0, labor_variance: 0 },
+            world_class: { internal_qa_score: 0, standard_met: false },
+            performance_proof: {},
+          },
+        } as Station;
       })
     );
 
@@ -53,6 +67,23 @@ export async function POST(req: Request) {
     return NextResponse.json(res, { status: 400 });
   }
 
+  // Validate stations exist in catalog
+  const missing: string[] = [];
+  for (const node of body.nodes) {
+    const st = await readStation(node.station_id);
+    if (!st) {
+      missing.push(node.station_id);
+    }
+  }
+  if (missing.length > 0) {
+    const res: ApiResponse<null> = {
+      success: false,
+      data: null,
+      error: `Unknown station(s) in catalog: ${missing.join(", ")}`,
+    };
+    return NextResponse.json(res, { status: 400 });
+  }
+
   // Persist stations globally (no per-line overrides) and hydrate nodes from catalog
   const hydratedNodes = [];
   for (const node of body.nodes) {
@@ -72,6 +103,7 @@ export async function POST(req: Request) {
       data_source: savedStation.data_source,
       rag_status: savedStation.rag_status,
       metrics: savedStation.metrics,
+      missing: savedStation.missing,
     });
   }
 

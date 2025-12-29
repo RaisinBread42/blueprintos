@@ -148,6 +148,7 @@ export interface Station {
   data_source: DataSourceType;
   rag_status?: RAGStatus;
   position?: { x: number; y: number };
+  missing?: boolean;
 }
 
 /**

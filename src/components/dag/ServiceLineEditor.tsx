@@ -584,11 +584,14 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
           metrics: n.data.metrics,
           rag_status: n.data.rag_status,
           position: n.position,
+          missing: n.data.missing,
         })),
         edges: [], // rollup currently only needs nodes
       }),
     [serviceLine, nodesForView]
   );
+
+  const hasMissingStations = useMemo(() => nodes.some((n) => n.data.missing), [nodes]);
 
   return (
     <div className="flex h-full w-full">
@@ -636,6 +639,11 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 <h1 className="text-lg font-semibold text-white">
                   {serviceLine.name}
                 </h1>
+                {hasMissingStations && (
+                  <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-300">
+                    Missing station in catalog
+                  </span>
+                )}
                 {hasUnsavedChanges && (
                   <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
                     Unsaved

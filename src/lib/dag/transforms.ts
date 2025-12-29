@@ -18,6 +18,7 @@ export interface StationNodeData {
   data_source: "mock" | "api";
   metrics: Station["metrics"];
   rag_status?: "red" | "amber" | "green";
+  missing?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export function stationToNode(station: Station): Node<StationNodeData> {
       data_source: station.data_source,
       metrics: station.metrics,
       rag_status: station.rag_status,
+      missing: station.missing,
     },
   };
 }

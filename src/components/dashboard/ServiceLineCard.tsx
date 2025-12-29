@@ -15,6 +15,7 @@ interface ServiceLineCardProps {
 export function ServiceLineCard({ serviceLine, expanded, onToggleBreakdown }: ServiceLineCardProps) {
   const rollup = computeServiceLineRollup(serviceLine);
   const rag = getRagDisplay(rollup.overall_rag);
+  const hasMissing = serviceLine.nodes?.some((n) => n.missing);
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg transition-colors hover:border-emerald-500/50 hover:bg-slate-900">
@@ -28,6 +29,11 @@ export function ServiceLineCard({ serviceLine, expanded, onToggleBreakdown }: Se
           {rag.label}
         </span>
       </div>
+      {hasMissing && (
+        <div className="mt-2 text-xs text-red-300">
+          Some stations are missing from the catalog; metrics may be incomplete.
+        </div>
+      )}
 
       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div className="space-y-1">
