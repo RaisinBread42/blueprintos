@@ -133,6 +133,11 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
   const [scenarioModalMode, setScenarioModalMode] = useState<"save" | "load">("load");
   const [scenarioNameInput, setScenarioNameInput] = useState("");
+  const [stationOptions, setStationOptions] = useState<Station[]>([]);
+  const [stationOptionsLoading, setStationOptionsLoading] = useState(false);
+  const [addStationModalOpen, setAddStationModalOpen] = useState(false);
+  const [addStationMode, setAddStationMode] = useState<"existing" | "new">("existing");
+  const [selectedStationId, setSelectedStationId] = useState<string>("");
 
   // Load scenario from local server storage
   const loadScenarioFromServer = useCallback(
@@ -167,6 +172,24 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   useEffect(() => {
     loadScenarioFromServer(serviceLine.service_line_id);
   }, [serviceLine.service_line_id, loadScenarioFromServer]);
+
+  // Load station catalog for "Add Station" modal
+  useEffect(() => {
+    const loadStations = async () => {
+      setStationOptionsLoading(true);
+      try {
+        const res = await fetch("/api/stations");
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          setStationOptions(json.data as Station[]);
+        }
+      } finally {
+        setStationOptionsLoading(false);
+      }
+    };
+    loadStations();
+  }, []);
 
   // New service line dialog state
   const [showNewDialog, setShowNewDialog] = useState(false);
@@ -292,29 +315,68 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     setHasUnsavedChanges(true);
   }, [selectedEdgeId, setEdges]);
 
-  // Add new station
-  const handleAddStation = useCallback(() => {
+  const centerPosition = useCallback(() => {
     const viewport = getViewport();
+    return {
+      x: (-viewport.x + 400) / viewport.zoom,
+      y: (-viewport.y + 300) / viewport.zoom,
+    };
+  }, [getViewport]);
+
+  // Add station modal helpers
+  const addExistingStation = useCallback(
+    (stationId: string) => {
+      if (!stationId) return;
+      if (nodes.some((n) => n.id === stationId)) {
+        alert("This station is already in the service line.");
+        return;
+      }
+      const st = stationOptions.find((s) => s.station_id === stationId);
+      if (!st) return;
+      const newNode: Node<StationNodeData> = {
+        id: st.station_id,
+        type: "stationNode",
+        position: centerPosition(),
+        data: {
+          station_id: st.station_id,
+          name: st.name,
+          department: st.department,
+          data_source: st.data_source,
+          metrics: st.metrics,
+          rag_status: st.rag_status,
+        },
+      };
+      setNodes((nds) => [...nds, newNode]);
+      setSelectedNodeId(st.station_id);
+      setSelectedEdgeId(null);
+      setHasUnsavedChanges(true);
+      setAddStationModalOpen(false);
+    },
+    [centerPosition, nodes, setNodes, stationOptions]
+  );
+
+  const addNewStation = useCallback(() => {
     const id = generateStationId();
     const defaultData = createDefaultStationData(id);
-    
-    // Position new node at center of current viewport
     const newNode: Node<StationNodeData> = {
       id,
       type: "stationNode",
-      position: {
-        x: (-viewport.x + 400) / viewport.zoom,
-        y: (-viewport.y + 300) / viewport.zoom,
-      },
+      position: centerPosition(),
       data: defaultData,
     };
-
     setNodes((nds) => [...nds, newNode]);
     setSelectedNodeId(id);
     setSelectedEdgeId(null);
     setHasUnsavedChanges(true);
     persistStationToCatalog(defaultData);
-  }, [getViewport, persistStationToCatalog, setNodes]);
+    setAddStationModalOpen(false);
+  }, [centerPosition, persistStationToCatalog, setNodes]);
+
+  const handleAddStation = useCallback(() => {
+    setAddStationMode("existing");
+    setSelectedStationId("");
+    setAddStationModalOpen(true);
+  }, []);
 
   // Delete selected station
   const handleDeleteStation = useCallback(() => {
@@ -1001,6 +1063,105 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                   }}
                 >
                   Load
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Station Modal */}
+      {addStationModalOpen && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900 p-5 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-semibold text-white">Add Station</div>
+              <button
+                onClick={() => setAddStationModalOpen(false)}
+                className="text-slate-400 hover:text-white text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-4 text-sm text-slate-200">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setAddStationMode("existing")}
+                  className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    addStationMode === "existing" ? "bg-slate-700 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"
+                  }`}
+                >
+                  Use Existing
+                </button>
+                <button
+                  onClick={() => setAddStationMode("new")}
+                  className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    addStationMode === "new" ? "bg-emerald-700 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"
+                  }`}
+                >
+                  Create New
+                </button>
+              </div>
+
+              {addStationMode === "existing" ? (
+                <div className="space-y-2">
+                  <label className="text-slate-400">Select station</label>
+                  <select
+                    value={selectedStationId}
+                    onChange={(e) => setSelectedStationId(e.target.value)}
+                    className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100"
+                    disabled={stationOptionsLoading}
+                  >
+                    <option value="">-- choose station --</option>
+                    {stationOptions
+                      .filter((s) => !nodes.some((n) => n.id === s.station_id))
+                      .map((s) => {
+                        const dept = s.department ? s.department : "No dept";
+                        return (
+                          <option key={s.station_id} value={s.station_id}>
+                            {s.name} ({dept})
+                          </option>
+                        );
+                      })}
+                  </select>
+                  {stationOptionsLoading && <p className="text-xs text-slate-500">Loading stations...</p>}
+                  {!stationOptionsLoading && stationOptions.length === 0 && (
+                    <p className="text-xs text-slate-500">No stations in catalog yet.</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-slate-400 text-sm">
+                    A new station will be created with default metrics and saved to the catalog.
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
+                onClick={() => setAddStationModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              {addStationMode === "existing" ? (
+                <Button
+                  size="sm"
+                  className="border border-emerald-700/60 bg-emerald-900/50 text-emerald-100 hover:bg-emerald-800 hover:text-white"
+                  disabled={!selectedStationId}
+                  onClick={() => addExistingStation(selectedStationId)}
+                >
+                  Add
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="border border-emerald-700/60 bg-emerald-900/50 text-emerald-100 hover:bg-emerald-800 hover:text-white"
+                  onClick={addNewStation}
+                >
+                  Create
                 </Button>
               )}
             </div>
