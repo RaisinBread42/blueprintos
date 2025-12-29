@@ -92,7 +92,8 @@ export async function PUT(req: Request, ctx: { params: { id: string } }) {
   // Persist stations globally (no per-line overrides) and hydrate nodes from catalog
   const hydratedNodes = [];
   for (const node of body.nodes) {
-    const savedStation = await writeStation({
+    const stationRecord = await readStation(node.station_id);
+    const base = stationRecord ?? {
       station_id: node.station_id,
       name: node.name,
       department: node.department,
@@ -100,6 +101,14 @@ export async function PUT(req: Request, ctx: { params: { id: string } }) {
       metrics: node.metrics,
       rag_status: node.rag_status,
       position: node.position,
+    };
+    const savedStation = await writeStation({
+      ...base,
+      name: node.name ?? base.name,
+      department: node.department ?? base.department,
+      data_source: node.data_source ?? base.data_source,
+      rag_status: node.rag_status ?? base.rag_status,
+      metrics: base.metrics, // enforce catalog metrics as source of truth
     });
     hydratedNodes.push({
       ...node,
@@ -107,7 +116,7 @@ export async function PUT(req: Request, ctx: { params: { id: string } }) {
       department: node.department ?? savedStation.department,
       data_source: savedStation.data_source,
       rag_status: savedStation.rag_status,
-      metrics: savedStation.metrics,
+      metrics: savedStation.metrics, // enforce catalog metrics
       missing: savedStation.missing,
     });
   }

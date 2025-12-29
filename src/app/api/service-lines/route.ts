@@ -87,7 +87,9 @@ export async function POST(req: Request) {
   // Persist stations globally (no per-line overrides) and hydrate nodes from catalog
   const hydratedNodes = [];
   for (const node of body.nodes) {
-    const savedStation = await writeStation({
+    const stationRecord = await readStation(node.station_id);
+    // Prevent embedded overrides: prefer catalog metrics/name/department if exists.
+    const base = stationRecord ?? {
       station_id: node.station_id,
       name: node.name,
       department: node.department,
@@ -95,6 +97,14 @@ export async function POST(req: Request) {
       metrics: node.metrics,
       rag_status: node.rag_status,
       position: node.position,
+    };
+    const savedStation = await writeStation({
+      ...base,
+      name: node.name ?? base.name,
+      department: node.department ?? base.department,
+      data_source: node.data_source ?? base.data_source,
+      rag_status: node.rag_status ?? base.rag_status,
+      metrics: base.metrics, // shared metrics remain catalog source of truth
     });
     hydratedNodes.push({
       ...node,
@@ -102,7 +112,7 @@ export async function POST(req: Request) {
       department: node.department ?? savedStation.department,
       data_source: savedStation.data_source,
       rag_status: savedStation.rag_status,
-      metrics: savedStation.metrics,
+      metrics: savedStation.metrics, // enforce catalog metrics
       missing: savedStation.missing,
     });
   }
