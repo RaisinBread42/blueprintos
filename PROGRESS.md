@@ -96,6 +96,8 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 
 **Phase 3 progress:** Added shared scenario overlay helper (`applyScenarioToMetrics/serviceLine` + `defaultScenario`) and wired both editor and dashboard to apply deltas on top of hydrated shared metrics. Scenario export now uses the shared base + overlay helper for consistency.
 
+**Phase 3 fix (2025-12-29):** API now returns default (zero) when no scenario name is provided, preventing auto-applying the first saved scenario. Editor loads/saves named scenarios and keeps the selected overlay applied; dashboard continues to use the shared overlay helper. Tests + build passing.
+
 **Simulation/AI alignment:** Synthetic generation, capacity simulation, and AI what-if should operate on the shared station catalog as the base; per-line scenarios stay as overlays applied at view time. RAG/rollups compute on resolved metrics (shared + overlay).
 
 #### Success Criteria
