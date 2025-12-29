@@ -130,6 +130,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
   const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
   const [scenarioModalMode, setScenarioModalMode] = useState<"save" | "load">("load");
   const [scenarioNameInput, setScenarioNameInput] = useState("");
+  const [scenarioDirty, setScenarioDirty] = useState(false);
   const [stationOptions, setStationOptions] = useState<Station[]>([]);
   const [stationOptionsLoading, setStationOptionsLoading] = useState(false);
   const [addStationModalOpen, setAddStationModalOpen] = useState(false);
@@ -184,10 +185,12 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
             byStation: {},
           });
         }
+        setScenarioDirty(false);
         return;
       }
     } catch {
       setScenario(defaultScenarioConfig);
+      setScenarioDirty(false);
     }
   }, []);
 
@@ -702,6 +705,9 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
               </div>
             </div>
           </div>
+          {scenarioDirty && (
+            <div className="mt-1 text-[11px] text-amber-300">Scenario changes not saved</div>
+          )}
             <div className="flex items-center gap-2 flex-wrap">
             {/* Dashboard link */}
             <Link
@@ -922,6 +928,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
               className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
               onClick={() => {
                 setScenario(defaultScenarioConfig);
+                setScenarioDirty(true);
                 fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
                   method: "DELETE",
                 });
@@ -1044,6 +1051,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
                       }
                     );
                     await loadScenarioFromServer(serviceLine.service_line_id, name);
+                    setScenarioDirty(false);
                     setScenarioModalOpen(false);
                   }}
                 >
@@ -1100,6 +1108,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
                       }
                     }
                     await loadScenarioFromServer(serviceLine.service_line_id, name);
+                    setScenarioDirty(false);
                     setScenarioModalOpen(false);
                   }}
                 >
@@ -1226,6 +1235,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
                 [selectedStation.station_id]: deltas,
               },
             }));
+            setScenarioDirty(true);
           }}
         />
       )}
