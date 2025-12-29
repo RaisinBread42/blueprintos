@@ -1,97 +1,31 @@
 {
   "service_line_id": "SL-360-CAMPAIGN",
-  "name": "360 Campaign",
-  "description": "A sample service line that models a cross-functional campaign delivery workflow.",
+  "name": "Core Business Line",
+  "description": "",
+  "created_at": "2025-12-28T21:02:03.047Z",
   "nodes": [
     {
-      "station_id": "Intake",
-      "name": "Intake",
-      "department": "Operations",
+      "station_id": "Station_mjq7uinj",
+      "name": "New Station",
       "data_source": "mock",
-      "position": { "x": 0, "y": 0 },
       "metrics": {
-        "fair_pricing": { "planned_hrs": 4, "actual_hrs": 4, "labor_variance": 0, "market_value": 600 },
-        "world_class": { "internal_qa_score": 8.0, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "24h" }
-      }
-    },
-    {
-      "station_id": "Creative_Studio",
-      "name": "Creative Studio",
-      "department": "Creative",
-      "data_source": "mock",
-      "position": { "x": 250, "y": 0 },
-      "metrics": {
-        "fair_pricing": { "planned_hrs": 20, "actual_hrs": 22, "labor_variance": 2, "market_value": 3000 },
-        "world_class": { "internal_qa_score": 8.5, "standard_met": true, "industry_benchmark": 8.0 },
-        "performance_proof": { "client_approval_speed": "48h" }
-      }
-    },
-    {
-      "station_id": "Production",
-      "name": "Production",
-      "department": "Production",
-      "data_source": "mock",
-      "position": { "x": 500, "y": -80 },
-      "metrics": {
-        "fair_pricing": { "planned_hrs": 30, "actual_hrs": 28, "labor_variance": -2, "market_value": 4200 },
-        "world_class": { "internal_qa_score": 7.8, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "engagement_rate": 0.041 }
-      }
-    },
-    {
-      "station_id": "QA",
-      "name": "QA",
-      "department": "Operations",
-      "data_source": "mock",
-      "position": { "x": 750, "y": 0 },
-      "metrics": {
-        "fair_pricing": { "planned_hrs": 6, "actual_hrs": 9, "labor_variance": 3, "market_value": 900 },
-        "world_class": { "internal_qa_score": 7.2, "standard_met": false, "industry_benchmark": 7.5 },
-        "performance_proof": { "client_approval_speed": "72h" }
-      }
-    },
-    {
-      "station_id": "Delivery",
-      "name": "Delivery",
-      "department": "Client Success",
-      "data_source": "mock",
-      "position": { "x": 1000, "y": 0 },
-      "metrics": {
-        "fair_pricing": { "planned_hrs": 3, "actual_hrs": 3, "labor_variance": 0, "market_value": 450 },
-        "world_class": { "internal_qa_score": 8.2, "standard_met": true, "industry_benchmark": 7.5 },
-        "performance_proof": { "roi": 1.35 }
+        "fair_pricing": {
+          "planned_hrs": 0,
+          "actual_hrs": 0,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 0,
+          "standard_met": false
+        },
+        "performance_proof": {}
+      },
+      "position": {
+        "x": 400,
+        "y": 300
       }
     }
   ],
-  "edges": [
-    {
-      "id": "Intake->Creative_Studio",
-      "source_station_id": "Intake",
-      "target_station_id": "Creative_Studio",
-      "weight": { "cost": 1, "time": 1 }
-    },
-    {
-      "id": "Creative_Studio->Production",
-      "source_station_id": "Creative_Studio",
-      "target_station_id": "Production",
-      "weight": { "cost": 2, "time": 3 }
-    },
-    {
-      "id": "Production->QA",
-      "source_station_id": "Production",
-      "target_station_id": "QA",
-      "weight": { "cost": 1, "time": 1 }
-    },
-    {
-      "id": "QA->Delivery",
-      "source_station_id": "QA",
-      "target_station_id": "Delivery",
-      "weight": { "cost": 1, "time": 1 }
-    }
-  ],
-  "created_at": "2025-12-27T00:00:00.000Z",
-  "updated_at": "2025-12-27T00:00:00.000Z"
+  "edges": [],
+  "updated_at": "2025-12-28T21:03:06.288Z"
 }
-
-

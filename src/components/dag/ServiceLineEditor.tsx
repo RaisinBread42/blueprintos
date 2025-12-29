@@ -222,25 +222,36 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   }, [setEdges]);
 
   // Handle station updates from the panel
+  const persistStationToCatalog = useCallback((data: StationNodeData) => {
+    const payload: Station = {
+      station_id: data.station_id,
+      name: data.name,
+      department: data.department,
+      data_source: data.data_source,
+      metrics: data.metrics,
+      rag_status: computeStationRag(data.metrics, data.rag_status),
+    };
+
+    return fetch(`/api/stations/${encodeURIComponent(payload.station_id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* ignore network errors */
+    });
+  }, []);
+
   const handleStationUpdate = useCallback(
     (updates: Partial<StationNodeData>) => {
       if (!selectedNodeId) return;
 
-      let updatedStation: Station | null = null;
+      let updatedStation: StationNodeData | null = null;
 
       setNodes((nds) =>
         nds.map((node) => {
           if (node.id === selectedNodeId) {
             const nextData = { ...node.data, ...updates };
-            updatedStation = {
-              station_id: nextData.station_id,
-              name: nextData.name,
-              department: nextData.department,
-              data_source: nextData.data_source,
-              metrics: nextData.metrics,
-              rag_status: nextData.rag_status,
-              position: node.position,
-            };
+            updatedStation = nextData;
             return {
               ...node,
               data: nextData,
@@ -251,19 +262,12 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
       );
 
       if (updatedStation) {
-        const st: Station = updatedStation;
-        fetch(`/api/stations/${encodeURIComponent(st.station_id)}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(st),
-        }).catch(() => {
-          /* ignore network errors */
-        });
+        persistStationToCatalog(updatedStation);
       }
 
       setHasUnsavedChanges(true);
     },
-    [selectedNodeId, setNodes]
+    [persistStationToCatalog, selectedNodeId, setNodes]
   );
 
   // Handle edge updates from the panel
@@ -292,6 +296,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const handleAddStation = useCallback(() => {
     const viewport = getViewport();
     const id = generateStationId();
+    const defaultData = createDefaultStationData(id);
     
     // Position new node at center of current viewport
     const newNode: Node<StationNodeData> = {
@@ -301,14 +306,15 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
         x: (-viewport.x + 400) / viewport.zoom,
         y: (-viewport.y + 300) / viewport.zoom,
       },
-      data: createDefaultStationData(id),
+      data: defaultData,
     };
 
     setNodes((nds) => [...nds, newNode]);
     setSelectedNodeId(id);
     setSelectedEdgeId(null);
     setHasUnsavedChanges(true);
-  }, [getViewport, setNodes]);
+    persistStationToCatalog(defaultData);
+  }, [getViewport, persistStationToCatalog, setNodes]);
 
   // Delete selected station
   const handleDeleteStation = useCallback(() => {

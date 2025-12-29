@@ -1,7 +1,6 @@
 {
-  "station_id": "Station_mjq7uinj",
-  "name": "New Station 1",
-  "department": "test dept",
+  "station_id": "Station_mjr72djx",
+  "name": "TEST 2",
   "data_source": "mock",
   "metrics": {
     "fair_pricing": {
@@ -11,10 +10,9 @@
     },
     "world_class": {
       "internal_qa_score": 0,
-      "industry_benchmark": 0,
       "standard_met": false
     },
     "performance_proof": {}
   },
-  "rag_status": "green"
+  "rag_status": "red"
 }

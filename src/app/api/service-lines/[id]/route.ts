@@ -58,22 +58,29 @@ export async function PUT(req: Request, ctx: { params: { id: string } }) {
     return NextResponse.json(res, { status: 400 });
   }
 
-  // Persist stations globally (no per-line overrides)
-  await Promise.all(
-    body.nodes.map((node) =>
-      writeStation({
-        station_id: node.station_id,
-        name: node.name,
-        department: node.department,
-        data_source: node.data_source,
-        metrics: node.metrics,
-        rag_status: node.rag_status,
-        position: node.position,
-      })
-    )
-  );
+  // Persist stations globally (no per-line overrides) and hydrate nodes from catalog
+  const hydratedNodes = [];
+  for (const node of body.nodes) {
+    const savedStation = await writeStation({
+      station_id: node.station_id,
+      name: node.name,
+      department: node.department,
+      data_source: node.data_source,
+      metrics: node.metrics,
+      rag_status: node.rag_status,
+      position: node.position,
+    });
+    hydratedNodes.push({
+      ...node,
+      name: node.name ?? savedStation.name,
+      department: node.department ?? savedStation.department,
+      data_source: savedStation.data_source,
+      rag_status: savedStation.rag_status,
+      metrics: savedStation.metrics,
+    });
+  }
 
-  const saved = await writeServiceLine(body);
+  const saved = await writeServiceLine({ ...body, nodes: hydratedNodes });
   const res: ApiResponse<ServiceLine> = { success: true, data: saved, message: "Service line updated." };
   return NextResponse.json(res);
 }

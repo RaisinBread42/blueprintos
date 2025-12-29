@@ -1,6 +1,6 @@
 {
   "projectName": "blueprintos",
-  "lastUpdated": "2025-12-27T00:00:00Z",
+  "lastUpdated": "2025-12-28T00:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -139,33 +139,50 @@
       "id": "feat-004",
       "title": "Sensors + dashboards (RAG v1)",
       "description": "Station metric editor, derived rollups, and basic Recharts dashboards; compute and display RAG overlays.",
-      "status": "implementing",
+      "status": "complete",
       "priority": "high",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {
         "planning": { "completedAt": "2025-12-27T00:00:00Z" },
-        "accepted": { "completedAt": "2025-12-27T00:00:00Z" }
+        "accepted": { "completedAt": "2025-12-27T00:00:00Z" },
+        "implemented": { "completedAt": "2025-12-28T00:00:00Z" },
+        "verified": { "completedAt": "2025-12-28T00:00:00Z" },
+        "committed": { "completedAt": "2025-12-28T00:00:00Z", "commitHash": "6fb1210" }
       },
-      "files": [],
-      "dependencies": [],
-      "notes": "7 iterations: metric editor, RAG computation, edge styling, rollups, dashboard, variance chart, QA chart."
-    }
-  ],
-  "backlog": [
+      "files": [
+        "src/lib/rag/compute.ts",
+        "src/lib/rag/compute.test.ts",
+        "src/lib/rag/rollup.ts",
+        "src/lib/rag/rollup.test.ts",
+        "src/components/dag/ServiceLineEditor.tsx",
+        "src/components/dag/StationNode.tsx",
+        "src/components/dag/StationPanel.tsx",
+        "src/app/dashboard/page.tsx",
+        "src/components/dashboard/ServiceLineCard.tsx",
+        "src/components/dashboard/VarianceChart.tsx",
+        "src/components/dashboard/QADistributionChart.tsx"
+      ],
+      "dependencies": ["reactflow", "recharts"],
+      "notes": "Completed in 7 iterations: metric editor, RAG computation, edge styling, rollups, dashboard, variance chart, QA chart."
+    },
     {
       "id": "feat-005",
       "title": "Synthetic data generator + sandbox simulation",
       "description": "Generate realistic mock station metrics and add scenario sliders to stress-test service lines; allow save/compare scenarios locally.",
-      "status": "backlog",
+      "status": "planning",
       "priority": "medium",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
-      "phases": {},
+      "phases": {
+        "planning": { "completedAt": "2025-12-28T00:00:00Z" }
+      },
       "files": [],
       "dependencies": [],
       "notes": "Enables Phase 3 'Simulation & Sensor Suite' without live integrations."
-    },
+    }
+  ],
+  "backlog": [
     {
       "id": "feat-006",
       "title": "Dispatcher v1 (rule-based reports + alerts)",

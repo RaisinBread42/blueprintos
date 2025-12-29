@@ -88,6 +88,11 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
   4) Dashboard resolves shared metrics; scenario mode overlays per-line deltas; rollups/charts use resolved data.
   5) Cleanup: enforce validation that service lines cannot embed metrics; add basic `/api/stations` list/check; handle missing stations gracefully.
 
+**Phase 2 status (2025-12-29)**  
+- Manual smoke check: creating/editing stations in the editor writes via `/api/stations/[id]` and persists to `data/stations/*.json` (no layout saved to catalog).  
+- New station creation seeds the catalog immediately; edits to name/department/metrics reflect on the node and in the catalog.  
+- Next: quick UI pass to confirm save/reload hydrates from catalog; add `/api/stations` list + validation in Phase 5.
+
 **Simulation/AI alignment:** Synthetic generation, capacity simulation, and AI what-if should operate on the shared station catalog as the base; per-line scenarios stay as overlays applied at view time. RAG/rollups compute on resolved metrics (shared + overlay).
 
 #### Success Criteria
