@@ -99,9 +99,10 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 **Phase 3 fix (2025-12-29):** API now returns default (zero) when no scenario name is provided, preventing auto-applying the first saved scenario. Editor loads/saves named scenarios and keeps the selected overlay applied; dashboard continues to use the shared overlay helper. Tests + build passing.
 
 **Next (Phase 5 / validation & health):**
-- Reject service-line saves that embed metrics or reference unknown stations; hydrate with fallbacks and surface a warning in the UI for missing stations.
-- Add a simple catalog/health view (list `/api/stations`, highlight duplicates/missing refs) for admin visibility.
-- Update scenario selector copy to make “none” explicit when no overlays exist (avoid implying a default overlay).
+- Reject service-line saves that embed metrics or reference unknown stations; hydrate with fallbacks and surface a warning in the UI for missing stations. ✅ implemented
+- Enforce catalog metrics as source of truth on service-line save; ignore embedded overrides. ✅ implemented
+- Add a simple catalog/health view (list `/api/stations`, highlight duplicates/missing refs) for admin visibility. ✅ `/admin/stations`
+- Update scenario selector copy to make “none” explicit when no overlays exist (avoid implying a default overlay). ✅ implemented
 - Prep Simulation/AI alignment: plan for “Live toggle” (mock→api data_source) and Dispatcher/alerts reading the shared catalog + overlays; no code yet.
 
 **Simulation/AI alignment:** Synthetic generation, capacity simulation, and AI what-if should operate on the shared station catalog as the base; per-line scenarios stay as overlays applied at view time. RAG/rollups compute on resolved metrics (shared + overlay).
