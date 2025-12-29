@@ -7,7 +7,11 @@ import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
 import { QADistributionChart } from "@/components/dashboard/QADistributionChart";
-import { applyScenarioToServiceLine, defaultScenario, type ScenarioDeltas } from "@/lib/scenario/apply";
+import {
+  applyScenarioToServiceLine,
+  defaultScenarioConfig,
+  type ScenarioConfig,
+} from "@/lib/scenario/apply";
 
 export default function DashboardPage() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
@@ -17,7 +21,7 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<"base" | "scenario">("base");
   const [scenarioName, setScenarioName] = useState("default");
   const [scenarioOptions, setScenarioOptions] = useState<string[]>(["default"]);
-  const [scenarioData, setScenarioData] = useState<Record<string, ScenarioDeltas>>({});
+  const [scenarioData, setScenarioData] = useState<Record<string, ScenarioConfig>>({});
   const [scenarioLoading, setScenarioLoading] = useState(false);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
 
@@ -52,16 +56,24 @@ export default function DashboardPage() {
                 `/api/scenarios/${encodeURIComponent(sl.service_line_id)}?name=${encodeURIComponent(name)}`
               );
               if (!res.ok) {
-                return [sl.service_line_id, defaultScenario] as const;
+                return [sl.service_line_id, defaultScenarioConfig] as const;
               }
               const json = await res.json();
               if (json.success && json.data?.scenario) {
-                return [sl.service_line_id, json.data.scenario as ScenarioDeltas, json.data.names ?? []] as const;
+                const sc = json.data.scenario;
+                if (sc.global) {
+                  return [sl.service_line_id, sc as ScenarioConfig, json.data.names ?? []] as const;
+                }
+                return [
+                  sl.service_line_id,
+                  { global: sc, byStation: {} } as ScenarioConfig,
+                  json.data.names ?? [],
+                ] as const;
               }
             } catch {
               // ignore
             }
-            return [sl.service_line_id, defaultScenario, []] as const;
+            return [sl.service_line_id, defaultScenarioConfig, []] as const;
           })
         );
         const scenarioEntries = entries.map(([id, payload]) => [id, payload]);
@@ -98,7 +110,9 @@ export default function DashboardPage() {
 
   const serviceLinesForView = useMemo(() => {
     if (viewMode !== "scenario") return serviceLines;
-    return serviceLines.map((sl) => applyScenarioToServiceLine(sl, scenarioData[sl.service_line_id] ?? defaultScenario));
+    return serviceLines.map((sl) =>
+      applyScenarioToServiceLine(sl, scenarioData[sl.service_line_id] ?? defaultScenarioConfig)
+    );
   }, [viewMode, serviceLines, scenarioData]);
 
   if (loading) {

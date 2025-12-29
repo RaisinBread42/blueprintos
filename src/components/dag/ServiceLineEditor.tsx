@@ -38,7 +38,9 @@ import { getRagDisplay } from "@/lib/rag/compute";
 import {
   applyScenarioToMetrics,
   applyScenarioToServiceLine,
-  defaultScenario,
+  defaultScenarioConfig,
+  type ScenarioConfig,
+  type ScenarioDeltas,
 } from "@/lib/scenario/apply";
 
 const nodeTypes: NodeTypes = {
@@ -123,7 +125,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   // Open dropdown state
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
 
-  const [scenario, setScenario] = useState(defaultScenario);
+const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
   const [scenarioNames, setScenarioNames] = useState<string[]>([]);
   const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
   const [scenarioModalMode, setScenarioModalMode] = useState<"save" | "load">("load");
@@ -142,7 +144,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
         : `/api/scenarios/${encodeURIComponent(id)}`;
       const res = await fetch(url);
       if (!res.ok) {
-        setScenario(defaultScenario);
+        setScenario(defaultScenarioConfig);
         return;
       }
       const json = await res.json();
@@ -151,15 +153,41 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
           setScenarioNames(json.data.names);
         }
         const sc = json.data.scenario ?? json.data;
-        setScenario({
-          laborDelta: sc.laborDelta ?? 0,
-          timeDelta: sc.timeDelta ?? 0,
-          qualityDelta: sc.qualityDelta ?? 0,
-        });
+        if (sc.global) {
+          setScenario({
+            global: {
+              laborDelta: sc.global.laborDelta ?? 0,
+              timeDelta: sc.global.timeDelta ?? 0,
+              qualityDelta: sc.global.qualityDelta ?? 0,
+            },
+            byStation: Object.fromEntries(
+              Object.entries(sc.byStation ?? {}).map(([k, v]) => {
+                const delta = v as Partial<ScenarioDeltas>;
+                return [
+                  k,
+                  {
+                    laborDelta: delta.laborDelta ?? 0,
+                    timeDelta: delta.timeDelta ?? 0,
+                    qualityDelta: delta.qualityDelta ?? 0,
+                  },
+                ];
+              })
+            ),
+          });
+        } else {
+          setScenario({
+            global: {
+              laborDelta: sc.laborDelta ?? 0,
+              timeDelta: sc.timeDelta ?? 0,
+              qualityDelta: sc.qualityDelta ?? 0,
+            },
+            byStation: {},
+          });
+        }
         return;
       }
     } catch {
-      setScenario(defaultScenario);
+      setScenario(defaultScenarioConfig);
     }
   }, []);
 
@@ -499,7 +527,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
       ...node,
       data: {
         ...node.data,
-        metrics: applyScenarioToMetrics(node.data.metrics, scenario),
+        metrics: applyScenarioToMetrics(node.data.metrics, scenario, node.data.station_id),
       },
     }));
   }, [nodes, scenario]);
@@ -835,8 +863,8 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-slate-200">{s.label}</span>
                   <span className="text-slate-400 font-mono">
-                    {scenario[s.key as keyof typeof scenario] >= 0 ? "+" : ""}
-                    {scenario[s.key as keyof typeof scenario]} {s.unit}
+                    {scenario.global[s.key as keyof typeof scenario.global] >= 0 ? "+" : ""}
+                    {scenario.global[s.key as keyof typeof scenario.global]} {s.unit}
                   </span>
                 </div>
                 <input
@@ -844,11 +872,14 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                   min={s.min}
                   max={s.max}
                   step={1}
-                  value={scenario[s.key as keyof typeof scenario] as number}
+                  value={scenario.global[s.key as keyof typeof scenario.global] as number}
                   onChange={(e) =>
                     setScenario((prev) => ({
                       ...prev,
-                      [s.key]: parseInt(e.target.value, 10),
+                      global: {
+                        ...prev.global,
+                        [s.key]: parseInt(e.target.value, 10),
+                      },
                     }))
                   }
                   className="w-full accent-emerald-500"
@@ -890,7 +921,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               size="sm"
               className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
               onClick={() => {
-                setScenario(defaultScenario);
+                setScenario(defaultScenarioConfig);
                 fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
                   method: "DELETE",
                 });
@@ -1034,11 +1065,38 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                     if (res.ok) {
                       const json = await res.json();
                       if (json.success && json.data?.scenario) {
-                        setScenario({
-                          laborDelta: json.data.scenario.laborDelta ?? 0,
-                          timeDelta: json.data.scenario.timeDelta ?? 0,
-                          qualityDelta: json.data.scenario.qualityDelta ?? 0,
-                        });
+                        const sc = json.data.scenario;
+                        if (sc.global) {
+                          setScenario({
+                            global: {
+                              laborDelta: sc.global.laborDelta ?? 0,
+                              timeDelta: sc.global.timeDelta ?? 0,
+                              qualityDelta: sc.global.qualityDelta ?? 0,
+                            },
+                            byStation: Object.fromEntries(
+                              Object.entries(sc.byStation ?? {}).map(([k, v]) => {
+                                const delta = v as Partial<ScenarioDeltas>;
+                                return [
+                                  k,
+                                  {
+                                    laborDelta: delta.laborDelta ?? 0,
+                                    timeDelta: delta.timeDelta ?? 0,
+                                    qualityDelta: delta.qualityDelta ?? 0,
+                                  },
+                                ];
+                              })
+                            ),
+                          });
+                        } else {
+                          setScenario({
+                            global: {
+                              laborDelta: sc.laborDelta ?? 0,
+                              timeDelta: sc.timeDelta ?? 0,
+                              qualityDelta: sc.qualityDelta ?? 0,
+                            },
+                            byStation: {},
+                          });
+                        }
                       }
                     }
                     await loadScenarioFromServer(serviceLine.service_line_id, name);
@@ -1159,6 +1217,16 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
           onClose={handleClosePanel}
           onUpdate={handleStationUpdate}
           onDelete={handleDeleteStation}
+          scenarioOverride={scenario.byStation?.[selectedStation.station_id]}
+          onScenarioOverrideChange={(deltas) => {
+            setScenario((prev) => ({
+              ...prev,
+              byStation: {
+                ...(prev.byStation ?? {}),
+                [selectedStation.station_id]: deltas,
+              },
+            }));
+          }}
         />
       )}
 

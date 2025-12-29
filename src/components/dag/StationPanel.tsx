@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import type { StationNodeData } from "@/lib/dag/transforms";
 import type { StationMetrics, PerformanceProofMetrics } from "@/types";
+import type { ScenarioDeltas } from "@/lib/scenario/apply";
 import { computeStationRag, getRagDisplay } from "@/lib/rag/compute";
 
 interface StationPanelProps {
@@ -14,12 +15,21 @@ interface StationPanelProps {
   onClose: () => void;
   onUpdate: (updates: Partial<StationNodeData>) => void;
   onDelete: () => void;
+  scenarioOverride?: ScenarioDeltas;
+  onScenarioOverrideChange?: (deltas: ScenarioDeltas) => void;
 }
 
 /**
  * Side panel for viewing and editing station details including all metrics.
  */
-export function StationPanel({ station, onClose, onUpdate, onDelete }: StationPanelProps) {
+export function StationPanel({
+  station,
+  onClose,
+  onUpdate,
+  onDelete,
+  scenarioOverride,
+  onScenarioOverrideChange,
+}: StationPanelProps) {
   const { fair_pricing, world_class, performance_proof } = station.metrics;
   
   // State for new performance proof field
@@ -387,6 +397,43 @@ export function StationPanel({ station, onClose, onUpdate, onDelete }: StationPa
             </div>
           </div>
         </section>
+
+        {/* Scenario override (per-station) */}
+        {onScenarioOverrideChange && (
+          <section>
+            <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500 mb-3">
+              Scenario Override (this station)
+            </h3>
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { key: "laborDelta", label: "Labor Δ (actual hrs)", min: -40, max: 40, step: 1 },
+                { key: "timeDelta", label: "Time Δ (planned hrs)", min: -40, max: 40, step: 1 },
+                { key: "qualityDelta", label: "Quality Δ (QA pts)", min: -10, max: 10, step: 1 },
+              ].map((f) => (
+                <div key={f.key} className="space-y-1.5">
+                  <Label className="text-slate-400 text-xs">{f.label}</Label>
+                  <Input
+                    type="number"
+                    min={f.min}
+                    max={f.max}
+                    step={f.step}
+                    value={(scenarioOverride?.[f.key as keyof ScenarioDeltas] as number | undefined) ?? 0}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      onScenarioOverrideChange({
+                        laborDelta: scenarioOverride?.laborDelta ?? 0,
+                        timeDelta: scenarioOverride?.timeDelta ?? 0,
+                        qualityDelta: scenarioOverride?.qualityDelta ?? 0,
+                        [f.key]: isNaN(val) ? 0 : val,
+                      } as ScenarioDeltas);
+                    }}
+                    className="bg-slate-900 border-slate-700 text-white focus:border-emerald-500 focus:ring-emerald-500/20"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {/* Footer with delete */}
