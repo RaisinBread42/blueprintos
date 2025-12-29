@@ -35,6 +35,11 @@ import { EdgePanel } from "./EdgePanel";
 import { Button } from "@/components/ui/button";
 import { computeServiceLineRollup } from "@/lib/rag/rollup";
 import { getRagDisplay } from "@/lib/rag/compute";
+import {
+  applyScenarioToMetrics,
+  applyScenarioToServiceLine,
+  defaultScenario,
+} from "@/lib/scenario/apply";
 
 const nodeTypes: NodeTypes = {
   stationNode: StationNode,
@@ -117,16 +122,6 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
   // Open dropdown state
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
-
-  // Scenario sliders (in-memory only), additive deltas (no scaling)
-  const defaultScenario = useMemo(
-    () => ({
-      laborDelta: 0, // +/- hours applied to actual_hrs
-      timeDelta: 0, // +/- hours applied to planned_hrs
-      qualityDelta: 0, // +/- points applied to QA/benchmark
-    }),
-    []
-  );
 
   const [scenario, setScenario] = useState(defaultScenario);
   const [scenarioNames, setScenarioNames] = useState<string[]>([]);
@@ -498,60 +493,33 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     event.target.value = "";
   }, [onImport]);
 
-  // Apply scenario multipliers to metrics (in-memory, non-persistent)
-  const applyScenarioToMetrics = useCallback(
-    (metrics: StationMetrics): StationMetrics => {
-      const planned = Math.max(0, metrics.fair_pricing.planned_hrs + scenario.timeDelta);
-      const actual = Math.max(0, metrics.fair_pricing.actual_hrs + scenario.laborDelta);
-      const labor_variance = actual - planned;
-
-      const qa_score = Math.min(10, Math.max(0, metrics.world_class.internal_qa_score + scenario.qualityDelta));
-      const benchmark =
-        metrics.world_class.industry_benchmark !== undefined
-          ? Math.min(10, Math.max(0, metrics.world_class.industry_benchmark + scenario.qualityDelta))
-          : undefined;
-      const standard_met = benchmark === undefined ? metrics.world_class.standard_met : qa_score >= benchmark;
-
-      return {
-        fair_pricing: {
-          ...metrics.fair_pricing,
-          planned_hrs: planned,
-          actual_hrs: actual,
-          labor_variance,
-        },
-        world_class: {
-          ...metrics.world_class,
-          internal_qa_score: qa_score,
-          industry_benchmark: benchmark,
-          standard_met,
-        },
-        performance_proof: { ...metrics.performance_proof },
-      };
-    },
-    [scenario]
-  );
-
   // Derived nodes with scenario applied (used for rendering only)
   const nodesForView = useMemo(() => {
     return nodes.map((node) => ({
       ...node,
       data: {
         ...node.data,
-        metrics: applyScenarioToMetrics(node.data.metrics),
+        metrics: applyScenarioToMetrics(node.data.metrics, scenario),
       },
     }));
-  }, [nodes, applyScenarioToMetrics]);
+  }, [nodes, scenario]);
 
   // Export handler for scenario-applied view (non-persistent)
   const handleExportScenario = useCallback(() => {
-    const scenarioServiceLine = flowToServiceLine(nodesForView, edges, {
-      service_line_id: `${serviceLine.service_line_id}-scenario`,
-      name: `${serviceLine.name} (scenario)`,
+    const baseServiceLine = flowToServiceLine(nodes, edges, {
+      service_line_id: serviceLine.service_line_id,
+      name: serviceLine.name,
       description: serviceLine.description,
       created_at: serviceLine.created_at,
     });
+    const scenarioServiceLine = applyScenarioToServiceLine(baseServiceLine, scenario);
+    const exportLine: ServiceLine = {
+      ...scenarioServiceLine,
+      service_line_id: `${serviceLine.service_line_id}-scenario`,
+      name: `${serviceLine.name} (scenario)`,
+    };
 
-    const blob = new Blob([JSON.stringify(scenarioServiceLine, null, 2)], {
+    const blob = new Blob([JSON.stringify(exportLine, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
@@ -562,7 +530,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [nodesForView, edges, serviceLine]);
+  }, [edges, nodes, scenario, serviceLine]);
 
   // Map of node id -> computed RAG (view)
   const nodeRagMap = useMemo(() => {

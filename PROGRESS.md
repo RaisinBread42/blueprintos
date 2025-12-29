@@ -94,6 +94,8 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 - Add-station modal lets users choose an existing catalog station (shows department) or create a new one; new stations seed the catalog instantly.
 - Next: quick UI pass to confirm save/reload hydrates from catalog; add `/api/stations` list + validation in Phase 5.
 
+**Phase 3 progress:** Added shared scenario overlay helper (`applyScenarioToMetrics/serviceLine` + `defaultScenario`) and wired both editor and dashboard to apply deltas on top of hydrated shared metrics. Scenario export now uses the shared base + overlay helper for consistency.
+
 **Simulation/AI alignment:** Synthetic generation, capacity simulation, and AI what-if should operate on the shared station catalog as the base; per-line scenarios stay as overlays applied at view time. RAG/rollups compute on resolved metrics (shared + overlay).
 
 #### Success Criteria

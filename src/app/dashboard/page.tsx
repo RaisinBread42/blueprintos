@@ -7,14 +7,12 @@ import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
 import { QADistributionChart } from "@/components/dashboard/QADistributionChart";
-
-type ScenarioPayload = {
-  laborDelta: number;
-  timeDelta: number;
-  qualityDelta: number;
-};
-
-const defaultScenario: ScenarioPayload = { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
+import {
+  applyScenarioToServiceLine,
+  applyScenarioToMetrics,
+  defaultScenario,
+  type ScenarioDeltas,
+} from "@/lib/scenario/apply";
 
 export default function DashboardPage() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
@@ -24,7 +22,7 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<"base" | "scenario">("base");
   const [scenarioName, setScenarioName] = useState("default");
   const [scenarioOptions, setScenarioOptions] = useState<string[]>(["default"]);
-  const [scenarioData, setScenarioData] = useState<Record<string, ScenarioPayload>>({});
+  const [scenarioData, setScenarioData] = useState<Record<string, ScenarioDeltas>>({});
   const [scenarioLoading, setScenarioLoading] = useState(false);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
 
@@ -46,46 +44,6 @@ export default function DashboardPage() {
     load();
   }, []);
 
-  const applyScenarioToMetrics = useCallback((metrics: ServiceLine["nodes"][number]["metrics"], scenario: ScenarioPayload) => {
-    const planned = Math.max(0, metrics.fair_pricing.planned_hrs + scenario.timeDelta);
-    const actual = Math.max(0, metrics.fair_pricing.actual_hrs + scenario.laborDelta);
-    const labor_variance = actual - planned;
-
-    const qa_score = Math.min(10, Math.max(0, metrics.world_class.internal_qa_score + scenario.qualityDelta));
-    const benchmark =
-      metrics.world_class.industry_benchmark !== undefined
-        ? Math.min(10, Math.max(0, metrics.world_class.industry_benchmark + scenario.qualityDelta))
-        : undefined;
-    const standard_met = benchmark === undefined ? metrics.world_class.standard_met : qa_score >= benchmark;
-
-    return {
-      fair_pricing: {
-        ...metrics.fair_pricing,
-        planned_hrs: planned,
-        actual_hrs: actual,
-        labor_variance,
-      },
-      world_class: {
-        ...metrics.world_class,
-        internal_qa_score: qa_score,
-        industry_benchmark: benchmark,
-        standard_met,
-      },
-      performance_proof: { ...metrics.performance_proof },
-    };
-  }, []);
-
-  const applyScenarioToServiceLine = useCallback(
-    (sl: ServiceLine, scenario: ScenarioPayload): ServiceLine => ({
-      ...sl,
-      nodes: sl.nodes.map((n) => ({
-        ...n,
-        metrics: applyScenarioToMetrics(n.metrics, scenario),
-      })),
-    }),
-    [applyScenarioToMetrics]
-  );
-
   const loadScenarioForAll = useCallback(
     async (name: string) => {
       if (serviceLines.length === 0) return;
@@ -103,7 +61,7 @@ export default function DashboardPage() {
               }
               const json = await res.json();
               if (json.success && json.data?.scenario) {
-                return [sl.service_line_id, json.data.scenario as ScenarioPayload, json.data.names ?? []] as const;
+                return [sl.service_line_id, json.data.scenario as ScenarioDeltas, json.data.names ?? []] as const;
               }
             } catch {
               // ignore
