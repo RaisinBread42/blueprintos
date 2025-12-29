@@ -11,13 +11,13 @@
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
-          "planned_hrs": 0,
-          "actual_hrs": 0,
-          "labor_variance": 0
+          "planned_hrs": 10,
+          "actual_hrs": 7,
+          "labor_variance": -3
         },
         "world_class": {
-          "internal_qa_score": 0,
-          "industry_benchmark": 0,
+          "internal_qa_score": 4,
+          "industry_benchmark": 10,
           "standard_met": false
         },
         "performance_proof": {}
@@ -30,5 +30,5 @@
     }
   ],
   "edges": [],
-  "updated_at": "2025-12-29T13:42:00.368Z"
+  "updated_at": "2025-12-29T13:54:23.007Z"
 }

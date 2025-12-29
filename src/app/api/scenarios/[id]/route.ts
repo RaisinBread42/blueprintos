@@ -65,9 +65,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     let scenario: ScenarioPayload;
     if (name) {
       scenario = fileData.scenarios[name] ?? defaultPayload();
-    } else if (names.length > 0) {
-      scenario = fileData.scenarios[names[0]] ?? defaultPayload();
     } else {
+      // If no name provided, return default (no overlay) but include names list for selection.
       scenario = defaultPayload();
     }
 

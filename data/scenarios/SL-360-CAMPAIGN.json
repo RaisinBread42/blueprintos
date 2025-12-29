@@ -1,0 +1,14 @@
+{
+  "scenarios": {
+    "test": {
+      "laborDelta": 19,
+      "timeDelta": 0,
+      "qualityDelta": 0
+    },
+    "test2": {
+      "laborDelta": -11,
+      "timeDelta": 0,
+      "qualityDelta": 0
+    }
+  }
+}

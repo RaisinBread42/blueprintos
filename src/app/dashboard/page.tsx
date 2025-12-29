@@ -7,12 +7,7 @@ import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
 import { QADistributionChart } from "@/components/dashboard/QADistributionChart";
-import {
-  applyScenarioToServiceLine,
-  applyScenarioToMetrics,
-  defaultScenario,
-  type ScenarioDeltas,
-} from "@/lib/scenario/apply";
+import { applyScenarioToServiceLine, defaultScenario, type ScenarioDeltas } from "@/lib/scenario/apply";
 
 export default function DashboardPage() {
   const [serviceLines, setServiceLines] = useState<ServiceLine[]>([]);
@@ -104,7 +99,7 @@ export default function DashboardPage() {
   const serviceLinesForView = useMemo(() => {
     if (viewMode !== "scenario") return serviceLines;
     return serviceLines.map((sl) => applyScenarioToServiceLine(sl, scenarioData[sl.service_line_id] ?? defaultScenario));
-  }, [viewMode, serviceLines, scenarioData, applyScenarioToServiceLine]);
+  }, [viewMode, serviceLines, scenarioData]);
 
   if (loading) {
     return (

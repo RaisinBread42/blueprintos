@@ -21,7 +21,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import type { ServiceLine, RAGStatus, StationMetrics, Station } from "@/types";
+import type { ServiceLine, RAGStatus, Station } from "@/types";
 import {
   serviceLineToFlow,
   flowToServiceLine,
@@ -135,33 +135,33 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const [selectedStationId, setSelectedStationId] = useState<string>("");
 
   // Load scenario from local server storage
-  const loadScenarioFromServer = useCallback(
-    async (id: string) => {
-      try {
-        const res = await fetch(`/api/scenarios/${encodeURIComponent(id)}`);
-        if (!res.ok) {
-          setScenario(defaultScenario);
-          return;
-        }
-        const json = await res.json();
-        if (json.success && json.data) {
-          if (Array.isArray(json.data.names)) {
-            setScenarioNames(json.data.names);
-          }
-          const sc = json.data.scenario ?? json.data;
-          setScenario({
-            laborDelta: sc.laborDelta ?? 0,
-            timeDelta: sc.timeDelta ?? 0,
-            qualityDelta: sc.qualityDelta ?? 0,
-          });
-          return;
-        }
-      } catch {
+  const loadScenarioFromServer = useCallback(async (id: string, name?: string) => {
+    try {
+      const url = name
+        ? `/api/scenarios/${encodeURIComponent(id)}?name=${encodeURIComponent(name)}`
+        : `/api/scenarios/${encodeURIComponent(id)}`;
+      const res = await fetch(url);
+      if (!res.ok) {
         setScenario(defaultScenario);
+        return;
       }
-    },
-    [defaultScenario]
-  );
+      const json = await res.json();
+      if (json.success && json.data) {
+        if (Array.isArray(json.data.names)) {
+          setScenarioNames(json.data.names);
+        }
+        const sc = json.data.scenario ?? json.data;
+        setScenario({
+          laborDelta: sc.laborDelta ?? 0,
+          timeDelta: sc.timeDelta ?? 0,
+          qualityDelta: sc.qualityDelta ?? 0,
+        });
+        return;
+      }
+    } catch {
+      setScenario(defaultScenario);
+    }
+  }, []);
 
   // Reload scenario whenever the service line changes
   useEffect(() => {
@@ -997,7 +997,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                         body: JSON.stringify(scenario),
                       }
                     );
-                    await loadScenarioFromServer(serviceLine.service_line_id);
+                    await loadScenarioFromServer(serviceLine.service_line_id, name);
                     setScenarioModalOpen(false);
                   }}
                 >
@@ -1026,7 +1026,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                         });
                       }
                     }
-                    await loadScenarioFromServer(serviceLine.service_line_id);
+                    await loadScenarioFromServer(serviceLine.service_line_id, name);
                     setScenarioModalOpen(false);
                   }}
                 >
