@@ -10,8 +10,13 @@ type ScenarioPayload = {
   qualityDelta: number;
 };
 
+type ScenarioConfig = {
+  global: ScenarioPayload;
+  byStation?: Record<string, ScenarioPayload>;
+};
+
 type ScenarioFile = {
-  scenarios: Record<string, ScenarioPayload>;
+  scenarios: Record<string, ScenarioConfig | ScenarioPayload>;
 };
 
 async function ensureDir() {
@@ -24,6 +29,19 @@ function filePath(id: string) {
 
 function defaultPayload(): ScenarioPayload {
   return { laborDelta: 0, timeDelta: 0, qualityDelta: 0 };
+}
+
+function toConfig(value: ScenarioConfig | ScenarioPayload | undefined): ScenarioConfig {
+  if (!value) return { global: defaultPayload(), byStation: {} };
+  if ((value as ScenarioConfig).global) {
+    const cfg = value as ScenarioConfig;
+    return {
+      global: cfg.global ?? defaultPayload(),
+      byStation: cfg.byStation ?? {},
+    };
+  }
+  const legacy = value as ScenarioPayload;
+  return { global: { ...defaultPayload(), ...legacy }, byStation: {} };
 }
 
 async function readFile(id: string): Promise<ScenarioFile> {
@@ -62,12 +80,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     const names = Object.keys(fileData.scenarios);
-    let scenario: ScenarioPayload;
+    let scenario: ScenarioConfig;
     if (name) {
-      scenario = fileData.scenarios[name] ?? defaultPayload();
+      scenario = toConfig(fileData.scenarios[name]);
     } else {
-      // If no name provided, return default (no overlay) but include names list for selection.
-      scenario = defaultPayload();
+      scenario = { global: defaultPayload(), byStation: {} };
     }
 
     return NextResponse.json({
@@ -84,12 +101,40 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     const url = new URL(req.url);
     const name = url.searchParams.get("name") || "default";
-    const body = (await req.json().catch(() => ({}))) as Partial<ScenarioPayload>;
-    const payload: ScenarioPayload = {
-      laborDelta: body.laborDelta ?? 0,
-      timeDelta: body.timeDelta ?? 0,
-      qualityDelta: body.qualityDelta ?? 0,
-    };
+    const body = (await req.json().catch(() => ({}))) as
+      | Partial<ScenarioPayload>
+      | { global?: Partial<ScenarioPayload>; byStation?: Record<string, Partial<ScenarioPayload>> };
+
+    // Accept both legacy and new shape
+    const isLegacy = (b: typeof body): b is Partial<ScenarioPayload> =>
+      "laborDelta" in b || "timeDelta" in b || "qualityDelta" in b;
+
+    const payload: ScenarioConfig = isLegacy(body)
+      ? {
+          global: {
+            laborDelta: body.laborDelta ?? 0,
+            timeDelta: body.timeDelta ?? 0,
+            qualityDelta: body.qualityDelta ?? 0,
+          },
+          byStation: {},
+        }
+      : {
+          global: {
+            laborDelta: body.global?.laborDelta ?? 0,
+            timeDelta: body.global?.timeDelta ?? 0,
+            qualityDelta: body.global?.qualityDelta ?? 0,
+          },
+          byStation: Object.fromEntries(
+            Object.entries(body.byStation ?? {}).map(([k, v]) => [
+              k,
+              {
+                laborDelta: v.laborDelta ?? 0,
+                timeDelta: v.timeDelta ?? 0,
+                qualityDelta: v.qualityDelta ?? 0,
+              },
+            ])
+          ),
+        };
 
     let fileData: ScenarioFile = { scenarios: {} };
     try {
