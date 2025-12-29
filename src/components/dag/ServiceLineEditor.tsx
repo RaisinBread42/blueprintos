@@ -203,6 +203,31 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     loadScenarioFromServer(serviceLine.service_line_id);
   }, [serviceLine.service_line_id, loadScenarioFromServer]);
 
+  // Auto-save scenario to active name when dirty (behaves like autosave)
+  useEffect(() => {
+    if (!scenarioDirty) return;
+    const controller = new AbortController();
+    const saveScenario = async () => {
+      const name = activeScenarioName || "default";
+      try {
+        await fetch(
+          `/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}?name=${encodeURIComponent(name)}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(scenario),
+            signal: controller.signal,
+          }
+        );
+        setScenarioDirty(false);
+      } catch {
+        // ignore; will retry on next change
+      }
+    };
+    void saveScenario();
+    return () => controller.abort();
+  }, [scenarioDirty, scenario, activeScenarioName, serviceLine.service_line_id]);
+
   // Load station catalog for "Add Station" modal
   useEffect(() => {
     const loadStations = async () => {
