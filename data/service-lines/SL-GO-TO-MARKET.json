@@ -1,0 +1,82 @@
+{
+  "service_line_id": "SL-GO-TO-MARKET",
+  "name": "Go-To-Market",
+  "description": "Business development and launch",
+  "nodes": [
+    {
+      "station_id": "OPS_PM",
+      "name": "Operations / PM",
+      "department": "Operations",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 40, "actual_hrs": 42, "labor_variance": 2 },
+        "world_class": { "internal_qa_score": 8.2, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "on_time_pct": 93 }
+      },
+      "rag_status": "green",
+      "position": { "x": 0, "y": 0 }
+    },
+    {
+      "station_id": "BIZ_DEV",
+      "name": "Business Development",
+      "department": "Business Development",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 40, "actual_hrs": 41, "labor_variance": 1 },
+        "world_class": { "internal_qa_score": 7.9, "standard_met": true, "industry_benchmark": 7.5 },
+        "performance_proof": { "qualified_pitches": 8 }
+      },
+      "rag_status": "green",
+      "position": { "x": 200, "y": 0 }
+    },
+    {
+      "station_id": "SALES_MKTG",
+      "name": "Sales & Marketing",
+      "department": "Sales and Marketing",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 40, "actual_hrs": 42, "labor_variance": 2 },
+        "world_class": { "internal_qa_score": 8, "standard_met": true, "industry_benchmark": 7.5 },
+        "performance_proof": { "mqls_generated": 30 }
+      },
+      "rag_status": "green",
+      "position": { "x": 400, "y": 0 }
+    },
+    {
+      "station_id": "ACCOUNT_MGMT",
+      "name": "Account Management",
+      "department": "Account Management",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 40, "actual_hrs": 40, "labor_variance": 0 },
+        "world_class": { "internal_qa_score": 8.4, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "csat": 4.5 }
+      },
+      "rag_status": "green",
+      "position": { "x": 600, "y": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "OPS_PM->BIZ_DEV",
+      "source_station_id": "OPS_PM",
+      "target_station_id": "BIZ_DEV",
+      "weight": { "cost": 1, "time": 1 }
+    },
+    {
+      "id": "BIZ_DEV->SALES_MKTG",
+      "source_station_id": "BIZ_DEV",
+      "target_station_id": "SALES_MKTG",
+      "weight": { "cost": 1, "time": 1 }
+    },
+    {
+      "id": "SALES_MKTG->ACCOUNT_MGMT",
+      "source_station_id": "SALES_MKTG",
+      "target_station_id": "ACCOUNT_MGMT",
+      "weight": { "cost": 1, "time": 1 }
+    }
+  ],
+  "created_at": "2025-12-29T00:00:00.000Z",
+  "updated_at": "2025-12-29T00:00:00.000Z"
+}
+

@@ -1,0 +1,23 @@
+{
+  "station_id": "SALES_MKTG",
+  "name": "Sales & Marketing",
+  "department": "Sales and Marketing",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 42,
+      "labor_variance": 2
+    },
+    "world_class": {
+      "internal_qa_score": 8,
+      "standard_met": true,
+      "industry_benchmark": 7.5
+    },
+    "performance_proof": {
+      "mqls_generated": 30
+    }
+  },
+  "rag_status": "green"
+}
+

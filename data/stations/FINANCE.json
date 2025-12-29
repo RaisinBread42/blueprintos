@@ -1,0 +1,23 @@
+{
+  "station_id": "FINANCE",
+  "name": "Finance",
+  "department": "Finance",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 40,
+      "labor_variance": 0
+    },
+    "world_class": {
+      "internal_qa_score": 8.5,
+      "standard_met": true,
+      "industry_benchmark": 7.5
+    },
+    "performance_proof": {
+      "billing_accuracy_pct": 99
+    }
+  },
+  "rag_status": "green"
+}
+

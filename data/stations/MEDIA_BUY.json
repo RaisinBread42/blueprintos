@@ -1,0 +1,23 @@
+{
+  "station_id": "MEDIA_BUY",
+  "name": "Media Planning & Buying",
+  "department": "Media Buying",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 44,
+      "labor_variance": 4
+    },
+    "world_class": {
+      "internal_qa_score": 7.8,
+      "standard_met": false,
+      "industry_benchmark": 8
+    },
+    "performance_proof": {
+      "roas": 3.1
+    }
+  },
+  "rag_status": "amber"
+}
+

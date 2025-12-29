@@ -1,0 +1,23 @@
+{
+  "station_id": "BIZ_DEV",
+  "name": "Business Development",
+  "department": "Business Development",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 41,
+      "labor_variance": 1
+    },
+    "world_class": {
+      "internal_qa_score": 7.9,
+      "standard_met": true,
+      "industry_benchmark": 7.5
+    },
+    "performance_proof": {
+      "qualified_pitches": 8
+    }
+  },
+  "rag_status": "green"
+}
+

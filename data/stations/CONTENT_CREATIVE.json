@@ -1,0 +1,23 @@
+{
+  "station_id": "CONTENT_CREATIVE",
+  "name": "Content & Creative",
+  "department": "Creative",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 42,
+      "labor_variance": 2
+    },
+    "world_class": {
+      "internal_qa_score": 8.1,
+      "standard_met": true,
+      "industry_benchmark": 8
+    },
+    "performance_proof": {
+      "deliverables": 6
+    }
+  },
+  "rag_status": "green"
+}
+

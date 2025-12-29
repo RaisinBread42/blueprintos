@@ -1,0 +1,23 @@
+{
+  "station_id": "OPS_PM",
+  "name": "Operations / PM",
+  "department": "Operations",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 42,
+      "labor_variance": 2
+    },
+    "world_class": {
+      "internal_qa_score": 8.2,
+      "standard_met": true,
+      "industry_benchmark": 8
+    },
+    "performance_proof": {
+      "on_time_pct": 93
+    }
+  },
+  "rag_status": "green"
+}
+

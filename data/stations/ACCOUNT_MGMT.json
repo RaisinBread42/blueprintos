@@ -1,0 +1,23 @@
+{
+  "station_id": "ACCOUNT_MGMT",
+  "name": "Account Management",
+  "department": "Account Management",
+  "data_source": "mock",
+  "metrics": {
+    "fair_pricing": {
+      "planned_hrs": 40,
+      "actual_hrs": 40,
+      "labor_variance": 0
+    },
+    "world_class": {
+      "internal_qa_score": 8.4,
+      "standard_met": true,
+      "industry_benchmark": 8
+    },
+    "performance_proof": {
+      "csat": 4.5
+    }
+  },
+  "rag_status": "green"
+}
+
