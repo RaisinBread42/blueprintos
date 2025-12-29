@@ -6,7 +6,8 @@
   "nodes": [
     {
       "station_id": "Station_mjq7uinj",
-      "name": "New Station",
+      "name": "Test station 3",
+      "department": "test dept",
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
@@ -16,10 +17,12 @@
         },
         "world_class": {
           "internal_qa_score": 0,
+          "industry_benchmark": 0,
           "standard_met": false
         },
         "performance_proof": {}
       },
+      "rag_status": "green",
       "position": {
         "x": 400,
         "y": 300
@@ -27,5 +30,5 @@
     }
   ],
   "edges": [],
-  "updated_at": "2025-12-28T21:03:06.288Z"
+  "updated_at": "2025-12-29T13:42:00.368Z"
 }

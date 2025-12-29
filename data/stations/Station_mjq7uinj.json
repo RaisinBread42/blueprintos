@@ -1,6 +1,6 @@
 {
   "station_id": "Station_mjq7uinj",
-  "name": "New Station 1",
+  "name": "Test station 3",
   "department": "test dept",
   "data_source": "mock",
   "metrics": {
@@ -16,5 +16,9 @@
     },
     "performance_proof": {}
   },
-  "rag_status": "green"
+  "rag_status": "green",
+  "position": {
+    "x": 400,
+    "y": 300
+  }
 }
