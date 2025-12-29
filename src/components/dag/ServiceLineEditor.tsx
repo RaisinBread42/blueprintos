@@ -683,6 +683,13 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
             >
               Dashboard
             </Link>
+            <Link
+              href="/admin/stations"
+              className="hidden sm:inline-flex h-8 items-center justify-center rounded-lg border border-slate-700/50 px-3 text-sm text-slate-300 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-colors"
+              title="Station catalog & health"
+            >
+              Stations
+            </Link>
 
             {/* New button */}
             <Button

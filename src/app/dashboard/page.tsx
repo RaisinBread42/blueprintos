@@ -131,13 +131,21 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-semibold text-white">Service Line Dashboard</h1>
             <p className="text-slate-400 text-sm">Overview of all service lines and their health</p>
           </div>
-          <Link
-            href="/editor"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-700/50 px-3 py-2 text-sm text-slate-300 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Editor
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/stations"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700/50 px-3 py-2 text-sm text-slate-300 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-colors"
+            >
+              Stations
+            </Link>
+            <Link
+              href="/editor"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700/50 px-3 py-2 text-sm text-slate-300 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Editor
+            </Link>
+          </div>
         </div>
 
         {/* Controls */}
@@ -157,16 +165,16 @@ export default function DashboardPage() {
             </button>
           </div>
           <div className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2">
-            <span className="text-slate-400">Scenario name</span>
+            <span className="text-slate-400">Scenario</span>
             <select
               value={scenarioName}
               onChange={(e) => setScenarioName(e.target.value)}
               className="w-44 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-sm"
             >
-              {scenarioOptions.length === 0 && <option value="default">default</option>}
+              {scenarioOptions.length === 0 && <option value="default">(none)</option>}
               {scenarioOptions.map((opt) => (
                 <option key={opt || "default"} value={opt || "default"}>
-                  {opt || "default"}
+                  {opt || "(none)"}
                 </option>
               ))}
             </select>
