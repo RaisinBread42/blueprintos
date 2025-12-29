@@ -125,11 +125,12 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   // Open dropdown state
   const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
 
-const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
+  const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
   const [scenarioNames, setScenarioNames] = useState<string[]>([]);
   const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
   const [scenarioModalMode, setScenarioModalMode] = useState<"save" | "load">("load");
   const [scenarioNameInput, setScenarioNameInput] = useState("");
+  const [activeScenarioName, setActiveScenarioName] = useState("default");
   const [scenarioDirty, setScenarioDirty] = useState(false);
   const [stationOptions, setStationOptions] = useState<Station[]>([]);
   const [stationOptionsLoading, setStationOptionsLoading] = useState(false);
@@ -146,6 +147,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
       const res = await fetch(url);
       if (!res.ok) {
         setScenario(defaultScenarioConfig);
+        setActiveScenarioName("default");
         return;
       }
       const json = await res.json();
@@ -185,11 +187,13 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
             byStation: {},
           });
         }
+        setActiveScenarioName(name ?? "default");
         setScenarioDirty(false);
         return;
       }
     } catch {
       setScenario(defaultScenarioConfig);
+      setActiveScenarioName("default");
       setScenarioDirty(false);
     }
   }, []);
@@ -445,6 +449,20 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
         description: serviceLine.description,
         created_at: serviceLine.created_at,
       });
+      // Persist scenario (default to activeScenarioName) if dirty
+      if (scenarioDirty) {
+        const name = activeScenarioName || "default";
+        await fetch(
+          `/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}?name=${encodeURIComponent(name)}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(scenario),
+          }
+        );
+        setScenarioDirty(false);
+      }
+
       const success = await onSave(updatedServiceLine);
       if (success) {
         setHasUnsavedChanges(false);
@@ -452,7 +470,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
     } finally {
       setSaving(false);
     }
-  }, [nodes, edges, serviceLine, onSave]);
+  }, [nodes, edges, serviceLine, onSave, scenario, scenarioDirty, activeScenarioName]);
 
   // Load handler
   const handleLoad = useCallback(async (id: string) => {
@@ -856,6 +874,9 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
               <span>•</span>
               <span>{edges.length} tracks</span>
             </div>
+            {scenarioDirty && (
+              <div className="text-[11px] text-amber-300">Scenario changes not saved</div>
+            )}
           </div>
 
           {/* Scenario sliders */}
@@ -888,6 +909,14 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
                       },
                     }))
                   }
+                  onMouseUp={() => {
+                    setScenarioDirty(true);
+                    setHasUnsavedChanges(true);
+                  }}
+                  onTouchEnd={() => {
+                    setScenarioDirty(true);
+                    setHasUnsavedChanges(true);
+                  }}
                   className="w-full accent-emerald-500"
                 />
               </div>
@@ -1236,6 +1265,7 @@ const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
               },
             }));
             setScenarioDirty(true);
+            setHasUnsavedChanges(true);
           }}
         />
       )}
