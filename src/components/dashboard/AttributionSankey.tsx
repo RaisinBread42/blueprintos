@@ -106,10 +106,12 @@ function CustomLink({
   // Create unique gradient ID (sanitize names for valid SVG ID)
   const gradientId = `lg-${payload.source.name.replace(/[^a-zA-Z0-9]/g, "")}-${payload.target.name.replace(/[^a-zA-Z0-9]/g, "")}`;
 
-  // Calculate midpoint for percentage label (along the bezier curve)
+  // Calculate midpoint for percentage label (above the bezier curve)
   const t = 0.5;
   const midX = (1-t)*(1-t)*(1-t)*sourceX + 3*(1-t)*(1-t)*t*sourceControlX + 3*(1-t)*t*t*targetControlX + t*t*t*targetX;
-  const midY = (1-t)*(1-t)*(1-t)*sourceY + 3*(1-t)*(1-t)*t*sourceY + 3*(1-t)*t*t*targetY + t*t*t*targetY;
+  const curveY = (1-t)*(1-t)*(1-t)*sourceY + 3*(1-t)*(1-t)*t*sourceY + 3*(1-t)*t*t*targetY + t*t*t*targetY;
+  // Position label above the link path
+  const midY = curveY - linkWidth / 2 - 14;
 
   const percentText = `${(payload.clickThroughRate * 100).toFixed(0)}%`;
   const usersText = payload.value >= 1000
