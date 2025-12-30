@@ -6,8 +6,8 @@
   "metrics": {
     "fair_pricing": {
       "planned_hrs": 39.5,
-      "actual_hrs": 42,
-      "labor_variance": 2.5
+      "actual_hrs": 6,
+      "labor_variance": -33.5
     },
     "world_class": {
       "internal_qa_score": 8.2,
