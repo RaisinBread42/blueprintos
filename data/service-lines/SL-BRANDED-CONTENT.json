@@ -11,9 +11,9 @@
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
-          "planned_hrs": 39.5,
-          "actual_hrs": 42,
-          "labor_variance": 2.5
+          "planned_hrs": 8,
+          "actual_hrs": 9,
+          "labor_variance": 1
         },
         "world_class": {
           "internal_qa_score": 8.2,
@@ -37,8 +37,8 @@
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
-          "planned_hrs": 40,
-          "actual_hrs": 42,
+          "planned_hrs": 20,
+          "actual_hrs": 22,
           "labor_variance": 2
         },
         "world_class": {
@@ -63,8 +63,8 @@
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
-          "planned_hrs": 40,
-          "actual_hrs": 40,
+          "planned_hrs": 10,
+          "actual_hrs": 10,
           "labor_variance": 0
         },
         "world_class": {
@@ -89,8 +89,8 @@
       "data_source": "mock",
       "metrics": {
         "fair_pricing": {
-          "planned_hrs": 40,
-          "actual_hrs": 44,
+          "planned_hrs": 20,
+          "actual_hrs": 24,
           "labor_variance": 4
         },
         "world_class": {
@@ -147,5 +147,5 @@
       }
     }
   ],
-  "updated_at": "2025-12-30T02:40:46.526Z"
+  "updated_at": "2025-12-30T03:11:51.848Z"
 }
