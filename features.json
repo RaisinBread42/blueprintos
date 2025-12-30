@@ -241,14 +241,16 @@
       "id": "feat-009",
       "title": "Attribution Data Model + Snapshots API",
       "description": "Add AttributionEdge, JourneySnapshot, and GapOpportunity types. Create /api/attribution/snapshots endpoint for storing/retrieving periodic cross-entity flow data.",
-      "status": "implemented",
+      "status": "complete",
       "priority": "high",
       "complexity": "M",
       "createdAt": "2025-12-30T00:00:00Z",
       "phases": {
         "planning": { "completedAt": "2025-12-30T14:00:00Z" },
         "accepted": { "completedAt": "2025-12-30T14:30:00Z" },
-        "implemented": { "completedAt": "2025-12-30T15:00:00Z" }
+        "implemented": { "completedAt": "2025-12-30T15:00:00Z" },
+        "verified": { "completedAt": "2025-12-30T16:00:00Z" },
+        "committed": { "completedAt": "2025-12-30T16:00:00Z", "commitHash": "c5a7644" }
       },
       "files": [
         "src/types/index.ts",
