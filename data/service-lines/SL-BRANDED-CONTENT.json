@@ -26,8 +26,8 @@
       },
       "rag_status": "green",
       "position": {
-        "x": 0,
-        "y": 0
+        "x": -109,
+        "y": -6
       }
     },
     {
@@ -52,8 +52,8 @@
       },
       "rag_status": "green",
       "position": {
-        "x": 200,
-        "y": 0
+        "x": 163.5,
+        "y": -7
       }
     },
     {
@@ -78,8 +78,34 @@
       },
       "rag_status": "green",
       "position": {
-        "x": 400,
-        "y": 0
+        "x": 480.0811895747503,
+        "y": -2.5
+      }
+    },
+    {
+      "station_id": "MEDIA_BUY",
+      "name": "Media Planning & Buying",
+      "department": "Media Buying",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 40,
+          "actual_hrs": 44,
+          "labor_variance": 4
+        },
+        "world_class": {
+          "internal_qa_score": 7.8,
+          "standard_met": false,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "roas": 3.1
+        }
+      },
+      "rag_status": "amber",
+      "position": {
+        "x": 160.06054012964728,
+        "y": 196
       }
     }
   ],
@@ -90,7 +116,7 @@
       "target_station_id": "CONTENT_CREATIVE",
       "weight": {
         "cost": 2,
-        "time": 3
+        "time": 4
       }
     },
     {
@@ -101,7 +127,25 @@
         "cost": 1,
         "time": 2
       }
+    },
+    {
+      "id": "OPS_PM->MEDIA_BUY",
+      "source_station_id": "OPS_PM",
+      "target_station_id": "MEDIA_BUY",
+      "weight": {
+        "cost": 3,
+        "time": 1
+      }
+    },
+    {
+      "id": "MEDIA_BUY->ACCOUNT_MGMT",
+      "source_station_id": "MEDIA_BUY",
+      "target_station_id": "ACCOUNT_MGMT",
+      "weight": {
+        "cost": 1,
+        "time": 2
+      }
     }
   ],
-  "updated_at": "2025-12-29T22:28:17.189Z"
+  "updated_at": "2025-12-30T02:40:46.526Z"
 }

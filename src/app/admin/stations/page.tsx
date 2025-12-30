@@ -145,34 +145,7 @@ export default async function StationsAdminPage() {
 
         <div className="rounded-lg border border-slate-800 bg-slate-900/70">
           <div className="border-b border-slate-800 px-4 py-3 text-sm font-semibold text-white">
-            Catalog
-          </div>
-          <div className="divide-y divide-slate-800">
-            {stations.length === 0 && (
-              <div className="px-4 py-3 text-sm text-slate-400">No stations in catalog.</div>
-            )}
-            {stations.map((st) => {
-              const refs = refCounts.get(st.station_id) ?? 0;
-              return (
-                <div key={st.station_id} className="px-4 py-3 text-sm flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="font-semibold text-white">{st.name}</div>
-                    <div className="text-xs text-slate-400">
-                      {st.station_id} · {st.department ?? "No dept"} · {st.data_source}
-                    </div>
-                  </div>
-                  <div className="text-xs text-slate-300">
-                    <span className="rounded-full bg-slate-800 px-2 py-1">Refs: {refs}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-slate-800 bg-slate-900/70">
-          <div className="border-b border-slate-800 px-4 py-3 text-sm font-semibold text-white">
-            Per-line usage (actual hours resolved)
+            Station Usage Breakdown
           </div>
           <div className="divide-y divide-slate-800">
             {stations.length === 0 && (
