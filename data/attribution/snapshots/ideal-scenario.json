@@ -10,8 +10,8 @@
       "target_touchpoint_id": "ECAY-SEARCH",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 340,
-        "click_through_rate": 0.08,
+        "users_flowed": 450,
+        "click_through_rate": 0.09,
         "lift_vs_baseline": 0.03
       },
       "attribution_model": "last_touch"
@@ -19,10 +19,10 @@
     {
       "id": "IDEAL-002",
       "source_touchpoint_id": "KISS-DRIVE-TIME",
-      "target_touchpoint_id": "ECAY-VEHICLE-SEARCH",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 520,
+        "users_flowed": 680,
         "click_through_rate": 0.12,
         "lift_vs_baseline": 0.05
       },
@@ -31,77 +31,77 @@
     {
       "id": "IDEAL-003",
       "source_touchpoint_id": "CT-REAL-ESTATE-ARTICLE",
-      "target_touchpoint_id": "ECAY-PROPERTY-SEARCH",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 890,
-        "click_through_rate": 0.22,
-        "lift_vs_baseline": 0.12
+        "users_flowed": 920,
+        "click_through_rate": 0.18,
+        "lift_vs_baseline": 0.10
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "IDEAL-004",
       "source_touchpoint_id": "CT-NEWSLETTER",
-      "target_touchpoint_id": "ECAY-DEALS-PAGE",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 156,
-        "click_through_rate": 0.15,
+        "users_flowed": 350,
+        "click_through_rate": 0.22,
         "lift_vs_baseline": 0.08
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "IDEAL-005",
-      "source_touchpoint_id": "ECAY-SEARCH",
-      "target_touchpoint_id": "ECAY-LISTING-VIEW",
+      "source_touchpoint_id": "REWARDS-MEMBER-LOGIN",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 2100,
-        "click_through_rate": 0.58
+        "users_flowed": 1600,
+        "click_through_rate": 0.42,
+        "lift_vs_baseline": 0.25
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "IDEAL-006",
-      "source_touchpoint_id": "ECAY-LISTING-VIEW",
-      "target_touchpoint_id": "ECAY-CONTACT-SELLER",
+      "source_touchpoint_id": "ECAY-SEARCH",
+      "target_touchpoint_id": "ECAY-LISTING-VIEW",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 420,
-        "click_through_rate": 0.20
+        "users_flowed": 2400,
+        "click_through_rate": 0.60
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "IDEAL-007",
-      "source_touchpoint_id": "ECAY-CONTACT-SELLER",
-      "target_touchpoint_id": "ECAY-SALE-CONFIRMED",
+      "source_touchpoint_id": "ECAY-LISTING-VIEW",
+      "target_touchpoint_id": "ECAY-CONTACT-SELLER",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 84,
+        "users_flowed": 480,
         "click_through_rate": 0.20
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "IDEAL-008",
-      "source_touchpoint_id": "REWARDS-MEMBER-LOGIN",
-      "target_touchpoint_id": "ECAY-SEARCH",
+      "source_touchpoint_id": "ECAY-CONTACT-SELLER",
+      "target_touchpoint_id": "ECAY-SALE-CONFIRMED",
       "period": "ideal",
       "metrics": {
-        "users_flowed": 1200,
-        "click_through_rate": 0.35,
-        "lift_vs_baseline": 0.20
+        "users_flowed": 96,
+        "click_through_rate": 0.20
       },
       "attribution_model": "last_touch"
     }
   ],
   "computed_at": "2025-12-30T00:00:00Z",
   "insights": {
-    "highest_click_through_path": ["CT-REAL-ESTATE-ARTICLE", "ECAY-PROPERTY-SEARCH", "ECAY-LISTING-VIEW", "ECAY-CONTACT-SELLER", "ECAY-SALE-CONFIRMED"],
-    "biggest_bridge": "ECAY-LISTING-VIEW",
+    "highest_click_through_path": ["REWARDS-MEMBER-LOGIN", "ECAY-SEARCH", "ECAY-LISTING-VIEW", "ECAY-CONTACT-SELLER", "ECAY-SALE-CONFIRMED"],
+    "biggest_bridge": "ECAY-SEARCH",
     "gap_opportunities": []
   }
 }
