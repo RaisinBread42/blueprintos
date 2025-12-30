@@ -46,15 +46,16 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 
 **Current session:**
 - feat-010: Attribution & Synergy Dashboard ✅
-  - **Core Sankey visualization** with entity color-coding (Stingray=blue, eCayTrade=emerald, CT=amber)
+  - **Core Sankey visualization** with entity color-coding (Stingray=blue, eCayTrade=emerald, CT=amber, Rewards=violet)
   - **Two-tab design**: Current State (within-platform tracking) + Multi-Platform Vision (aspirational)
-  - **Fixed critical bugs**: Sankey self-loop stack overflow, useMemo dependency re-render
+  - **Inline metrics on links**: Shows user count + click-through % above each flow path
+  - **Fixed critical bugs**: Sankey self-loop stack overflow, useMemo dependency re-render, gradient ID sanitization
+  - **Mathematically correct funnel**: Inflows = 4,000 → Search → 2,400 → Listing → 480 → Contact → 96 Sale
   - **Entity-level aggregation**: aggregateToEntityLevel() filters same-entity flows
   - **Synergy lift comparison**: 12% (single) → 34% (multi) → 52% (with rewards)
   - **Bundle advantage cards** explaining multi-platform value proposition
   - **Stingray Rewards teaser** with unified user ID benefits
   - **Recommendations modal** with synergy-focused tracking improvements
-  - **Updated snapshot data**: realistic within-platform flows + ideal-scenario.json
 
 ---
 
