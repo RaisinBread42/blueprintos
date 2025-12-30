@@ -48,7 +48,7 @@
       "id": "OPS_PM->LEGAL",
       "source_station_id": "OPS_PM",
       "target_station_id": "LEGAL",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": { "cost": 3, "time": 4 }
     },
     {
       "id": "LEGAL->ACCOUNT_MGMT",

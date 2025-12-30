@@ -89,8 +89,8 @@
       "source_station_id": "OPS_PM",
       "target_station_id": "CONTENT_CREATIVE",
       "weight": {
-        "cost": 1,
-        "time": 1
+        "cost": 2,
+        "time": 3
       }
     },
     {
@@ -99,7 +99,7 @@
       "target_station_id": "ACCOUNT_MGMT",
       "weight": {
         "cost": 1,
-        "time": 1
+        "time": 2
       }
     }
   ],

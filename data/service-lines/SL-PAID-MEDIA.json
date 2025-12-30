@@ -61,19 +61,19 @@
       "id": "OPS_PM->CONTENT_CREATIVE",
       "source_station_id": "OPS_PM",
       "target_station_id": "CONTENT_CREATIVE",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": { "cost": 2, "time": 1 }
     },
     {
       "id": "CONTENT_CREATIVE->MEDIA_BUY",
       "source_station_id": "CONTENT_CREATIVE",
       "target_station_id": "MEDIA_BUY",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": { "cost": 4, "time": 3 }
     },
     {
       "id": "MEDIA_BUY->ACCOUNT_MGMT",
       "source_station_id": "MEDIA_BUY",
       "target_station_id": "ACCOUNT_MGMT",
-      "weight": { "cost": 1, "time": 1 }
+      "weight": { "cost": 2, "time": 2 }
     }
   ],
   "created_at": "2025-12-29T00:00:00.000Z",

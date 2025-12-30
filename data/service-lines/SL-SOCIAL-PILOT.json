@@ -46,7 +46,7 @@
     }
   ],
   "edges": [
-    { "id": "PLAN->CREATIVE", "source_station_id": "ST-PLAN", "target_station_id": "ST-CREATIVE", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" },
-    { "id": "CREATIVE->DISTRO", "source_station_id": "ST-CREATIVE", "target_station_id": "ST-DISTRO", "weight": { "cost": 1, "time": 1 }, "rag_status": "amber" }
+    { "id": "PLAN->CREATIVE", "source_station_id": "ST-PLAN", "target_station_id": "ST-CREATIVE", "weight": { "cost": 3, "time": 2 }, "rag_status": "amber" },
+    { "id": "CREATIVE->DISTRO", "source_station_id": "ST-CREATIVE", "target_station_id": "ST-DISTRO", "weight": { "cost": 2, "time": 1 }, "rag_status": "amber" }
   ]
 }

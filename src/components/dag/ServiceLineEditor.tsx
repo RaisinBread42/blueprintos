@@ -32,6 +32,7 @@ import { computeStationRag, worstRag } from "@/lib/rag/compute";
 import { StationNode } from "./StationNode";
 import { StationPanel } from "./StationPanel";
 import { EdgePanel } from "./EdgePanel";
+import { PathfinderPanel } from "./PathfinderPanel";
 import { Button } from "@/components/ui/button";
 import { computeServiceLineRollup } from "@/lib/rag/rollup";
 import { getRagDisplay } from "@/lib/rag/compute";
@@ -137,6 +138,8 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const [addStationModalOpen, setAddStationModalOpen] = useState(false);
   const [addStationMode, setAddStationMode] = useState<"existing" | "new">("existing");
   const [selectedStationId, setSelectedStationId] = useState<string>("");
+  const [showPathfinder, setShowPathfinder] = useState(false);
+  const [highlightedEdges, setHighlightedEdges] = useState<string[] | null>(null);
 
   // Load scenario from local server storage
   const loadScenarioFromServer = useCallback(async (id: string, name?: string) => {
@@ -627,23 +630,39 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     }
   };
 
-  // Apply RAG styling to edges
+  // Apply RAG styling, weight labels, and path highlighting to edges
   const coloredEdges = useMemo(() => {
+    const highlightSet = highlightedEdges ? new Set(highlightedEdges) : null;
     return edges.map((edge) => {
       const sourceRag = nodeRagMap.get(edge.source) ?? "green";
       const targetRag = nodeRagMap.get(edge.target) ?? "green";
       const edgeRag = worstRag(sourceRag, targetRag);
+      const weight = (edge.data?.weight?.cost ?? 1) + (edge.data?.weight?.time ?? 1);
+      const isHighlighted = highlightSet?.has(edge.id);
       return {
         ...edge,
         data: { ...edge.data, rag_status: edgeRag },
+        label: String(weight),
+        labelStyle: {
+          fill: isHighlighted ? "#22d3ee" : "#94a3b8",
+          fontSize: 12,
+          fontWeight: isHighlighted ? 700 : 600
+        },
+        labelBgStyle: {
+          fill: isHighlighted ? "#0e7490" : "#1e293b",
+          fillOpacity: 0.9
+        },
+        labelBgPadding: [4, 6] as [number, number],
+        labelBgBorderRadius: 4,
+        animated: isHighlighted,
         style: {
           ...(edge.style ?? {}),
-          stroke: ragColor(edgeRag),
-          strokeWidth: 2.5,
+          stroke: isHighlighted ? "#22d3ee" : ragColor(edgeRag),
+          strokeWidth: isHighlighted ? 4 : 2.5,
         },
       };
     });
-  }, [edges, nodeRagMap]);
+  }, [edges, nodeRagMap, highlightedEdges]);
 
   // Service line rollup (totals, averages, overall rag)
   const rollup = useMemo(
@@ -900,6 +919,26 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
             >
               <Plus className="h-4 w-4 mr-1" />
               Add Station
+            </Button>
+
+            {/* Pathfinder button */}
+            <Button
+              onClick={() => {
+                setShowPathfinder(!showPathfinder);
+                if (showPathfinder) setHighlightedEdges(null);
+              }}
+              variant="ghost"
+              size="sm"
+              className={`border transition-all ${
+                showPathfinder
+                  ? "border-cyan-500 text-cyan-300 bg-cyan-900/30 hover:bg-cyan-900/50"
+                  : "border-slate-700/50 text-slate-400 bg-transparent hover:bg-cyan-600 hover:text-white hover:border-cyan-600"
+              }`}
+            >
+              <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Pathfinder
             </Button>
 
             <div className="flex items-center gap-2 text-xs text-slate-500 ml-2">
@@ -1314,6 +1353,21 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
           onUpdate={handleEdgeUpdate}
           onDelete={handleDeleteEdge}
         />
+      )}
+
+      {/* Pathfinder Panel */}
+      {showPathfinder && (
+        <div className="fixed right-0 top-0 h-screen w-80 z-30">
+          <PathfinderPanel
+            stations={nodes.map((n) => ({ id: n.id, name: n.data.name }))}
+            edges={edges}
+            onSelectPath={(edgeIds) => setHighlightedEdges(edgeIds)}
+            onClose={() => {
+              setShowPathfinder(false);
+              setHighlightedEdges(null);
+            }}
+          />
+        </div>
       )}
 
       {/* New Service Line Dialog */}
