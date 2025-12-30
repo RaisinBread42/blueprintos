@@ -106,6 +106,17 @@ function CustomLink({
   // Create gradient ID
   const gradientId = `link-gradient-${payload.source.name}-${payload.target.name}`;
 
+  // Calculate midpoint for percentage label
+  const midX = (sourceX + targetX) / 2;
+  const midY = (sourceY + targetY) / 2;
+  const percentText = `${(payload.clickThroughRate * 100).toFixed(0)}%`;
+  const usersText = payload.value >= 1000
+    ? `${(payload.value / 1000).toFixed(1)}k`
+    : `${payload.value}`;
+
+  // Show label if link is visible enough
+  const showLabel = linkWidth > 6;
+
   return (
     <g>
       <defs>
@@ -124,6 +135,34 @@ function CustomLink({
         strokeWidth={linkWidth}
         strokeOpacity={1}
       />
+      {showLabel && (
+        <>
+          {/* Background pill for readability */}
+          <rect
+            x={midX - 28}
+            y={midY - 9}
+            width={56}
+            height={18}
+            rx={9}
+            fill="#1e293b"
+            fillOpacity={0.95}
+            stroke="#334155"
+            strokeWidth={0.5}
+          />
+          <text
+            x={midX}
+            y={midY}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={9}
+            fontFamily="system-ui, sans-serif"
+          >
+            <tspan fill="#94a3b8">{usersText}</tspan>
+            <tspan fill="#64748b"> · </tspan>
+            <tspan fill="#10b981" fontWeight="600">{percentText}</tspan>
+          </text>
+        </>
+      )}
     </g>
   );
 }
