@@ -123,7 +123,8 @@ export default async function StationsAdminPage() {
         missingRefs.push({ service_line_id: sl.service_line_id, station_id: node.station_id });
       }
       const base = stationMap.get(node.station_id);
-      const metrics = base ? applyScenarioToMetrics(base.metrics, sc, node.station_id) : node.metrics;
+      // Use node.metrics (per-service-line allocation), not base.metrics (station total capacity)
+      const metrics = applyScenarioToMetrics(node.metrics, sc, node.station_id);
       const planned = metrics.fair_pricing.planned_hrs;
       const actual = metrics.fair_pricing.actual_hrs;
       if (!stationUsage.has(node.station_id)) {
