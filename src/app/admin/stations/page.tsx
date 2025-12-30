@@ -197,7 +197,7 @@ export default async function StationsAdminPage() {
                                 <td className="py-1 pr-4 w-24">{r.planned.toFixed(1)}</td>
                                 <td className="py-1 pr-4 w-24">{r.actual.toFixed(1)}</td>
                                 <td className="py-1 pr-4 w-28">
-                                  <span className={contribution >= 0 ? "text-amber-400" : "text-emerald-400"}>
+                                  <span className={contribution === 0 ? "text-white" : contribution > 0 ? "text-amber-400" : "text-emerald-400"}>
                                     {contribution >= 0 ? "+" : ""}{contribution.toFixed(1)} hrs
                                   </span>
                                 </td>
