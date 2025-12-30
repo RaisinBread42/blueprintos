@@ -6,104 +6,107 @@
   "edges": [
     {
       "id": "E-001",
-      "source_touchpoint_id": "X107-SOLAR-AD",
-      "target_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "source_touchpoint_id": "ECAY-HOME",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 384,
-        "conversion_rate": 0.12,
-        "lift_vs_baseline": 0.08
+        "users_flowed": 4820,
+        "click_through_rate": 0.42
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "E-002",
-      "source_touchpoint_id": "ECAY-SOLAR-SEARCH",
-      "target_touchpoint_id": "ECAY-PURCHASE",
+      "source_touchpoint_id": "ECAY-SEARCH",
+      "target_touchpoint_id": "ECAY-LISTING-VIEW",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 131,
-        "conversion_rate": 0.34
+        "users_flowed": 2890,
+        "click_through_rate": 0.60
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "E-003",
-      "source_touchpoint_id": "X107-MORNING-SHOW",
-      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "source_touchpoint_id": "ECAY-LISTING-VIEW",
+      "target_touchpoint_id": "ECAY-CONTACT-SELLER",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 520,
-        "conversion_rate": 0.061,
-        "lift_vs_baseline": 0.04
+        "users_flowed": 578,
+        "click_through_rate": 0.20
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "E-004",
-      "source_touchpoint_id": "CT-REAL-ESTATE-ARTICLE",
-      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "source_touchpoint_id": "CT-HOME",
+      "target_touchpoint_id": "CT-ARTICLE-VIEW",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 378,
-        "conversion_rate": 0.18,
-        "lift_vs_baseline": 0.12
+        "users_flowed": 8450,
+        "click_through_rate": 0.35
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "E-005",
-      "source_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
-      "target_touchpoint_id": "ECAY-LISTING-VIEW",
+      "source_touchpoint_id": "CT-ARTICLE-VIEW",
+      "target_touchpoint_id": "CT-NEWSLETTER-SIGNUP",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 1620,
-        "conversion_rate": 0.72
+        "users_flowed": 423,
+        "click_through_rate": 0.05
       },
       "attribution_model": "last_touch"
     },
     {
       "id": "E-006",
-      "source_touchpoint_id": "CT-BREAKING-NEWS",
-      "target_touchpoint_id": "CT-NEWSLETTER",
+      "source_touchpoint_id": "X107-WEBSITE",
+      "target_touchpoint_id": "X107-STREAM-PLAY",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 1470,
-        "conversion_rate": 0.15
+        "users_flowed": 1240,
+        "click_through_rate": 0.28
       },
-      "attribution_model": "first_touch"
+      "attribution_model": "last_touch"
     },
     {
       "id": "E-007",
-      "source_touchpoint_id": "STINGRAY-REWARDS-PROMO",
-      "target_touchpoint_id": "ECAY-VEHICLE-SEARCH",
+      "source_touchpoint_id": "X107-STREAM-PLAY",
+      "target_touchpoint_id": "X107-AD-CLICK",
       "period": "2025-01",
       "metrics": {
-        "users_flowed": 168,
-        "conversion_rate": 0.08,
-        "lift_vs_baseline": 0.05
+        "users_flowed": 186,
+        "click_through_rate": 0.15
       },
       "attribution_model": "last_touch"
     }
   ],
   "computed_at": "2025-02-01T00:00:00Z",
   "insights": {
-    "highest_conversion_path": ["CT-REAL-ESTATE-ARTICLE", "ECAY-REAL-ESTATE-SEARCH", "ECAY-LISTING-VIEW"],
-    "biggest_bridge": "ECAY-REAL-ESTATE-SEARCH",
+    "highest_click_through_path": ["ECAY-SEARCH", "ECAY-LISTING-VIEW", "ECAY-CONTACT-SELLER"],
+    "biggest_bridge": "ECAY-LISTING-VIEW",
     "gap_opportunities": [
       {
-        "touchpoint_id": "ECAY-SOLAR-SEARCH",
-        "search_demand": 620,
-        "supply_count": 12,
-        "gap_score": 0.98,
-        "recommended_action": "Recruit solar panel retailers for eCayTrade + Radio package"
+        "touchpoint_id": "CROSS-PLATFORM-RADIO-TO-ECAY",
+        "search_demand": 0,
+        "supply_count": 0,
+        "gap_score": 1.0,
+        "recommended_action": "No tracking exists between radio ads and eCayTrade visits. Implement UTM parameters in radio call-to-actions."
       },
       {
-        "touchpoint_id": "ECAY-VEHICLE-SEARCH",
-        "search_demand": 3200,
-        "supply_count": 89,
-        "gap_score": 0.97,
-        "recommended_action": "Increase vehicle dealer partnerships; bundle with Kiss FM Drive Time ads"
+        "touchpoint_id": "CROSS-PLATFORM-NEWS-TO-ECAY",
+        "search_demand": 0,
+        "supply_count": 0,
+        "gap_score": 1.0,
+        "recommended_action": "No tracking between CT articles and eCayTrade. Add QR codes to print editions and UTM links in digital articles."
+      },
+      {
+        "touchpoint_id": "ECAY-CONTACT-TO-SALE",
+        "search_demand": 578,
+        "supply_count": 0,
+        "gap_score": 1.0,
+        "recommended_action": "Cannot track if contact leads to sale (happens off-platform via phone/email). Consider in-platform messaging or sale confirmation flow."
       }
     ]
   }

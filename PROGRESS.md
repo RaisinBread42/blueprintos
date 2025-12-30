@@ -6,7 +6,7 @@
 
 ## Current Focus
 
-**Active Feature**: `feat-009` Attribution Data Model + Snapshots API (implemented, awaiting verification)
+**Recently Completed**: `feat-010` Attribution Sankey Dashboard
 
 ### 2026 Vision: Multiplex Network
 
@@ -27,8 +27,8 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 | Sensors | Dashboards + RAG overlays | ✅ Complete |
 | Simulation | Synthetic data + scenarios | ✅ Complete |
 | **Entity Layer** | Entity registry + touchpoints (feat-008) | ✅ Complete |
-| **Attribution** | Snapshots API + data model (feat-009) | ✅ Implemented |
-| Sankey | Attribution dashboard (feat-010) | 📋 Backlog |
+| **Attribution** | Snapshots API + data model (feat-009) | ✅ Complete |
+| **Sankey** | Attribution dashboard (feat-010) | ✅ Complete |
 | Gap Analysis | Demand vs supply engine (feat-011) | 📋 Backlog |
 | Centrality | Graph analytics (feat-012) | 📋 Backlog |
 | Dispatcher | Rule-based reports/alerts (feat-006) | ⏸️ Deferred (needs live data) |
@@ -40,12 +40,21 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 2. Admin Stations Dashboard
 3. Data Model Fix (per-SL allocations)
 4. Editor Enhancements (description, duplicate)
+5. Defined 2026 Multiplex Network vision (Option B)
+6. feat-008: Entity Registry ✅
+7. feat-009: Attribution Data Model + Snapshots API ✅
 
-**Current:**
-- Defined 2026 Multiplex Network vision
-- Chose Option B (dashboard attribution vs canvas attribution)
-- Added feat-008 through feat-012 to backlog
-- Starting feat-008: Entity Registry
+**Current session:**
+- feat-010: Attribution & Synergy Dashboard ✅
+  - **Core Sankey visualization** with entity color-coding (Stingray=blue, eCayTrade=emerald, CT=amber)
+  - **Two-tab design**: Current State (within-platform tracking) + Multi-Platform Vision (aspirational)
+  - **Fixed critical bugs**: Sankey self-loop stack overflow, useMemo dependency re-render
+  - **Entity-level aggregation**: aggregateToEntityLevel() filters same-entity flows
+  - **Synergy lift comparison**: 12% (single) → 34% (multi) → 52% (with rewards)
+  - **Bundle advantage cards** explaining multi-platform value proposition
+  - **Stingray Rewards teaser** with unified user ID benefits
+  - **Recommendations modal** with synergy-focused tracking improvements
+  - **Updated snapshot data**: realistic within-platform flows + ideal-scenario.json
 
 ---
 
@@ -53,9 +62,9 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 7          |
-| Currently In Progress | 1 (feat-009) |
-| Backlog Items         | 5          |
+| Features Completed    | 9          |
+| Currently In Progress | 0          |
+| Backlog Items         | 4          |
 | Last Updated          | 2025-12-30 |
 
 ---

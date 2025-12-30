@@ -55,7 +55,7 @@ export function isAttributionEdge(obj: unknown): obj is AttributionEdge {
     typeof e.metrics === "object" &&
     e.metrics !== null &&
     typeof (e.metrics as Record<string, unknown>).users_flowed === "number" &&
-    typeof (e.metrics as Record<string, unknown>).conversion_rate === "number" &&
+    typeof (e.metrics as Record<string, unknown>).click_through_rate === "number" &&
     typeof e.attribution_model === "string" &&
     validModels.includes(e.attribution_model)
   );
@@ -83,8 +83,8 @@ export function isJourneyInsights(obj: unknown): obj is JourneyInsights {
   if (!obj || typeof obj !== "object") return false;
   const i = obj as Record<string, unknown>;
   return (
-    Array.isArray(i.highest_conversion_path) &&
-    i.highest_conversion_path.every((p) => typeof p === "string") &&
+    Array.isArray(i.highest_click_through_path) &&
+    i.highest_click_through_path.every((p) => typeof p === "string") &&
     (i.biggest_bridge === undefined || typeof i.biggest_bridge === "string") &&
     Array.isArray(i.gap_opportunities) &&
     i.gap_opportunities.every(isGapOpportunity)

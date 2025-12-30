@@ -9,7 +9,7 @@ import type {
 /**
  * Compute conversion rate between two touchpoints
  */
-export function computeConversionRate(
+export function computeClickThroughRate(
   usersFlowed: number,
   sourceImpressions: number
 ): number {
@@ -38,23 +38,23 @@ export function createAttributionEdge(params: {
   period: string;
   usersFlowed: number;
   sourceImpressions: number;
-  baselineConversionRate?: number;
+  baselineClickThroughRate?: number;
   attributionModel?: AttributionModel;
 }): AttributionEdge {
-  const conversionRate = computeConversionRate(
+  const clickThroughRate = computeClickThroughRate(
     params.usersFlowed,
     params.sourceImpressions
   );
 
   const metrics: AttributionEdgeMetrics = {
     users_flowed: params.usersFlowed,
-    conversion_rate: conversionRate,
+    click_through_rate: clickThroughRate,
   };
 
-  if (params.baselineConversionRate !== undefined) {
+  if (params.baselineClickThroughRate !== undefined) {
     metrics.lift_vs_baseline = computeLift(
-      conversionRate,
-      params.baselineConversionRate
+      clickThroughRate,
+      params.baselineClickThroughRate
     );
   }
 
@@ -148,11 +148,11 @@ export function findHighestConversionPath(
 
       // Pick edge with highest conversion rate
       const best = outgoing.reduce((a, b) =>
-        a.metrics.conversion_rate > b.metrics.conversion_rate ? a : b
+        a.metrics.click_through_rate > b.metrics.click_through_rate ? a : b
       );
 
       path.push(best.target_touchpoint_id);
-      score += best.metrics.conversion_rate;
+      score += best.metrics.click_through_rate;
       current = best.target_touchpoint_id;
       depth++;
     }
@@ -216,12 +216,12 @@ export function computeSnapshotInsights(
   edges: AttributionEdge[],
   gapOpportunities: GapOpportunity[] = []
 ): {
-  highest_conversion_path: string[];
+  highest_click_through_path: string[];
   biggest_bridge?: string;
   gap_opportunities: GapOpportunity[];
 } {
   return {
-    highest_conversion_path: findHighestConversionPath(edges),
+    highest_click_through_path: findHighestConversionPath(edges),
     biggest_bridge: findBiggestBridge(edges),
     gap_opportunities: gapOpportunities,
   };
@@ -250,8 +250,8 @@ export function aggregateEdges(
 /**
  * Calculate average conversion rate for an edge across periods
  */
-export function averageConversionRate(metrics: AttributionEdgeMetrics[]): number {
+export function averageClickThroughRate(metrics: AttributionEdgeMetrics[]): number {
   if (metrics.length === 0) return 0;
-  const sum = metrics.reduce((acc, m) => acc + m.conversion_rate, 0);
+  const sum = metrics.reduce((acc, m) => acc + m.click_through_rate, 0);
   return Math.round((sum / metrics.length) * 100) / 100;
 }

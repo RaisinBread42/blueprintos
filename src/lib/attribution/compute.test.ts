@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { AttributionEdge, JourneySnapshot } from "@/types";
 import {
   aggregateEdges,
-  averageConversionRate,
-  computeConversionRate,
+  averageClickThroughRate,
+  computeClickThroughRate,
   computeGapScore,
   computeLift,
   computeSnapshotInsights,
@@ -14,20 +14,20 @@ import {
   findHighestConversionPath,
 } from "@/lib/attribution/compute";
 
-describe("computeConversionRate", () => {
+describe("computeClickThroughRate", () => {
   it("computes correct conversion rate", () => {
-    expect(computeConversionRate(100, 1000)).toBe(0.1);
-    expect(computeConversionRate(50, 200)).toBe(0.25);
-    expect(computeConversionRate(1, 3)).toBe(0.33);
+    expect(computeClickThroughRate(100, 1000)).toBe(0.1);
+    expect(computeClickThroughRate(50, 200)).toBe(0.25);
+    expect(computeClickThroughRate(1, 3)).toBe(0.33);
   });
 
   it("returns 0 for zero impressions", () => {
-    expect(computeConversionRate(100, 0)).toBe(0);
-    expect(computeConversionRate(0, 0)).toBe(0);
+    expect(computeClickThroughRate(100, 0)).toBe(0);
+    expect(computeClickThroughRate(0, 0)).toBe(0);
   });
 
   it("handles negative impressions", () => {
-    expect(computeConversionRate(100, -10)).toBe(0);
+    expect(computeClickThroughRate(100, -10)).toBe(0);
   });
 });
 
@@ -62,7 +62,7 @@ describe("createAttributionEdge", () => {
     expect(edge.source_touchpoint_id).toBe("TP-A");
     expect(edge.target_touchpoint_id).toBe("TP-B");
     expect(edge.metrics.users_flowed).toBe(100);
-    expect(edge.metrics.conversion_rate).toBe(0.1);
+    expect(edge.metrics.click_through_rate).toBe(0.1);
     expect(edge.metrics.lift_vs_baseline).toBeUndefined();
     expect(edge.attribution_model).toBe("last_touch");
   });
@@ -75,10 +75,10 @@ describe("createAttributionEdge", () => {
       period: "2025-01",
       usersFlowed: 150,
       sourceImpressions: 1000,
-      baselineConversionRate: 0.10,
+      baselineClickThroughRate: 0.10,
     });
 
-    expect(edge.metrics.conversion_rate).toBe(0.15);
+    expect(edge.metrics.click_through_rate).toBe(0.15);
     expect(edge.metrics.lift_vs_baseline).toBe(0.05);
   });
 
@@ -144,7 +144,7 @@ describe("findHighestConversionPath", () => {
         source_touchpoint_id: "A",
         target_touchpoint_id: "B",
         period: "2025",
-        metrics: { users_flowed: 100, conversion_rate: 0.5 },
+        metrics: { users_flowed: 100, click_through_rate: 0.5 },
         attribution_model: "last_touch",
       },
       {
@@ -152,7 +152,7 @@ describe("findHighestConversionPath", () => {
         source_touchpoint_id: "A",
         target_touchpoint_id: "C",
         period: "2025",
-        metrics: { users_flowed: 50, conversion_rate: 0.2 },
+        metrics: { users_flowed: 50, click_through_rate: 0.2 },
         attribution_model: "last_touch",
       },
       {
@@ -160,7 +160,7 @@ describe("findHighestConversionPath", () => {
         source_touchpoint_id: "B",
         target_touchpoint_id: "D",
         period: "2025",
-        metrics: { users_flowed: 40, conversion_rate: 0.8 },
+        metrics: { users_flowed: 40, click_through_rate: 0.8 },
         attribution_model: "last_touch",
       },
     ];
@@ -182,7 +182,7 @@ describe("findBiggestBridge", () => {
         source_touchpoint_id: "A",
         target_touchpoint_id: "B",
         period: "2025",
-        metrics: { users_flowed: 100, conversion_rate: 0.5 },
+        metrics: { users_flowed: 100, click_through_rate: 0.5 },
         attribution_model: "last_touch",
       },
       {
@@ -190,7 +190,7 @@ describe("findBiggestBridge", () => {
         source_touchpoint_id: "C",
         target_touchpoint_id: "B",
         period: "2025",
-        metrics: { users_flowed: 50, conversion_rate: 0.2 },
+        metrics: { users_flowed: 50, click_through_rate: 0.2 },
         attribution_model: "last_touch",
       },
       {
@@ -198,7 +198,7 @@ describe("findBiggestBridge", () => {
         source_touchpoint_id: "B",
         target_touchpoint_id: "D",
         period: "2025",
-        metrics: { users_flowed: 40, conversion_rate: 0.8 },
+        metrics: { users_flowed: 40, click_through_rate: 0.8 },
         attribution_model: "last_touch",
       },
     ];
@@ -218,7 +218,7 @@ describe("findBiggestBridge", () => {
         source_touchpoint_id: "A",
         target_touchpoint_id: "B",
         period: "2025",
-        metrics: { users_flowed: 100, conversion_rate: 0.5 },
+        metrics: { users_flowed: 100, click_through_rate: 0.5 },
         attribution_model: "last_touch",
       },
     ];
@@ -236,7 +236,7 @@ describe("computeSnapshotInsights", () => {
         source_touchpoint_id: "A",
         target_touchpoint_id: "B",
         period: "2025",
-        metrics: { users_flowed: 100, conversion_rate: 0.5 },
+        metrics: { users_flowed: 100, click_through_rate: 0.5 },
         attribution_model: "last_touch",
       },
       {
@@ -244,7 +244,7 @@ describe("computeSnapshotInsights", () => {
         source_touchpoint_id: "B",
         target_touchpoint_id: "C",
         period: "2025",
-        metrics: { users_flowed: 50, conversion_rate: 0.5 },
+        metrics: { users_flowed: 50, click_through_rate: 0.5 },
         attribution_model: "last_touch",
       },
     ];
@@ -261,7 +261,7 @@ describe("computeSnapshotInsights", () => {
 
     const insights = computeSnapshotInsights(edges, gaps);
 
-    expect(insights.highest_conversion_path).toEqual(["A", "B", "C"]);
+    expect(insights.highest_click_through_path).toEqual(["A", "B", "C"]);
     expect(insights.biggest_bridge).toBe("B");
     expect(insights.gap_opportunities).toEqual(gaps);
   });
@@ -281,13 +281,13 @@ describe("aggregateEdges", () => {
             source_touchpoint_id: "A",
             target_touchpoint_id: "B",
             period: "2025-01",
-            metrics: { users_flowed: 100, conversion_rate: 0.1 },
+            metrics: { users_flowed: 100, click_through_rate: 0.1 },
             attribution_model: "last_touch",
           },
         ],
         computed_at: "2025-02-01",
         insights: {
-          highest_conversion_path: [],
+          highest_click_through_path: [],
           gap_opportunities: [],
         },
       },
@@ -302,13 +302,13 @@ describe("aggregateEdges", () => {
             source_touchpoint_id: "A",
             target_touchpoint_id: "B",
             period: "2025-02",
-            metrics: { users_flowed: 150, conversion_rate: 0.15 },
+            metrics: { users_flowed: 150, click_through_rate: 0.15 },
             attribution_model: "last_touch",
           },
         ],
         computed_at: "2025-03-01",
         insights: {
-          highest_conversion_path: [],
+          highest_click_through_path: [],
           gap_opportunities: [],
         },
       },
@@ -318,24 +318,24 @@ describe("aggregateEdges", () => {
     const metrics = aggregated.get("A→B");
 
     expect(metrics?.length).toBe(2);
-    expect(metrics?.[0].conversion_rate).toBe(0.1);
-    expect(metrics?.[1].conversion_rate).toBe(0.15);
+    expect(metrics?.[0].click_through_rate).toBe(0.1);
+    expect(metrics?.[1].click_through_rate).toBe(0.15);
   });
 });
 
-describe("averageConversionRate", () => {
+describe("averageClickThroughRate", () => {
   it("computes average conversion rate", () => {
     const metrics = [
-      { users_flowed: 100, conversion_rate: 0.1 },
-      { users_flowed: 150, conversion_rate: 0.15 },
-      { users_flowed: 120, conversion_rate: 0.12 },
+      { users_flowed: 100, click_through_rate: 0.1 },
+      { users_flowed: 150, click_through_rate: 0.15 },
+      { users_flowed: 120, click_through_rate: 0.12 },
     ];
 
     // (0.1 + 0.15 + 0.12) / 3 = 0.1233...
-    expect(averageConversionRate(metrics)).toBe(0.12);
+    expect(averageClickThroughRate(metrics)).toBe(0.12);
   });
 
   it("returns 0 for empty array", () => {
-    expect(averageConversionRate([])).toBe(0);
+    expect(averageClickThroughRate([])).toBe(0);
   });
 });

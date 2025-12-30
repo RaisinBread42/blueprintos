@@ -268,16 +268,31 @@
     },
     {
       "id": "feat-010",
-      "title": "Attribution Sankey Dashboard",
-      "description": "Build /dashboard/attribution page with Recharts Sankey diagram showing user flow across entities. Include period selector and entity filters.",
-      "status": "backlog",
+      "title": "Attribution & Synergy Dashboard",
+      "description": "Build /dashboard/attribution page with Recharts Sankey diagram showing user flow across entities. Emphasizes multi-platform synergy value proposition.",
+      "status": "complete",
       "priority": "medium",
-      "complexity": "M",
+      "complexity": "L",
       "createdAt": "2025-12-30T00:00:00Z",
-      "phases": {},
-      "files": [],
+      "phases": {
+        "planning": { "completedAt": "2025-12-30T16:00:00Z" },
+        "accepted": { "completedAt": "2025-12-30T16:05:00Z" },
+        "implemented": { "completedAt": "2025-12-30T18:00:00Z" },
+        "verified": { "completedAt": "2025-12-30T18:00:00Z" },
+        "committed": { "completedAt": "2025-12-30T18:30:00Z" }
+      },
+      "files": [
+        "src/app/dashboard/attribution/page.tsx",
+        "src/lib/attribution/sankey.ts",
+        "src/lib/attribution/sankey.test.ts",
+        "src/components/dashboard/AttributionSankey.tsx",
+        "src/app/dashboard/page.tsx",
+        "data/attribution/snapshots/2025-01.json",
+        "data/attribution/snapshots/2025-W52.json",
+        "data/attribution/snapshots/ideal-scenario.json"
+      ],
       "dependencies": ["feat-009"],
-      "notes": "Uses Recharts Sankey component. Visualizes cross-entity conversion paths."
+      "notes": "Synergy-focused dashboard with two tabs: Current State (within-platform tracking) and Multi-Platform Vision (aspirational cross-entity flows). Features: entity-level Sankey aggregation, synergy lift comparison (12% single → 34% multi → 52% rewards), bundle advantage cards, Stingray Rewards teaser, recommendations modal. Fixed: Sankey self-loop stack overflow, useMemo dependency re-render issue."
     },
     {
       "id": "feat-011",

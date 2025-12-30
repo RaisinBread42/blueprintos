@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, TrendingUp } from "lucide-react";
 import type { ServiceLine } from "@/types";
 import { ServiceLineCard } from "@/components/dashboard/ServiceLineCard";
 import { VarianceChart } from "@/components/dashboard/VarianceChart";
@@ -146,6 +146,13 @@ export default function DashboardPage() {
             <p className="text-slate-400 text-sm">Overview of all service lines and their health</p>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/attribution"
+              className="inline-flex items-center gap-2 rounded-lg border border-emerald-700/50 px-3 py-2 text-sm text-emerald-300 bg-emerald-900/20 hover:bg-emerald-900/40 hover:text-emerald-200 hover:border-emerald-600 transition-colors"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Attribution
+            </Link>
             <Link
               href="/admin/stations"
               className="inline-flex items-center gap-2 rounded-lg border border-slate-700/50 px-3 py-2 text-sm text-slate-300 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-colors"

@@ -316,7 +316,7 @@ export type SnapshotPeriodType = "weekly" | "monthly" | "quarterly";
  */
 export interface AttributionEdgeMetrics {
   users_flowed: number;
-  conversion_rate: number;
+  click_through_rate: number;
   lift_vs_baseline?: number;
 }
 
@@ -349,7 +349,7 @@ export interface GapOpportunity {
  * Journey Insights - computed analytics for a snapshot
  */
 export interface JourneyInsights {
-  highest_conversion_path: string[];
+  highest_click_through_path: string[];
   biggest_bridge?: string;
   gap_opportunities: GapOpportunity[];
 }

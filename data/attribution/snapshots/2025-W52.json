@@ -5,75 +5,72 @@
   "entities": ["STINGRAY", "ECAYTRADE", "CAYMANIAN-TIMES"],
   "edges": [
     {
-      "id": "W52-E-001",
-      "source_touchpoint_id": "X107-SOLAR-AD",
-      "target_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "id": "W52-001",
+      "source_touchpoint_id": "ECAY-HOME",
+      "target_touchpoint_id": "ECAY-SEARCH",
       "period": "2025-W52",
       "metrics": {
-        "users_flowed": 98,
-        "conversion_rate": 0.14,
-        "lift_vs_baseline": 0.10
+        "users_flowed": 1205,
+        "click_through_rate": 0.44
       },
       "attribution_model": "last_touch"
     },
     {
-      "id": "W52-E-002",
-      "source_touchpoint_id": "ECAY-SOLAR-SEARCH",
-      "target_touchpoint_id": "ECAY-PURCHASE",
-      "period": "2025-W52",
-      "metrics": {
-        "users_flowed": 38,
-        "conversion_rate": 0.39
-      },
-      "attribution_model": "last_touch"
-    },
-    {
-      "id": "W52-E-003",
-      "source_touchpoint_id": "KISS-DRIVE-TIME",
-      "target_touchpoint_id": "ECAY-VEHICLE-SEARCH",
-      "period": "2025-W52",
-      "metrics": {
-        "users_flowed": 186,
-        "conversion_rate": 0.03,
-        "lift_vs_baseline": 0.02
-      },
-      "attribution_model": "last_touch"
-    },
-    {
-      "id": "W52-E-004",
-      "source_touchpoint_id": "CT-BUSINESS-ARTICLE",
+      "id": "W52-002",
+      "source_touchpoint_id": "ECAY-SEARCH",
       "target_touchpoint_id": "ECAY-LISTING-VIEW",
       "period": "2025-W52",
       "metrics": {
-        "users_flowed": 224,
-        "conversion_rate": 0.08
+        "users_flowed": 723,
+        "click_through_rate": 0.62
       },
-      "attribution_model": "linear"
+      "attribution_model": "last_touch"
     },
     {
-      "id": "W52-E-005",
-      "source_touchpoint_id": "CT-SPONSORED-CONTENT",
-      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "id": "W52-003",
+      "source_touchpoint_id": "ECAY-LISTING-VIEW",
+      "target_touchpoint_id": "ECAY-CONTACT-SELLER",
       "period": "2025-W52",
       "metrics": {
-        "users_flowed": 156,
-        "conversion_rate": 0.13,
-        "lift_vs_baseline": 0.09
+        "users_flowed": 145,
+        "click_through_rate": 0.21
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "W52-004",
+      "source_touchpoint_id": "CT-HOME",
+      "target_touchpoint_id": "CT-ARTICLE-VIEW",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 2112,
+        "click_through_rate": 0.38
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "W52-005",
+      "source_touchpoint_id": "CT-ARTICLE-VIEW",
+      "target_touchpoint_id": "CT-NEWSLETTER-SIGNUP",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 106,
+        "click_through_rate": 0.05
       },
       "attribution_model": "last_touch"
     }
   ],
   "computed_at": "2025-12-30T00:00:00Z",
   "insights": {
-    "highest_conversion_path": ["X107-SOLAR-AD", "ECAY-SOLAR-SEARCH", "ECAY-PURCHASE"],
-    "biggest_bridge": "ECAY-SOLAR-SEARCH",
+    "highest_click_through_path": ["ECAY-SEARCH", "ECAY-LISTING-VIEW", "ECAY-CONTACT-SELLER"],
+    "biggest_bridge": "ECAY-LISTING-VIEW",
     "gap_opportunities": [
       {
-        "touchpoint_id": "ECAY-SOLAR-SEARCH",
-        "search_demand": 155,
-        "supply_count": 10,
-        "gap_score": 0.94,
-        "recommended_action": "Holiday solar deals - recruit 3 more retailers"
+        "touchpoint_id": "CROSS-PLATFORM-ATTRIBUTION",
+        "search_demand": 0,
+        "supply_count": 0,
+        "gap_score": 1.0,
+        "recommended_action": "No cross-platform tracking implemented. Radio and news referrals to eCayTrade are invisible."
       }
     ]
   }

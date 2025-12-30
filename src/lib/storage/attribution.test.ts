@@ -37,14 +37,14 @@ const validSnapshot: JourneySnapshot = {
       period: "2025-TEST",
       metrics: {
         users_flowed: 100,
-        conversion_rate: 0.1,
+        click_through_rate: 0.1,
       },
       attribution_model: "last_touch",
     },
   ],
   computed_at: "2025-12-30T00:00:00Z",
   insights: {
-    highest_conversion_path: ["TP-A", "TP-B"],
+    highest_click_through_path: ["TP-A", "TP-B"],
     biggest_bridge: "TP-A",
     gap_opportunities: [
       {
@@ -130,7 +130,7 @@ describe("isAttributionEdge", () => {
       source_touchpoint_id: "TP-A",
       target_touchpoint_id: "TP-B",
       period: "2025-01",
-      metrics: { users_flowed: 100, conversion_rate: 0.1 },
+      metrics: { users_flowed: 100, click_through_rate: 0.1 },
       attribution_model: "last_touch",
     };
     expect(isAttributionEdge(valid)).toBe(true);
@@ -152,7 +152,7 @@ describe("isAttributionEdge", () => {
         source_touchpoint_id: "TP-A",
         target_touchpoint_id: "TP-B",
         period: "2025-01",
-        metrics: { users_flowed: 100, conversion_rate: 0.1 },
+        metrics: { users_flowed: 100, click_through_rate: 0.1 },
         attribution_model: "invalid_model",
       })
     ).toBe(false);
@@ -166,7 +166,7 @@ describe("isAttributionEdge", () => {
         source_touchpoint_id: "TP-A",
         target_touchpoint_id: "TP-B",
         period: "2025-01",
-        metrics: { users_flowed: 100, conversion_rate: 0.1 },
+        metrics: { users_flowed: 100, click_through_rate: 0.1 },
         attribution_model: model,
       };
       expect(isAttributionEdge(edge)).toBe(true);
@@ -195,7 +195,7 @@ describe("isGapOpportunity", () => {
 describe("isJourneyInsights", () => {
   it("returns true for valid insights", () => {
     const valid = {
-      highest_conversion_path: ["TP-A", "TP-B"],
+      highest_click_through_path: ["TP-A", "TP-B"],
       biggest_bridge: "TP-A",
       gap_opportunities: [],
     };
@@ -204,7 +204,7 @@ describe("isJourneyInsights", () => {
 
   it("allows undefined biggest_bridge", () => {
     const valid = {
-      highest_conversion_path: [],
+      highest_click_through_path: [],
       gap_opportunities: [],
     };
     expect(isJourneyInsights(valid)).toBe(true);
