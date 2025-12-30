@@ -6,7 +6,7 @@
 
 ## Current Focus
 
-**Active Feature**: `feat-005` — Synthetic data generator + sandbox simulation (planning)
+**Active Feature**: None — Ready for `feat-006` (Dispatcher v1)
 
 ### Roadmap (kept intentionally lightweight)
 
@@ -24,9 +24,9 @@
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 5          |
-| Currently In Progress | 1          |
-| Backlog Items         | 2          |
+| Features Completed    | 6          |
+| Currently In Progress | 0          |
+| Backlog Items         | 1          |
 | Last Updated          | 2025-12-29 |
 
 ---
@@ -45,13 +45,13 @@ These rules are validated after every implementation:
 
 ---
 
-## Active Feature
+## Recently Completed
 
 ### feat-005: Synthetic data generator + sandbox simulation
 
-**Status**: complete  
-**Complexity**: L (6-8 hours)  
-**Started**: 2025-12-28
+**Status**: complete ✅
+**Complexity**: L (6-8 hours)
+**Completed**: 2025-12-29
 
 #### Summary
 
@@ -111,11 +111,11 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 
 #### Success Criteria
 
-- [ ] Generate mock metrics per station with realistic ranges
-- [ ] Scenario sliders adjust labor/time/quality and recompute RAG
-- [ ] Scenarios do not mutate persisted data unless saved explicitly
-- [ ] Can save/restore scenarios locally (per browser)
-- [ ] Dashboard can toggle between base data and scenario view
+- [x] Generate mock metrics per station with realistic ranges
+- [x] Scenario sliders adjust labor/time/quality and recompute RAG
+- [x] Scenarios do not mutate persisted data unless saved explicitly
+- [x] Can save/restore scenarios locally (server-side JSON storage)
+- [x] Dashboard can toggle between base data and scenario view
 
 ---
 

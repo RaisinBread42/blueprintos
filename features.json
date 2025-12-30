@@ -1,6 +1,6 @@
 {
   "projectName": "blueprintos",
-  "lastUpdated": "2025-12-28T00:00:00Z",
+  "lastUpdated": "2025-12-29T00:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -170,16 +170,29 @@
       "id": "feat-005",
       "title": "Synthetic data generator + sandbox simulation",
       "description": "Generate realistic mock station metrics and add scenario sliders to stress-test service lines; allow save/compare scenarios locally.",
-      "status": "planning",
+      "status": "complete",
       "priority": "medium",
       "complexity": "L",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {
-        "planning": { "completedAt": "2025-12-28T00:00:00Z" }
+        "planning": { "completedAt": "2025-12-28T00:00:00Z" },
+        "accepted": { "completedAt": "2025-12-28T00:00:00Z" },
+        "implemented": { "completedAt": "2025-12-29T00:00:00Z" },
+        "verified": { "completedAt": "2025-12-29T00:00:00Z" },
+        "committed": { "completedAt": "2025-12-29T00:00:00Z", "commitHash": "02379cf" }
       },
-      "files": [],
+      "files": [
+        "src/lib/synthetic/generator.ts",
+        "src/lib/synthetic/generator.test.ts",
+        "src/lib/scenario/apply.ts",
+        "src/app/api/scenarios/[id]/route.ts",
+        "src/components/dag/ServiceLineEditor.tsx",
+        "src/components/dag/StationPanel.tsx",
+        "src/app/dashboard/page.tsx",
+        "src/app/admin/stations/page.tsx"
+      ],
       "dependencies": [],
-      "notes": "Enables Phase 3 'Simulation & Sensor Suite' without live integrations."
+      "notes": "Completed in 5 iterations: synthetic generator, scenario sliders, in-memory apply, save/restore, dashboard toggle. Includes shared station catalog, per-station overrides, and scenario name display in top bar."
     }
   ],
   "backlog": [
