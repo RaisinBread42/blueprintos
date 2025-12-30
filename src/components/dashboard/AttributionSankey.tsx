@@ -119,15 +119,6 @@ function CustomLink({
   // Show label if link is visible enough
   const showLabel = linkWidth > 6;
 
-  // Debug: log link coordinates for troubleshooting
-  if (process.env.NODE_ENV === "development" && payload.source.name.includes("SEARCH")) {
-    console.log(`Link ${payload.source.name} → ${payload.target.name}:`, {
-      sourceX, sourceY, targetX, targetY,
-      sourceControlX, targetControlX,
-      linkWidth, value: payload.value
-    });
-  }
-
   return (
     <g>
       <defs>
