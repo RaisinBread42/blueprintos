@@ -1,0 +1,68 @@
+{
+  "entity_id": "ECAYTRADE",
+  "name": "eCayTrade",
+  "type": "marketplace",
+  "description": "Cayman Islands online marketplace for buying and selling goods, real estate, vehicles, and services.",
+  "touchpoints": [
+    {
+      "touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "entity_id": "ECAYTRADE",
+      "name": "Real Estate Search",
+      "category": "search",
+      "metrics": {
+        "impressions": 2500,
+        "unique_users": 1800,
+        "avg_time_spent": 120
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "ECAY-VEHICLE-SEARCH",
+      "entity_id": "ECAYTRADE",
+      "name": "Vehicle Search",
+      "category": "search",
+      "metrics": {
+        "impressions": 3200,
+        "unique_users": 2400,
+        "avg_time_spent": 90
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "entity_id": "ECAYTRADE",
+      "name": "Solar Panel Search",
+      "category": "search",
+      "metrics": {
+        "impressions": 620,
+        "unique_users": 580,
+        "avg_time_spent": 60
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "ECAY-LISTING-VIEW",
+      "entity_id": "ECAYTRADE",
+      "name": "Listing Detail View",
+      "category": "listing",
+      "metrics": {
+        "impressions": 8500,
+        "unique_users": 4200
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "ECAY-PURCHASE",
+      "entity_id": "ECAYTRADE",
+      "name": "Purchase/Inquiry Conversion",
+      "category": "purchase",
+      "metrics": {
+        "impressions": 450,
+        "unique_users": 450
+      },
+      "data_source": "mock"
+    }
+  ],
+  "created_at": "2025-12-30T00:00:00Z",
+  "updated_at": "2025-12-30T00:00:00Z"
+}

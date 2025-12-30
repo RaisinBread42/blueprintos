@@ -243,3 +243,53 @@ export interface SimulationConfig {
   enabled: boolean;
 }
 
+// =============================================================================
+// Entity Registry Types - Cross-Entity Attribution (2026 Multiplex Network)
+// =============================================================================
+
+/**
+ * Entity type - the kind of business unit in the ecosystem
+ */
+export type EntityType =
+  | "radio"
+  | "marketplace"
+  | "news"
+  | "rewards"
+  | "internal";
+
+/**
+ * Touchpoint metrics - observable user interaction metrics
+ */
+export interface TouchpointMetrics {
+  impressions: number;
+  unique_users: number;
+  avg_time_spent?: number;
+}
+
+/**
+ * Touchpoint - an observable user interaction point within an entity
+ * Examples: "X107 Solar Panel Ad", "eCayTrade Real Estate Search"
+ */
+export interface Touchpoint {
+  touchpoint_id: string;
+  entity_id: string;
+  name: string;
+  category: string; // "audio_ad", "search", "article_view", "listing", "purchase"
+  metrics: TouchpointMetrics;
+  data_source: DataSourceType;
+}
+
+/**
+ * Entity - a business unit in the ecosystem
+ * Examples: Stingray Radio, eCayTrade, Caymanian Times
+ */
+export interface Entity {
+  entity_id: string;
+  name: string;
+  type: EntityType;
+  description?: string;
+  touchpoints: Touchpoint[];
+  created_at: string;
+  updated_at: string;
+}
+

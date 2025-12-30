@@ -6,37 +6,46 @@
 
 ## Current Focus
 
-**Active Feature**: None — Ready for `feat-006` (Dispatcher v1)
+**Active Feature**: None — feat-008 complete, ready for next feature
+
+### 2026 Vision: Multiplex Network
+
+BlueprintOS is evolving from a single-company operations tracker into a **cross-entity intelligence hub** connecting:
+- **Stingray Radio** (audio ads, programming)
+- **eCayTrade** (marketplace listings, search)
+- **Caymanian Times** (news, articles)
+- **Rewards App** (loyalty, conversions)
+
+**Architecture Decision (Option B)**: Keep React Flow canvas for operational workflows. Use **dashboard-based attribution** (Sankey diagrams, tables) for cross-entity user journey tracking.
+
+### Roadmap
+
+| Phase | Feature | Status |
+|-------|---------|--------|
+| Foundations | Standard Gauge types + JSON persistence | ✅ Complete |
+| Iron Horse | Editable service line DAG (React Flow) | ✅ Complete |
+| Sensors | Dashboards + RAG overlays | ✅ Complete |
+| Simulation | Synthetic data + scenarios | ✅ Complete |
+| **Dispatcher** | Rule-based reports/alerts (feat-006) | 📋 Backlog |
+| **Entity Layer** | Entity registry + touchpoints (feat-008) | ✅ Complete |
+| Attribution | Snapshots API + data model (feat-009) | 📋 Backlog |
+| Sankey | Attribution dashboard (feat-010) | 📋 Backlog |
+| Gap Analysis | Demand vs supply engine (feat-011) | 📋 Backlog |
+| Centrality | Graph analytics (feat-012) | 📋 Backlog |
 
 ### Session 2025-12-30 Summary
 
-**Completed this session:**
-1. **Edge Weights & Pathfinding** - Display combined edge weights on canvas, pathfinder panel to find/compare all paths between stations
-2. **Admin Stations Dashboard** - Comprehensive allocation monitoring with summary cards, RAG health indicators, flags, sorting by worst offenders
-3. **Data Model Fix** - Service line nodes now show per-SL allocation (e.g., 10 hrs) instead of station total capacity (e.g., 50 hrs)
-4. **Editor Enhancements** - Added description field (editable, saved with export/import) and duplicate button
+**Earlier today:**
+1. Edge Weights & Pathfinding
+2. Admin Stations Dashboard
+3. Data Model Fix (per-SL allocations)
+4. Editor Enhancements (description, duplicate)
 
-**Key files changed:**
-- `src/components/dag/ServiceLineEditor.tsx` - pathfinder, description, duplicate
-- `src/components/dag/PathfinderPanel.tsx` - new pathfinding UI
-- `src/lib/dag/pathfinder.ts` + tests - DFS path enumeration
-- `src/app/admin/stations/page.tsx` - allocation monitoring dashboard
-- `data/service-lines/*.json` - corrected per-SL hour allocations
-
-**Next session ideas:**
-- feat-006: Dispatcher v1 (rule-based reports/alerts)
-- Service line renaming from editor
-- Station catalog management UI improvements
-
-### Roadmap (kept intentionally lightweight)
-
-- **Foundations**: Standard Gauge schema/types + local JSON persistence (no DB)
-- **Phase 1 (Iron Horse)**: Editable service line DAG (React Flow) with save/load + import/export
-- **Phase 2**: Sensors + dashboards + RAG overlays
-- **Phase 3**: Synthetic data + sandbox simulation (scenarios)
-- **Phase 4**: Dispatcher v1 rule-based reports/alerts (**AI integration later**)
-
-> Note: as each phase is implemented, we’ll update docs (`VISION.md`, `PROGRESS.md`, and `features.json`) to reflect any scope/UX evolution so the repo stays current.
+**Current:**
+- Defined 2026 Multiplex Network vision
+- Chose Option B (dashboard attribution vs canvas attribution)
+- Added feat-008 through feat-012 to backlog
+- Starting feat-008: Entity Registry
 
 ---
 
@@ -44,9 +53,9 @@
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Features Completed    | 6          |
+| Features Completed    | 7          |
 | Currently In Progress | 0          |
-| Backlog Items         | 1          |
+| Backlog Items         | 6          |
 | Last Updated          | 2025-12-30 |
 
 ---
@@ -62,6 +71,141 @@ These rules are validated after every implementation:
 | Recharts for Charts     | ✅ Validated        |
 | shadcn/ui Components    | ✅ Validated        |
 | Tailwind CSS v3.4.x     | ✅ Validated (v3.4.19) |
+
+---
+
+## Active Planning
+
+### feat-008: Entity Registry
+
+**Status**: planning 📝
+**Complexity**: S (2-3 hours)
+**Priority**: Medium
+
+#### Summary
+
+Add Entity concept to model multiple business units (Radio, eCayTrade, News, Rewards). This is the foundation for cross-entity attribution tracking (Option B architecture).
+
+#### Why This Matters
+
+Currently, BlueprintOS tracks operations within a single implicit entity. To support the 2026 Multiplex Network vision (tracking user journeys across Radio → eCayTrade → News), we need:
+
+1. **Entity Registry** — Define the business units in the ecosystem
+2. **Touchpoints** — Observable user interaction points within each entity
+3. **Entity-aware UI** — Group/filter by entity in dashboards
+
+#### Data Model
+
+```typescript
+// New types to add to src/types/index.ts
+
+type EntityType = "radio" | "marketplace" | "news" | "rewards" | "internal";
+
+interface Entity {
+  entity_id: string;           // "STINGRAY", "ECAYTRADE", "CAYMANIAN-TIMES"
+  name: string;                // "Stingray Radio"
+  type: EntityType;
+  description?: string;
+  touchpoints: Touchpoint[];   // Observable interaction points
+  created_at: string;
+  updated_at: string;
+}
+
+interface Touchpoint {
+  touchpoint_id: string;       // "X107-SOLAR-AD"
+  entity_id: string;           // Parent entity reference
+  name: string;                // "X107 Solar Panel Ad"
+  category: string;            // "audio_ad", "search", "article_view", "purchase"
+  metrics: {
+    impressions: number;
+    unique_users: number;
+    avg_time_spent?: number;
+  };
+  data_source: DataSourceType; // "mock" | "api"
+}
+```
+
+#### File Structure
+
+```
+data/
+└── entities/
+    ├── STINGRAY.json
+    ├── ECAYTRADE.json
+    └── CAYMANIAN-TIMES.json
+
+src/
+├── types/index.ts              # Add Entity, Touchpoint types
+├── lib/
+│   └── storage/
+│       └── entities.ts         # CRUD for entities (server-only)
+└── app/
+    └── api/
+        └── entities/
+            ├── route.ts        # GET all, POST new
+            └── [id]/
+                └── route.ts    # GET one, PUT, DELETE
+```
+
+#### Iterations
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 1 | Types | Add `Entity`, `Touchpoint`, `EntityType` to `src/types/index.ts` | ✅ |
+| 2 | Storage | Create `src/lib/storage/entities.ts` with list/get/save/delete | ✅ |
+| 3 | API Routes | `/api/entities` (list, create) and `/api/entities/[id]` (get, update, delete) | ✅ |
+| 4 | Seed Data | Create sample entities for Stingray, eCayTrade, Caymanian Times | ✅ |
+| 5 | Tests | Unit tests for storage module (11 tests) | ✅ |
+
+#### Quality Gates Passed
+
+* ✅ `pnpm type-check` - No type errors
+* ✅ `pnpm lint` - No linting errors
+* ✅ `pnpm test` - 59 tests pass (11 new entity tests)
+* ✅ `pnpm build` - Build successful
+
+#### Seed Data (Example)
+
+```json
+{
+  "entity_id": "STINGRAY",
+  "name": "Stingray Radio",
+  "type": "radio",
+  "description": "Radio broadcasting and audio advertising",
+  "touchpoints": [
+    {
+      "touchpoint_id": "X107-SOLAR-AD",
+      "entity_id": "STINGRAY",
+      "name": "X107 Solar Panel Ad",
+      "category": "audio_ad",
+      "metrics": { "impressions": 5000, "unique_users": 3200 },
+      "data_source": "mock"
+    }
+  ],
+  "created_at": "2025-12-30T00:00:00Z",
+  "updated_at": "2025-12-30T00:00:00Z"
+}
+```
+
+#### Success Criteria
+
+- [x] Entity and Touchpoint types defined
+- [x] `/api/entities` returns list of all entities
+- [x] `/api/entities/[id]` supports CRUD operations
+- [x] 3+ sample entities seeded with touchpoints
+- [x] Unit tests pass for storage module
+- [x] Type-check, lint, build all pass
+
+#### Files to Create/Modify
+
+- `src/types/index.ts` — Add Entity types
+- `src/lib/storage/entities.ts` — Storage helpers (NEW)
+- `src/lib/storage/entities.test.ts` — Unit tests (NEW)
+- `src/app/api/entities/route.ts` — List/create (NEW)
+- `src/app/api/entities/[id]/route.ts` — CRUD (NEW)
+- `data/entities/STINGRAY.json` — Seed data (NEW)
+- `data/entities/ECAYTRADE.json` — Seed data (NEW)
+- `data/entities/CAYMANIAN-TIMES.json` — Seed data (NEW)
 
 ---
 

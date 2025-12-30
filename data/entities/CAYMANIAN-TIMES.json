@@ -1,0 +1,69 @@
+{
+  "entity_id": "CAYMANIAN-TIMES",
+  "name": "The Caymanian Times",
+  "type": "news",
+  "description": "Cayman Islands news publication covering local news, business, real estate, and community events.",
+  "touchpoints": [
+    {
+      "touchpoint_id": "CT-BREAKING-NEWS",
+      "entity_id": "CAYMANIAN-TIMES",
+      "name": "Breaking News Article",
+      "category": "article_view",
+      "metrics": {
+        "impressions": 15000,
+        "unique_users": 9800,
+        "avg_time_spent": 180
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "CT-REAL-ESTATE-ARTICLE",
+      "entity_id": "CAYMANIAN-TIMES",
+      "name": "Real Estate Section Article",
+      "category": "article_view",
+      "metrics": {
+        "impressions": 3200,
+        "unique_users": 2100,
+        "avg_time_spent": 240
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "CT-BUSINESS-ARTICLE",
+      "entity_id": "CAYMANIAN-TIMES",
+      "name": "Business Section Article",
+      "category": "article_view",
+      "metrics": {
+        "impressions": 4500,
+        "unique_users": 2800,
+        "avg_time_spent": 200
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "CT-SPONSORED-CONTENT",
+      "entity_id": "CAYMANIAN-TIMES",
+      "name": "Sponsored Content",
+      "category": "sponsored",
+      "metrics": {
+        "impressions": 1800,
+        "unique_users": 1200,
+        "avg_time_spent": 90
+      },
+      "data_source": "mock"
+    },
+    {
+      "touchpoint_id": "CT-NEWSLETTER",
+      "entity_id": "CAYMANIAN-TIMES",
+      "name": "Email Newsletter",
+      "category": "newsletter",
+      "metrics": {
+        "impressions": 5500,
+        "unique_users": 5500
+      },
+      "data_source": "mock"
+    }
+  ],
+  "created_at": "2025-12-30T00:00:00Z",
+  "updated_at": "2025-12-30T00:00:00Z"
+}

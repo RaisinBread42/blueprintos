@@ -1,6 +1,6 @@
 {
   "projectName": "blueprintos",
-  "lastUpdated": "2025-12-30T00:00:00Z",
+  "lastUpdated": "2025-12-30T12:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -201,13 +201,93 @@
       "title": "Dispatcher v1 (rule-based reports + alerts)",
       "description": "Generate deterministic dispatcher reports and global alerts from current JSON state; AI integration comes later.",
       "status": "backlog",
-      "priority": "low",
+      "priority": "medium",
       "complexity": "M",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {},
       "files": [],
       "dependencies": [],
       "notes": "AI integration explicitly deferred; keep alerts decoupled and derived at runtime."
+    },
+    {
+      "id": "feat-008",
+      "title": "Entity Registry",
+      "description": "Add Entity concept to model multiple business units (Radio, eCayTrade, News). Includes entity types, touchpoints, and CRUD API. Foundation for cross-entity attribution.",
+      "status": "complete",
+      "priority": "medium",
+      "complexity": "S",
+      "createdAt": "2025-12-30T00:00:00Z",
+      "phases": {
+        "planning": { "completedAt": "2025-12-30T12:00:00Z" },
+        "accepted": { "completedAt": "2025-12-30T12:30:00Z" },
+        "implemented": { "completedAt": "2025-12-30T13:00:00Z" },
+        "verified": { "completedAt": "2025-12-30T13:30:00Z" },
+        "committed": { "completedAt": "2025-12-30T13:30:00Z", "commitHash": "994a410" }
+      },
+      "files": [
+        "src/types/index.ts",
+        "src/lib/storage/entities.ts",
+        "src/lib/storage/entities.test.ts",
+        "src/app/api/entities/route.ts",
+        "src/app/api/entities/[id]/route.ts",
+        "data/entities/STINGRAY.json",
+        "data/entities/ECAYTRADE.json",
+        "data/entities/CAYMANIAN-TIMES.json"
+      ],
+      "dependencies": [],
+      "notes": "Part of 2026 Multiplex Network vision. Enables Option B (dashboard-based attribution)."
+    },
+    {
+      "id": "feat-009",
+      "title": "Attribution Data Model + Snapshots API",
+      "description": "Add AttributionEdge, JourneySnapshot, and GapOpportunity types. Create /api/attribution/snapshots endpoint for storing/retrieving periodic cross-entity flow data.",
+      "status": "backlog",
+      "priority": "medium",
+      "complexity": "M",
+      "createdAt": "2025-12-30T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": ["feat-008"],
+      "notes": "Snapshots are aggregated (weekly/monthly), not real-time. Separate from operational ServiceLine data."
+    },
+    {
+      "id": "feat-010",
+      "title": "Attribution Sankey Dashboard",
+      "description": "Build /dashboard/attribution page with Recharts Sankey diagram showing user flow across entities. Include period selector and entity filters.",
+      "status": "backlog",
+      "priority": "medium",
+      "complexity": "M",
+      "createdAt": "2025-12-30T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": ["feat-009"],
+      "notes": "Uses Recharts Sankey component. Visualizes cross-entity conversion paths."
+    },
+    {
+      "id": "feat-011",
+      "title": "Gap Analysis Engine",
+      "description": "Compute demand vs supply gaps from touchpoint data. Display gap opportunity cards on attribution dashboard with recommended actions.",
+      "status": "backlog",
+      "priority": "low",
+      "complexity": "M",
+      "createdAt": "2025-12-30T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": ["feat-009"],
+      "notes": "Identifies high-demand, low-supply opportunities (e.g., 500 searches, 10 listings). Feeds into Sales Engine targeting."
+    },
+    {
+      "id": "feat-012",
+      "title": "Centrality Computation (Graph Analytics)",
+      "description": "Add betweenness and closeness centrality algorithms to identify highest-value touchpoints ('biggest bridge'). Display on attribution dashboard.",
+      "status": "backlog",
+      "priority": "low",
+      "complexity": "M",
+      "createdAt": "2025-12-30T00:00:00Z",
+      "phases": {},
+      "files": [],
+      "dependencies": ["feat-009"],
+      "notes": "Graph theory metrics to quantify which assets drive the most cross-entity conversions."
     }
   ]
 }
