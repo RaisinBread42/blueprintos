@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Save, FolderOpen, Check, Loader2, FilePlus, Download, Upload } from "lucide-react";
+import { Plus, Save, FolderOpen, Check, Loader2, FilePlus, Download, Upload, Copy } from "lucide-react";
 import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -107,6 +107,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     const flow = serviceLineToFlow(serviceLine);
     setNodes(flow.nodes);
     setEdges(flow.edges);
+    setDescription(serviceLine.description ?? "");
     setHasUnsavedChanges(false);
 
   }, [serviceLine, setNodes, setEdges]);
@@ -140,6 +141,10 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
   const [selectedStationId, setSelectedStationId] = useState<string>("");
   const [showPathfinder, setShowPathfinder] = useState(false);
   const [highlightedEdges, setHighlightedEdges] = useState<string[] | null>(null);
+  const [description, setDescription] = useState(serviceLine.description ?? "");
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [duplicateId, setDuplicateId] = useState("");
+  const [duplicateName, setDuplicateName] = useState("");
 
   // Load scenario from local server storage
   const loadScenarioFromServer = useCallback(async (id: string, name?: string) => {
@@ -474,7 +479,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
       const updatedServiceLine = flowToServiceLine(nodes, edges, {
         service_line_id: serviceLine.service_line_id,
         name: serviceLine.name,
-        description: serviceLine.description,
+        description: description,
         created_at: serviceLine.created_at,
       });
       // Persist scenario (default to activeScenarioName) if dirty
@@ -498,7 +503,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     } finally {
       setSaving(false);
     }
-  }, [nodes, edges, serviceLine, onSave, scenario, scenarioDirty, activeScenarioName]);
+  }, [nodes, edges, serviceLine, onSave, scenario, scenarioDirty, activeScenarioName, description]);
 
   // Load handler
   const handleLoad = useCallback(async (id: string) => {
@@ -529,7 +534,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     const currentServiceLine = flowToServiceLine(nodes, edges, {
       service_line_id: serviceLine.service_line_id,
       name: serviceLine.name,
-      description: serviceLine.description,
+      description: description,
       created_at: serviceLine.created_at,
     });
     
@@ -542,7 +547,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [nodes, edges, serviceLine]);
+  }, [nodes, edges, serviceLine, description]);
 
   // Import handler
   const handleImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -586,7 +591,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     const baseServiceLine = flowToServiceLine(nodes, edges, {
       service_line_id: serviceLine.service_line_id,
       name: serviceLine.name,
-      description: serviceLine.description,
+      description: description,
       created_at: serviceLine.created_at,
     });
     const scenarioServiceLine = applyScenarioToServiceLine(baseServiceLine, scenario);
@@ -607,7 +612,26 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [edges, nodes, scenario, serviceLine]);
+  }, [edges, nodes, scenario, serviceLine, description]);
+
+  // Duplicate handler - creates a copy with new ID and name
+  const handleDuplicate = useCallback(async () => {
+    if (!duplicateId.trim() || !duplicateName.trim()) return;
+
+    // Create a new service line with current nodes/edges but new ID/name
+    const duplicatedServiceLine = flowToServiceLine(nodes, edges, {
+      service_line_id: duplicateId.trim(),
+      name: duplicateName.trim(),
+      description: description,
+      created_at: new Date().toISOString(),
+    });
+
+    // Import the duplicated service line (this will trigger a save)
+    onImport(duplicatedServiceLine);
+    setShowDuplicateDialog(false);
+    setDuplicateId("");
+    setDuplicateName("");
+  }, [duplicateId, duplicateName, nodes, edges, description, onImport]);
 
   // Map of node id -> computed RAG (view)
   const nodeRagMap = useMemo(() => {
@@ -752,6 +776,16 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 )}
               </div>
               <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setHasUnsavedChanges(true);
+                }}
+                placeholder="Add a description..."
+                className="mt-1 w-full max-w-md bg-transparent text-xs text-slate-300 placeholder:text-slate-500 border-b border-transparent hover:border-slate-600 focus:border-cyan-500 focus:outline-none transition-colors"
+              />
               <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-400">
                 <span>
                   Total:{" "}
@@ -804,6 +838,22 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
             >
               <FilePlus className="h-4 w-4 mr-1" />
               New
+            </Button>
+
+            {/* Duplicate button */}
+            <Button
+              onClick={() => {
+                setDuplicateId(`${serviceLine.service_line_id}-copy`);
+                setDuplicateName(`${serviceLine.name} (Copy)`);
+                setShowDuplicateDialog(true);
+              }}
+              variant="ghost"
+              size="sm"
+              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+              title="Duplicate this service line"
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Duplicate
             </Button>
 
             {/* Open dropdown */}
@@ -1422,6 +1472,63 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                   <FilePlus className="h-4 w-4 mr-1" />
                 )}
                 Create
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Duplicate Service Line Dialog */}
+      {showDuplicateDialog && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={() => setShowDuplicateDialog(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-96 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-slate-700 bg-slate-900 p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-white mb-4">Duplicate Service Line</h2>
+            <p className="text-sm text-slate-400 mb-4">
+              Create a copy of &quot;{serviceLine.name}&quot; with a new ID and name.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">New Service Line ID</label>
+                <input
+                  type="text"
+                  value={duplicateId}
+                  onChange={(e) => setDuplicateId(e.target.value.toUpperCase().replace(/[^A-Z0-9-_]/g, ""))}
+                  placeholder="e.g., SL-NEW-PROJECT"
+                  className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                />
+                <p className="text-xs text-slate-500 mt-1">Uppercase letters, numbers, hyphens, underscores only</p>
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">New Name</label>
+                <input
+                  type="text"
+                  value={duplicateName}
+                  onChange={(e) => setDuplicateName(e.target.value)}
+                  placeholder="e.g., New Project Workflow"
+                  className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                onClick={() => setShowDuplicateDialog(false)}
+                variant="ghost"
+                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDuplicate}
+                disabled={!duplicateId.trim() || !duplicateName.trim()}
+                variant="ghost"
+                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-cyan-600 hover:text-white hover:border-cyan-600 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-all"
+              >
+                <Copy className="h-4 w-4 mr-1" />
+                Duplicate
               </Button>
             </div>
           </div>
