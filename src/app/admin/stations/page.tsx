@@ -155,9 +155,10 @@ export default async function StationsAdminPage() {
               const usage = stationUsage.get(st.station_id);
               const refs = usage?.refs ?? [];
               const actuals = refs.map((r) => r.actual);
+              const totalActual = actuals.reduce((a, b) => a + b, 0);
               const min = actuals.length ? Math.min(...actuals) : 0;
               const max = actuals.length ? Math.max(...actuals) : 0;
-              const avg = actuals.length ? actuals.reduce((a, b) => a + b, 0) / actuals.length : 0;
+              const avg = actuals.length ? totalActual / actuals.length : 0;
               return (
                 <div key={`usage-${st.station_id}`} className="px-4 py-3 text-sm space-y-2">
                   <div className="flex items-center justify-between">
@@ -168,9 +169,9 @@ export default async function StationsAdminPage() {
                       </div>
                     </div>
                     <div className="text-xs text-slate-300 text-right">
-                      <div>Refs: {refs.length}</div>
+                      <div>Refs: {refs.length} · Total: {totalActual.toFixed(1)} hrs</div>
                       <div>
-                        Min/Avg/Max actual: {min.toFixed(1)} / {avg.toFixed(1)} / {max.toFixed(1)}
+                        Min/Avg/Max: {min.toFixed(1)} / {avg.toFixed(1)} / {max.toFixed(1)}
                       </div>
                     </div>
                   </div>
@@ -183,17 +184,30 @@ export default async function StationsAdminPage() {
                           <tr>
                             <th className="py-1 pr-4">Service line</th>
                             <th className="py-1 pr-4">Planned hrs</th>
-                            <th className="py-1 pr-4">Actual hrs (resolved)</th>
+                            <th className="py-1 pr-4">Actual hrs</th>
+                            <th className="py-1 pr-4">% of Total</th>
                           </tr>
                         </thead>
                         <tbody className="text-slate-200">
-                          {refs.map((r) => (
-                            <tr key={`${st.station_id}-${r.service_line_id}`}>
-                              <td className="py-1 pr-4">{r.service_line_id}</td>
-                              <td className="py-1 pr-4">{r.planned.toFixed(1)}</td>
-                              <td className="py-1 pr-4">{r.actual.toFixed(1)}</td>
-                            </tr>
-                          ))}
+                          {refs.map((r) => {
+                            const pct = totalActual > 0 ? (r.actual / totalActual) * 100 : 0;
+                            return (
+                              <tr key={`${st.station_id}-${r.service_line_id}`}>
+                                <td className="py-1 pr-4">{r.service_line_id}</td>
+                                <td className="py-1 pr-4">{r.planned.toFixed(1)}</td>
+                                <td className="py-1 pr-4">{r.actual.toFixed(1)}</td>
+                                <td className="py-1 pr-4">
+                                  <span className="inline-flex items-center gap-1">
+                                    {pct.toFixed(1)}%
+                                    <span
+                                      className="inline-block h-1.5 rounded-full bg-emerald-500"
+                                      style={{ width: `${Math.min(pct, 100) * 0.4}px` }}
+                                    />
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
