@@ -5,9 +5,9 @@
   "data_source": "mock",
   "metrics": {
     "fair_pricing": {
-      "planned_hrs": 40,
+      "planned_hrs": 42,
       "actual_hrs": 40,
-      "labor_variance": 0
+      "labor_variance": -2
     },
     "world_class": {
       "internal_qa_score": 8.4,
