@@ -8,6 +8,26 @@
 
 **Active Feature**: None — Ready for `feat-006` (Dispatcher v1)
 
+### Session 2025-12-30 Summary
+
+**Completed this session:**
+1. **Edge Weights & Pathfinding** - Display combined edge weights on canvas, pathfinder panel to find/compare all paths between stations
+2. **Admin Stations Dashboard** - Comprehensive allocation monitoring with summary cards, RAG health indicators, flags, sorting by worst offenders
+3. **Data Model Fix** - Service line nodes now show per-SL allocation (e.g., 10 hrs) instead of station total capacity (e.g., 50 hrs)
+4. **Editor Enhancements** - Added description field (editable, saved with export/import) and duplicate button
+
+**Key files changed:**
+- `src/components/dag/ServiceLineEditor.tsx` - pathfinder, description, duplicate
+- `src/components/dag/PathfinderPanel.tsx` - new pathfinding UI
+- `src/lib/dag/pathfinder.ts` + tests - DFS path enumeration
+- `src/app/admin/stations/page.tsx` - allocation monitoring dashboard
+- `data/service-lines/*.json` - corrected per-SL hour allocations
+
+**Next session ideas:**
+- feat-006: Dispatcher v1 (rule-based reports/alerts)
+- Service line renaming from editor
+- Station catalog management UI improvements
+
 ### Roadmap (kept intentionally lightweight)
 
 - **Foundations**: Standard Gauge schema/types + local JSON persistence (no DB)
@@ -27,7 +47,7 @@
 | Features Completed    | 6          |
 | Currently In Progress | 0          |
 | Backlog Items         | 1          |
-| Last Updated          | 2025-12-29 |
+| Last Updated          | 2025-12-30 |
 
 ---
 

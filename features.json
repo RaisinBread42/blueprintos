@@ -1,6 +1,6 @@
 {
   "projectName": "blueprintos",
-  "lastUpdated": "2025-12-29T00:00:00Z",
+  "lastUpdated": "2025-12-30T00:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -192,7 +192,7 @@
         "src/app/admin/stations/page.tsx"
       ],
       "dependencies": [],
-      "notes": "Completed in 5 iterations: synthetic generator, scenario sliders, in-memory apply, save/restore, dashboard toggle. Includes shared station catalog, per-station overrides, and scenario name display in top bar."
+      "notes": "Completed in 5 iterations: synthetic generator, scenario sliders, in-memory apply, save/restore, dashboard toggle. Includes shared station catalog, per-station overrides, scenario name display. Session 2025-12-30: Added edge weights display, pathfinder panel, admin stations dashboard, description field, duplicate button, and fixed per-SL hour allocation data model."
     }
   ],
   "backlog": [
