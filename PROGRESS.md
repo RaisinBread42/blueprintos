@@ -27,7 +27,7 @@
 | Features Completed    | 5          |
 | Currently In Progress | 1          |
 | Backlog Items         | 2          |
-| Last Updated          | 2025-12-28 |
+| Last Updated          | 2025-12-29 |
 
 ---
 
@@ -97,6 +97,8 @@ Generate realistic mock station metrics and provide sandbox sliders to stress-te
 **Phase 3 progress:** Added shared scenario overlay helper (`applyScenarioToMetrics/serviceLine` + `defaultScenario`) and wired both editor and dashboard to apply deltas on top of hydrated shared metrics. Scenario export now uses the shared base + overlay helper for consistency.
 
 **Phase 3 fix (2025-12-29):** API now returns default (zero) when no scenario name is provided, preventing auto-applying the first saved scenario. Editor loads/saves named scenarios and keeps the selected overlay applied; dashboard continues to use the shared overlay helper. Tests + build passing.
+
+**UI enhancement (2025-12-29):** Added scenario name indicator to the editor top bar. When a named scenario (other than "default") is loaded, an emerald badge displays "Scenario: {name}" next to the service line title for clear visibility of the active scenario.
 
 **Next (Phase 5 / validation & health):**
 - Reject service-line saves that embed metrics or reference unknown stations; hydrate with fallbacks and surface a warning in the UI for missing stations. ✅ implemented

@@ -1,6 +1,13 @@
-import type { StationMetrics } from "@/types";
+import type { StationMetrics, FairPricingMetrics, WorldClassMetrics, PerformanceProofMetrics } from "@/types";
 
 type NumberRange = [number, number];
+
+/** Deep partial for StationMetrics overrides */
+type MetricsOverrides = {
+  fair_pricing?: Partial<FairPricingMetrics>;
+  world_class?: Partial<WorldClassMetrics>;
+  performance_proof?: Partial<PerformanceProofMetrics>;
+};
 
 const HOURS_PLANNED: NumberRange = [8, 40];
 const VARIANCE_PCT: NumberRange = [-20, 25]; // -20% under to +25% over
@@ -24,7 +31,7 @@ function round1(n: number): number {
  * Accepts optional partial overrides to bias or force values.
  */
 export function generateSyntheticMetrics(
-  overrides: Partial<StationMetrics> = {}
+  overrides: MetricsOverrides = {}
 ): StationMetrics {
   const planned_hrs =
     overrides.fair_pricing?.planned_hrs ??
@@ -89,5 +96,6 @@ export function generateSyntheticMetrics(
     },
   };
 }
+
 
 
