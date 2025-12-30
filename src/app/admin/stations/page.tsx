@@ -362,15 +362,18 @@ export default async function StationsAdminPage() {
                         </thead>
                         <tbody className="text-slate-200">
                           {refs.map((r) => {
-                            const contribution = r.actual - r.planned;
+                            const pct = r.planned > 0 ? (r.actual / r.planned) * 100 : 100;
+                            const pctOver = pct - 100;
+                            const pctHealth = pctOver > 15 ? "red" : pctOver > 5 ? "amber" : "green";
+                            const pctColor = pctHealth === "red" ? "text-red-400" : pctHealth === "amber" ? "text-amber-400" : "text-emerald-400";
                             return (
                               <tr key={`${st.station_id}-${r.service_line_id}`}>
                                 <td className="py-1 pr-4 w-48 truncate">{r.service_line_id}</td>
                                 <td className="py-1 pr-4 w-24">{r.planned.toFixed(1)}</td>
                                 <td className="py-1 pr-4 w-24">{r.actual.toFixed(1)}</td>
                                 <td className="py-1 pr-4 w-28">
-                                  <span className={contribution === 0 ? "text-white" : contribution > 0 ? "text-amber-400" : "text-emerald-400"}>
-                                    {contribution >= 0 ? "+" : ""}{contribution.toFixed(1)} hrs
+                                  <span className={pct === 100 ? "text-white" : pctColor}>
+                                    {pct.toFixed(0)}%
                                   </span>
                                 </td>
                               </tr>
@@ -408,7 +411,7 @@ export default async function StationsAdminPage() {
 
         {/* Footer disclaimer */}
         <div className="text-xs text-slate-500 text-center">
-          Data reflects current catalog state with scenario overlays applied. Contribution = Actual − Planned hours.
+          Data reflects current catalog state with scenario overlays applied. Contribution = Actual ÷ Planned × 100%.
         </div>
       </div>
     </main>
