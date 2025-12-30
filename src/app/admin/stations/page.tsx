@@ -169,9 +169,9 @@ export default async function StationsAdminPage() {
                       </div>
                     </div>
                     <div className="text-xs text-slate-300 text-right">
-                      <div>Refs: {refs.length} · Total: {totalActual.toFixed(1)} hrs</div>
+                      <div>Used by {refs.length} service line{refs.length !== 1 ? "s" : ""}</div>
                       <div>
-                        Min/Avg/Max: {min.toFixed(1)} / {avg.toFixed(1)} / {max.toFixed(1)}
+                        Actual hrs — Min: {min.toFixed(1)} / Avg: {avg.toFixed(1)} / Max: {max.toFixed(1)}
                       </div>
                     </div>
                   </div>
@@ -179,30 +179,26 @@ export default async function StationsAdminPage() {
                     <div className="text-xs text-slate-500">No service lines reference this station.</div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-left">
+                      <table className="w-full text-xs text-left table-fixed">
                         <thead className="text-slate-400">
                           <tr>
-                            <th className="py-1 pr-4">Service line</th>
-                            <th className="py-1 pr-4">Planned hrs</th>
-                            <th className="py-1 pr-4">Actual hrs</th>
-                            <th className="py-1 pr-4">% of Total</th>
+                            <th className="py-1 pr-4 w-48">Service line</th>
+                            <th className="py-1 pr-4 w-24">Planned hrs</th>
+                            <th className="py-1 pr-4 w-24">Actual hrs</th>
+                            <th className="py-1 pr-4 w-28">Contribution</th>
                           </tr>
                         </thead>
                         <tbody className="text-slate-200">
                           {refs.map((r) => {
-                            const pct = totalActual > 0 ? (r.actual / totalActual) * 100 : 0;
+                            const contribution = r.actual - r.planned;
                             return (
                               <tr key={`${st.station_id}-${r.service_line_id}`}>
-                                <td className="py-1 pr-4">{r.service_line_id}</td>
-                                <td className="py-1 pr-4">{r.planned.toFixed(1)}</td>
-                                <td className="py-1 pr-4">{r.actual.toFixed(1)}</td>
-                                <td className="py-1 pr-4">
-                                  <span className="inline-flex items-center gap-1">
-                                    {pct.toFixed(1)}%
-                                    <span
-                                      className="inline-block h-1.5 rounded-full bg-emerald-500"
-                                      style={{ width: `${Math.min(pct, 100) * 0.4}px` }}
-                                    />
+                                <td className="py-1 pr-4 w-48 truncate">{r.service_line_id}</td>
+                                <td className="py-1 pr-4 w-24">{r.planned.toFixed(1)}</td>
+                                <td className="py-1 pr-4 w-24">{r.actual.toFixed(1)}</td>
+                                <td className="py-1 pr-4 w-28">
+                                  <span className={contribution >= 0 ? "text-amber-400" : "text-emerald-400"}>
+                                    {contribution >= 0 ? "+" : ""}{contribution.toFixed(1)} hrs
                                   </span>
                                 </td>
                               </tr>
