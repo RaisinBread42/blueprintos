@@ -101,14 +101,16 @@ function CustomLink({
   const targetColor = getColorForNode(payload.target);
 
   // Opacity based on click-through rate (higher = more opaque)
-  const opacity = 0.3 + payload.clickThroughRate * 0.5;
+  const opacity = 0.4 + payload.clickThroughRate * 0.4;
 
-  // Create gradient ID
-  const gradientId = `link-gradient-${payload.source.name}-${payload.target.name}`;
+  // Create unique gradient ID (sanitize names for valid SVG ID)
+  const gradientId = `lg-${payload.source.name.replace(/[^a-zA-Z0-9]/g, "")}-${payload.target.name.replace(/[^a-zA-Z0-9]/g, "")}`;
 
-  // Calculate midpoint for percentage label
-  const midX = (sourceX + targetX) / 2;
-  const midY = (sourceY + targetY) / 2;
+  // Calculate midpoint for percentage label (along the bezier curve)
+  const t = 0.5;
+  const midX = (1-t)*(1-t)*(1-t)*sourceX + 3*(1-t)*(1-t)*t*sourceControlX + 3*(1-t)*t*t*targetControlX + t*t*t*targetX;
+  const midY = (1-t)*(1-t)*(1-t)*sourceY + 3*(1-t)*(1-t)*t*sourceY + 3*(1-t)*t*t*targetY + t*t*t*targetY;
+
   const percentText = `${(payload.clickThroughRate * 100).toFixed(0)}%`;
   const usersText = payload.value >= 1000
     ? `${(payload.value / 1000).toFixed(1)}k`
@@ -116,6 +118,15 @@ function CustomLink({
 
   // Show label if link is visible enough
   const showLabel = linkWidth > 6;
+
+  // Debug: log link coordinates for troubleshooting
+  if (process.env.NODE_ENV === "development" && payload.source.name.includes("SEARCH")) {
+    console.log(`Link ${payload.source.name} → ${payload.target.name}:`, {
+      sourceX, sourceY, targetX, targetY,
+      sourceControlX, targetControlX,
+      linkWidth, value: payload.value
+    });
+  }
 
   return (
     <g>
@@ -125,15 +136,21 @@ function CustomLink({
           <stop offset="100%" stopColor={targetColor} stopOpacity={opacity} />
         </linearGradient>
       </defs>
+      {/* Main gradient path */}
       <path
-        d={`
-          M${sourceX},${sourceY}
-          C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
-        `}
+        d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
         fill="none"
         stroke={`url(#${gradientId})`}
-        strokeWidth={linkWidth}
-        strokeOpacity={1}
+        strokeWidth={Math.max(linkWidth, 3)}
+        strokeOpacity={opacity}
+      />
+      {/* Additional visible stroke for all links */}
+      <path
+        d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
+        fill="none"
+        stroke={sourceColor}
+        strokeWidth={Math.max(linkWidth * 0.5, 1.5)}
+        strokeOpacity={0.3}
       />
       {showLabel && (
         <>

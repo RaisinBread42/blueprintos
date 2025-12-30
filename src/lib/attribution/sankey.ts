@@ -38,6 +38,8 @@ export const ENTITY_COLORS: Record<string, string> = {
   STINGRAY: "#3b82f6", // blue-500
   ECAYTRADE: "#10b981", // emerald-500
   "CAYMANIAN-TIMES": "#f59e0b", // amber-500
+  REWARDS: "#8b5cf6", // violet-500 (distinct color for rewards program)
+  UNKNOWN: "#64748b", // slate-500
 };
 
 /**
@@ -46,7 +48,12 @@ export const ENTITY_COLORS: Record<string, string> = {
  */
 export function getEntityFromTouchpoint(touchpointId: string): string {
   // Known prefixes
-  if (touchpointId.startsWith("X107-") || touchpointId.startsWith("KISS-") || touchpointId.startsWith("STINGRAY-")) {
+  if (
+    touchpointId.startsWith("X107-") ||
+    touchpointId.startsWith("KISS-") ||
+    touchpointId.startsWith("STINGRAY-") ||
+    touchpointId.startsWith("REWARDS-")  // Rewards program is part of Stingray ecosystem
+  ) {
     return "STINGRAY";
   }
   if (touchpointId.startsWith("ECAY-")) {
