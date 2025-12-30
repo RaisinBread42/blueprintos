@@ -6,7 +6,7 @@
 
 ## Current Focus
 
-**Active Feature**: None — feat-008 complete, ready for next feature
+**Active Feature**: `feat-009` Attribution Data Model + Snapshots API (implemented, awaiting verification)
 
 ### 2026 Vision: Multiplex Network
 
@@ -26,12 +26,12 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 | Iron Horse | Editable service line DAG (React Flow) | ✅ Complete |
 | Sensors | Dashboards + RAG overlays | ✅ Complete |
 | Simulation | Synthetic data + scenarios | ✅ Complete |
-| **Dispatcher** | Rule-based reports/alerts (feat-006) | 📋 Backlog |
 | **Entity Layer** | Entity registry + touchpoints (feat-008) | ✅ Complete |
-| Attribution | Snapshots API + data model (feat-009) | 📋 Backlog |
+| **Attribution** | Snapshots API + data model (feat-009) | ✅ Implemented |
 | Sankey | Attribution dashboard (feat-010) | 📋 Backlog |
 | Gap Analysis | Demand vs supply engine (feat-011) | 📋 Backlog |
 | Centrality | Graph analytics (feat-012) | 📋 Backlog |
+| Dispatcher | Rule-based reports/alerts (feat-006) | ⏸️ Deferred (needs live data) |
 
 ### Session 2025-12-30 Summary
 
@@ -54,8 +54,8 @@ BlueprintOS is evolving from a single-company operations tracker into a **cross-
 | Metric                | Value      |
 | --------------------- | ---------- |
 | Features Completed    | 7          |
-| Currently In Progress | 0          |
-| Backlog Items         | 6          |
+| Currently In Progress | 1 (feat-009) |
+| Backlog Items         | 5          |
 | Last Updated          | 2025-12-30 |
 
 ---
@@ -76,11 +76,205 @@ These rules are validated after every implementation:
 
 ## Active Planning
 
-### feat-008: Entity Registry
+### feat-009: Attribution Data Model + Snapshots API
 
 **Status**: planning 📝
+**Complexity**: M (3-4 hours)
+**Priority**: High
+**Depends on**: feat-008 (Entity Registry) ✅
+
+#### Summary
+
+Add the data model and API for tracking **cross-entity user flows**. This captures how users move between touchpoints (Radio Ad → eCayTrade Search → Purchase) and stores aggregated snapshots for analysis.
+
+#### Why This Matters
+
+The Entity Registry (feat-008) defines **what** the touchpoints are. This feature tracks **how users flow between them**:
+
+```
+Entity Registry (feat-008)     Attribution (feat-009)
+─────────────────────────      ─────────────────────
+"X107 Solar Ad exists"    →    "12% of listeners visited eCayTrade"
+"eCayTrade Search exists" →    "34% of searchers converted"
+```
+
+#### Data Model
+
+```typescript
+// New types to add to src/types/index.ts
+
+/**
+ * Attribution model types
+ */
+type AttributionModel = "first_touch" | "last_touch" | "linear" | "time_decay";
+
+/**
+ * Attribution Edge - user flow between two touchpoints
+ */
+interface AttributionEdge {
+  id: string;
+  source_touchpoint_id: string;
+  target_touchpoint_id: string;
+  period: string;                    // "2025-W01", "2025-01", "2025-Q1"
+  metrics: {
+    users_flowed: number;            // How many users went A → B
+    conversion_rate: number;         // users_flowed / source_impressions
+    lift_vs_baseline?: number;       // +12% compared to no campaign
+  };
+  attribution_model: AttributionModel;
+}
+
+/**
+ * Gap Opportunity - demand vs supply mismatch
+ */
+interface GapOpportunity {
+  touchpoint_id: string;
+  search_demand: number;             // 500 searches
+  supply_count: number;              // 10 listings
+  gap_score: number;                 // 0.98 (high = big opportunity)
+  recommended_action: string;        // "Recruit furniture retailers"
+}
+
+/**
+ * Journey Snapshot - aggregated cross-entity flow for a time period
+ */
+interface JourneySnapshot {
+  snapshot_id: string;
+  period: string;                    // "2025-01" (monthly), "2025-W01" (weekly)
+  period_type: "weekly" | "monthly" | "quarterly";
+  entities: string[];                // Entity IDs included in this snapshot
+  edges: AttributionEdge[];
+  computed_at: string;
+  insights: {
+    highest_conversion_path: string[];   // Touchpoint IDs in order
+    biggest_bridge?: string;             // Touchpoint with highest betweenness
+    gap_opportunities: GapOpportunity[];
+  };
+}
+```
+
+#### File Structure
+
+```
+data/
+└── attribution/
+    └── snapshots/
+        ├── 2025-01.json            # Monthly snapshot
+        └── 2025-W01.json           # Weekly snapshot
+
+src/
+├── types/index.ts                  # Add Attribution types
+├── lib/
+│   └── storage/
+│       └── attribution.ts          # Snapshot CRUD (server-only)
+│   └── attribution/
+│       └── compute.ts              # Edge/gap computation helpers
+└── app/
+    └── api/
+        └── attribution/
+            └── snapshots/
+                ├── route.ts        # GET all, POST new
+                └── [id]/
+                    └── route.ts    # GET one, DELETE
+```
+
+#### Iterations
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 1 | Types | Add `AttributionEdge`, `JourneySnapshot`, `GapOpportunity` to types | ✅ |
+| 2 | Storage | Create `src/lib/storage/attribution.ts` with snapshot CRUD | ✅ |
+| 3 | API Routes | `/api/attribution/snapshots` and `/api/attribution/snapshots/[id]` | ✅ |
+| 4 | Seed Data | Create 2 sample snapshots (weekly + monthly) with realistic edges | ✅ |
+| 5 | Compute Helpers | Add `lib/attribution/compute.ts` for edge/gap calculations | ✅ |
+| 6 | Tests | Unit tests for storage and compute modules (39 tests) | ✅ |
+
+#### Quality Gates Passed
+
+* ✅ `pnpm type-check` - No type errors
+* ✅ `pnpm lint` - No linting errors
+* ✅ `pnpm test` - 98 tests pass (39 new attribution tests)
+* ✅ `pnpm build` - Build successful
+
+#### Sample Snapshot
+
+```json
+{
+  "snapshot_id": "2025-01",
+  "period": "2025-01",
+  "period_type": "monthly",
+  "entities": ["STINGRAY", "ECAYTRADE", "CAYMANIAN-TIMES"],
+  "edges": [
+    {
+      "id": "E-001",
+      "source_touchpoint_id": "X107-SOLAR-AD",
+      "target_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 384,
+        "conversion_rate": 0.12,
+        "lift_vs_baseline": 0.08
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-002",
+      "source_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "target_touchpoint_id": "ECAY-PURCHASE",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 204,
+        "conversion_rate": 0.34
+      },
+      "attribution_model": "last_touch"
+    }
+  ],
+  "computed_at": "2025-02-01T00:00:00Z",
+  "insights": {
+    "highest_conversion_path": ["X107-SOLAR-AD", "ECAY-SOLAR-SEARCH", "ECAY-PURCHASE"],
+    "biggest_bridge": "ECAY-SOLAR-SEARCH",
+    "gap_opportunities": [
+      {
+        "touchpoint_id": "ECAY-SOLAR-SEARCH",
+        "search_demand": 500,
+        "supply_count": 10,
+        "gap_score": 0.98,
+        "recommended_action": "Recruit solar panel retailers for eCayTrade + Radio package"
+      }
+    ]
+  }
+}
+```
+
+#### Success Criteria
+
+- [x] Attribution types defined (`AttributionEdge`, `JourneySnapshot`, `GapOpportunity`)
+- [x] `/api/attribution/snapshots` returns list of all snapshots
+- [x] `/api/attribution/snapshots/[id]` supports GET and DELETE
+- [x] 2+ sample snapshots seeded with realistic edge data
+- [x] Compute helpers for edge metrics and gap scores
+- [x] Unit tests pass for storage and compute modules
+- [x] Type-check, lint, build all pass
+
+#### Files to Create/Modify
+
+- `src/types/index.ts` — Add Attribution types
+- `src/lib/storage/attribution.ts` — Snapshot CRUD (NEW)
+- `src/lib/storage/attribution.test.ts` — Unit tests (NEW)
+- `src/lib/attribution/compute.ts` — Edge/gap computation (NEW)
+- `src/lib/attribution/compute.test.ts` — Unit tests (NEW)
+- `src/app/api/attribution/snapshots/route.ts` — List/create (NEW)
+- `src/app/api/attribution/snapshots/[id]/route.ts` — GET/DELETE (NEW)
+- `data/attribution/snapshots/2025-01.json` — Monthly seed (NEW)
+- `data/attribution/snapshots/2025-W52.json` — Weekly seed (NEW)
+
+---
+
+### feat-008: Entity Registry (Complete)
+
+**Status**: complete ✅
 **Complexity**: S (2-3 hours)
-**Priority**: Medium
+**Commit**: `8452755`
 
 #### Summary
 

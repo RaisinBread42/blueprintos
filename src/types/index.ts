@@ -293,3 +293,78 @@ export interface Entity {
   updated_at: string;
 }
 
+// =============================================================================
+// Attribution Types - Cross-Entity User Flow Tracking
+// =============================================================================
+
+/**
+ * Attribution model - how credit is assigned across touchpoints
+ */
+export type AttributionModel =
+  | "first_touch"
+  | "last_touch"
+  | "linear"
+  | "time_decay";
+
+/**
+ * Period type for snapshots
+ */
+export type SnapshotPeriodType = "weekly" | "monthly" | "quarterly";
+
+/**
+ * Attribution Edge metrics - flow statistics between two touchpoints
+ */
+export interface AttributionEdgeMetrics {
+  users_flowed: number;
+  conversion_rate: number;
+  lift_vs_baseline?: number;
+}
+
+/**
+ * Attribution Edge - user flow between two touchpoints
+ * Represents how users move from one touchpoint to another
+ */
+export interface AttributionEdge {
+  id: string;
+  source_touchpoint_id: string;
+  target_touchpoint_id: string;
+  period: string;
+  metrics: AttributionEdgeMetrics;
+  attribution_model: AttributionModel;
+}
+
+/**
+ * Gap Opportunity - demand vs supply mismatch
+ * Identifies opportunities where user demand exceeds available supply
+ */
+export interface GapOpportunity {
+  touchpoint_id: string;
+  search_demand: number;
+  supply_count: number;
+  gap_score: number;
+  recommended_action: string;
+}
+
+/**
+ * Journey Insights - computed analytics for a snapshot
+ */
+export interface JourneyInsights {
+  highest_conversion_path: string[];
+  biggest_bridge?: string;
+  gap_opportunities: GapOpportunity[];
+}
+
+/**
+ * Journey Snapshot - aggregated cross-entity flow for a time period
+ * Captures user journeys across entities for analysis and visualization
+ */
+export interface JourneySnapshot {
+  snapshot_id: string;
+  period: string;
+  period_type: SnapshotPeriodType;
+  entities: string[];
+  edges: AttributionEdge[];
+  computed_at: string;
+  insights: JourneyInsights;
+}
+

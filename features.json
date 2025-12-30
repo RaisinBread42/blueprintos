@@ -201,13 +201,13 @@
       "title": "Dispatcher v1 (rule-based reports + alerts)",
       "description": "Generate deterministic dispatcher reports and global alerts from current JSON state; AI integration comes later.",
       "status": "backlog",
-      "priority": "medium",
+      "priority": "low",
       "complexity": "M",
       "createdAt": "2025-12-27T00:00:00Z",
       "phases": {},
       "files": [],
-      "dependencies": [],
-      "notes": "AI integration explicitly deferred; keep alerts decoupled and derived at runtime."
+      "dependencies": ["feat-009", "feat-010"],
+      "notes": "Deferred until live data infrastructure is in place. Most valuable when monitoring real signals, not mock data. Will integrate with Entity + Attribution layers once those are complete."
     },
     {
       "id": "feat-008",
@@ -241,12 +241,26 @@
       "id": "feat-009",
       "title": "Attribution Data Model + Snapshots API",
       "description": "Add AttributionEdge, JourneySnapshot, and GapOpportunity types. Create /api/attribution/snapshots endpoint for storing/retrieving periodic cross-entity flow data.",
-      "status": "backlog",
-      "priority": "medium",
+      "status": "implemented",
+      "priority": "high",
       "complexity": "M",
       "createdAt": "2025-12-30T00:00:00Z",
-      "phases": {},
-      "files": [],
+      "phases": {
+        "planning": { "completedAt": "2025-12-30T14:00:00Z" },
+        "accepted": { "completedAt": "2025-12-30T14:30:00Z" },
+        "implemented": { "completedAt": "2025-12-30T15:00:00Z" }
+      },
+      "files": [
+        "src/types/index.ts",
+        "src/lib/storage/attribution.ts",
+        "src/lib/storage/attribution.test.ts",
+        "src/lib/attribution/compute.ts",
+        "src/lib/attribution/compute.test.ts",
+        "src/app/api/attribution/snapshots/route.ts",
+        "src/app/api/attribution/snapshots/[id]/route.ts",
+        "data/attribution/snapshots/2025-01.json",
+        "data/attribution/snapshots/2025-W52.json"
+      ],
       "dependencies": ["feat-008"],
       "notes": "Snapshots are aggregated (weekly/monthly), not real-time. Separate from operational ServiceLine data."
     },

@@ -1,0 +1,110 @@
+{
+  "snapshot_id": "2025-01",
+  "period": "2025-01",
+  "period_type": "monthly",
+  "entities": ["STINGRAY", "ECAYTRADE", "CAYMANIAN-TIMES"],
+  "edges": [
+    {
+      "id": "E-001",
+      "source_touchpoint_id": "X107-SOLAR-AD",
+      "target_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 384,
+        "conversion_rate": 0.12,
+        "lift_vs_baseline": 0.08
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-002",
+      "source_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "target_touchpoint_id": "ECAY-PURCHASE",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 131,
+        "conversion_rate": 0.34
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-003",
+      "source_touchpoint_id": "X107-MORNING-SHOW",
+      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 520,
+        "conversion_rate": 0.061,
+        "lift_vs_baseline": 0.04
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-004",
+      "source_touchpoint_id": "CT-REAL-ESTATE-ARTICLE",
+      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 378,
+        "conversion_rate": 0.18,
+        "lift_vs_baseline": 0.12
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-005",
+      "source_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "target_touchpoint_id": "ECAY-LISTING-VIEW",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 1620,
+        "conversion_rate": 0.72
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "E-006",
+      "source_touchpoint_id": "CT-BREAKING-NEWS",
+      "target_touchpoint_id": "CT-NEWSLETTER",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 1470,
+        "conversion_rate": 0.15
+      },
+      "attribution_model": "first_touch"
+    },
+    {
+      "id": "E-007",
+      "source_touchpoint_id": "STINGRAY-REWARDS-PROMO",
+      "target_touchpoint_id": "ECAY-VEHICLE-SEARCH",
+      "period": "2025-01",
+      "metrics": {
+        "users_flowed": 168,
+        "conversion_rate": 0.08,
+        "lift_vs_baseline": 0.05
+      },
+      "attribution_model": "last_touch"
+    }
+  ],
+  "computed_at": "2025-02-01T00:00:00Z",
+  "insights": {
+    "highest_conversion_path": ["CT-REAL-ESTATE-ARTICLE", "ECAY-REAL-ESTATE-SEARCH", "ECAY-LISTING-VIEW"],
+    "biggest_bridge": "ECAY-REAL-ESTATE-SEARCH",
+    "gap_opportunities": [
+      {
+        "touchpoint_id": "ECAY-SOLAR-SEARCH",
+        "search_demand": 620,
+        "supply_count": 12,
+        "gap_score": 0.98,
+        "recommended_action": "Recruit solar panel retailers for eCayTrade + Radio package"
+      },
+      {
+        "touchpoint_id": "ECAY-VEHICLE-SEARCH",
+        "search_demand": 3200,
+        "supply_count": 89,
+        "gap_score": 0.97,
+        "recommended_action": "Increase vehicle dealer partnerships; bundle with Kiss FM Drive Time ads"
+      }
+    ]
+  }
+}

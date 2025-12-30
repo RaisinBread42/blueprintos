@@ -1,0 +1,80 @@
+{
+  "snapshot_id": "2025-W52",
+  "period": "2025-W52",
+  "period_type": "weekly",
+  "entities": ["STINGRAY", "ECAYTRADE", "CAYMANIAN-TIMES"],
+  "edges": [
+    {
+      "id": "W52-E-001",
+      "source_touchpoint_id": "X107-SOLAR-AD",
+      "target_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 98,
+        "conversion_rate": 0.14,
+        "lift_vs_baseline": 0.10
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "W52-E-002",
+      "source_touchpoint_id": "ECAY-SOLAR-SEARCH",
+      "target_touchpoint_id": "ECAY-PURCHASE",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 38,
+        "conversion_rate": 0.39
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "W52-E-003",
+      "source_touchpoint_id": "KISS-DRIVE-TIME",
+      "target_touchpoint_id": "ECAY-VEHICLE-SEARCH",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 186,
+        "conversion_rate": 0.03,
+        "lift_vs_baseline": 0.02
+      },
+      "attribution_model": "last_touch"
+    },
+    {
+      "id": "W52-E-004",
+      "source_touchpoint_id": "CT-BUSINESS-ARTICLE",
+      "target_touchpoint_id": "ECAY-LISTING-VIEW",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 224,
+        "conversion_rate": 0.08
+      },
+      "attribution_model": "linear"
+    },
+    {
+      "id": "W52-E-005",
+      "source_touchpoint_id": "CT-SPONSORED-CONTENT",
+      "target_touchpoint_id": "ECAY-REAL-ESTATE-SEARCH",
+      "period": "2025-W52",
+      "metrics": {
+        "users_flowed": 156,
+        "conversion_rate": 0.13,
+        "lift_vs_baseline": 0.09
+      },
+      "attribution_model": "last_touch"
+    }
+  ],
+  "computed_at": "2025-12-30T00:00:00Z",
+  "insights": {
+    "highest_conversion_path": ["X107-SOLAR-AD", "ECAY-SOLAR-SEARCH", "ECAY-PURCHASE"],
+    "biggest_bridge": "ECAY-SOLAR-SEARCH",
+    "gap_opportunities": [
+      {
+        "touchpoint_id": "ECAY-SOLAR-SEARCH",
+        "search_demand": 155,
+        "supply_count": 10,
+        "gap_score": 0.94,
+        "recommended_action": "Holiday solar deals - recruit 3 more retailers"
+      }
+    ]
+  }
+}
