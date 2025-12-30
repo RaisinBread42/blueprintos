@@ -12,6 +12,35 @@ interface MissingRef {
   station_id: string;
 }
 
+interface StationStats {
+  station: Station;
+  refs: { service_line_id: string; planned: number; actual: number }[];
+  totalPlanned: number;
+  totalActual: number;
+  totalContribution: number;
+  contributionPct: number;
+  health: "green" | "amber" | "red";
+  flags: string[];
+  min: number;
+  max: number;
+  avg: number;
+  varianceRatio: number;
+}
+
+function getHealth(contributionPct: number): "green" | "amber" | "red" {
+  if (contributionPct > 15) return "red";
+  if (contributionPct > 5) return "amber";
+  return "green";
+}
+
+function getHealthColor(health: "green" | "amber" | "red"): string {
+  switch (health) {
+    case "red": return "bg-red-500";
+    case "amber": return "bg-amber-500";
+    case "green": return "bg-emerald-500";
+  }
+}
+
 export default async function StationsAdminPage() {
   const stationIds = await listStationIds();
   const stations: Station[] = (
@@ -25,7 +54,6 @@ export default async function StationsAdminPage() {
     await Promise.all(serviceLineIds.map(async (id) => readServiceLine(id)))
   ).filter((sl): sl is NonNullable<typeof sl> => Boolean(sl));
 
-  const refCounts = new Map<string, number>();
   const missingRefs: MissingRef[] = [];
   const scenarioMap = new Map<string, ScenarioConfig>();
 
@@ -91,7 +119,6 @@ export default async function StationsAdminPage() {
   serviceLines.forEach((sl) => {
     const sc = scenarioMap.get(sl.service_line_id) ?? defaultScenarioConfig;
     sl.nodes.forEach((node) => {
-      refCounts.set(node.station_id, (refCounts.get(node.station_id) ?? 0) + 1);
       if (!stationMap.has(node.station_id) || node.missing) {
         missingRefs.push({ service_line_id: sl.service_line_id, station_id: node.station_id });
       }
@@ -110,14 +137,61 @@ export default async function StationsAdminPage() {
     });
   });
 
+  // Compute per-station stats
+  const stationStats: StationStats[] = stations.map((st) => {
+    const usage = stationUsage.get(st.station_id);
+    const refs = usage?.refs ?? [];
+    const actuals = refs.map((r) => r.actual);
+    const planneds = refs.map((r) => r.planned);
+
+    const totalActual = actuals.reduce((a, b) => a + b, 0);
+    const totalPlanned = planneds.reduce((a, b) => a + b, 0);
+    const totalContribution = totalActual - totalPlanned;
+    const contributionPct = totalPlanned > 0 ? (totalContribution / totalPlanned) * 100 : 0;
+
+    const min = actuals.length ? Math.min(...actuals) : 0;
+    const max = actuals.length ? Math.max(...actuals) : 0;
+    const avg = actuals.length ? totalActual / actuals.length : 0;
+    const varianceRatio = avg > 0 ? (max - min) / avg : 0;
+
+    const flags: string[] = [];
+    if (refs.length === 1) flags.push("single-use");
+    if (contributionPct > 20) flags.push("over-20");
+    if (varianceRatio > 0.5) flags.push("high-variance");
+
+    return {
+      station: st,
+      refs,
+      totalPlanned,
+      totalActual,
+      totalContribution,
+      contributionPct,
+      health: getHealth(contributionPct),
+      flags,
+      min,
+      max,
+      avg,
+      varianceRatio,
+    };
+  });
+
+  // Sort by worst offenders (highest contribution % first)
+  stationStats.sort((a, b) => b.contributionPct - a.contributionPct);
+
+  // Aggregate stats
+  const grandTotalPlanned = stationStats.reduce((sum, s) => sum + s.totalPlanned, 0);
+  const grandTotalActual = stationStats.reduce((sum, s) => sum + s.totalActual, 0);
+  const grandNetContribution = grandTotalActual - grandTotalPlanned;
+  const stationsOverBudget = stationStats.filter((s) => s.totalContribution > 0).length;
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-5xl px-6 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Station Catalog Health</h1>
+            <h1 className="text-2xl font-semibold text-white">Station Allocation Overview</h1>
             <p className="text-sm text-slate-400">
-              Shared station definitions with references across service lines.
+              Monitor hour allocation and usage per station. Spot anomalies before they become problems.
             </p>
           </div>
           <Link
@@ -128,53 +202,151 @@ export default async function StationsAdminPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-            <div className="text-sm text-slate-400">Stations in catalog</div>
-            <div className="text-2xl font-semibold text-white">{stations.length}</div>
+            <div className="text-sm text-slate-400" title="Sum of planned hours across all station usages">
+              Total Planned
+            </div>
+            <div className="text-2xl font-semibold text-white">{grandTotalPlanned.toFixed(0)} hrs</div>
+            <div className="text-xs text-slate-500 mt-1">Baseline budget</div>
           </div>
           <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-            <div className="text-sm text-slate-400">Service lines</div>
-            <div className="text-2xl font-semibold text-white">{serviceLines.length}</div>
+            <div className="text-sm text-slate-400" title="Sum of actual hours across all station usages">
+              Total Actual
+            </div>
+            <div className="text-2xl font-semibold text-white">{grandTotalActual.toFixed(0)} hrs</div>
+            <div className="text-xs text-slate-500 mt-1">Hours spent</div>
           </div>
           <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-            <div className="text-sm text-slate-400">Missing references</div>
-            <div className="text-2xl font-semibold text-white">{missingRefs.length}</div>
+            <div className="text-sm text-slate-400" title="Total actual minus total planned">
+              Net Contribution
+            </div>
+            <div className={`text-2xl font-semibold ${grandNetContribution === 0 ? "text-white" : grandNetContribution > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+              {grandNetContribution >= 0 ? "+" : ""}{grandNetContribution.toFixed(0)} hrs
+            </div>
+            <div className="text-xs text-slate-500 mt-1">
+              {grandNetContribution > 0 ? "Over budget" : grandNetContribution < 0 ? "Under budget" : "On target"}
+            </div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
+            <div className="text-sm text-slate-400" title="Stations where actual exceeds planned hours">
+              Over Budget
+            </div>
+            <div className={`text-2xl font-semibold ${stationsOverBudget > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+              {stationsOverBudget} / {stations.length}
+            </div>
+            <div className="text-xs text-slate-500 mt-1">Stations needing review</div>
           </div>
         </div>
 
+        {/* Legend */}
+        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 bg-slate-900/50 rounded-lg px-4 py-3 border border-slate-800">
+          <span className="font-medium text-slate-300">Health indicators:</span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            Green: ≤5% over
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            Amber: 5-15% over
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+            Red: &gt;15% over
+          </span>
+          <span className="border-l border-slate-700 pl-4 ml-2">
+            Sorted by worst contribution first
+          </span>
+        </div>
+
+        {/* Station Breakdown */}
         <div className="rounded-lg border border-slate-800 bg-slate-900/70">
-          <div className="border-b border-slate-800 px-4 py-3 text-sm font-semibold text-white">
-            Station Usage Breakdown
+          <div className="border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold text-white">Station Usage Breakdown</div>
+              <div className="text-xs text-slate-500">Stations sorted by highest over-budget contribution</div>
+            </div>
+            <div className="text-xs text-slate-400">{stations.length} stations</div>
           </div>
           <div className="divide-y divide-slate-800">
-            {stations.length === 0 && (
+            {stationStats.length === 0 && (
               <div className="px-4 py-3 text-sm text-slate-400">No stations in catalog.</div>
             )}
-            {stations.map((st) => {
-              const usage = stationUsage.get(st.station_id);
-              const refs = usage?.refs ?? [];
-              const actuals = refs.map((r) => r.actual);
-              const totalActual = actuals.reduce((a, b) => a + b, 0);
-              const min = actuals.length ? Math.min(...actuals) : 0;
-              const max = actuals.length ? Math.max(...actuals) : 0;
-              const avg = actuals.length ? totalActual / actuals.length : 0;
+            {stationStats.map((stat) => {
+              const { station: st, refs, totalPlanned, totalActual, totalContribution, contributionPct, health, flags, min, max, avg, varianceRatio } = stat;
               return (
-                <div key={`usage-${st.station_id}`} className="px-4 py-3 text-sm space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">{st.name}</div>
-                      <div className="text-xs text-slate-400">
-                        {st.station_id} · {st.department ?? "No dept"}
+                <div key={`usage-${st.station_id}`} className="px-4 py-4 text-sm space-y-3">
+                  {/* Station Header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      {/* Health Indicator */}
+                      <div
+                        className={`w-3 h-3 rounded-full ${getHealthColor(health)} shrink-0`}
+                        title={`${contributionPct.toFixed(1)}% over planned`}
+                      />
+                      <div>
+                        <div className="font-semibold text-white flex items-center gap-2">
+                          {st.name}
+                          {/* Flags */}
+                          {flags.includes("single-use") && (
+                            <span
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300"
+                              title="Only used by one service line - potential fragility"
+                            >
+                              Single use
+                            </span>
+                          )}
+                          {flags.includes("over-20") && (
+                            <span
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-300"
+                              title="More than 20% over planned hours - needs attention"
+                            >
+                              &gt;20% over
+                            </span>
+                          )}
+                          {flags.includes("high-variance") && (
+                            <span
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/50 text-amber-300"
+                              title="Large difference between min and max usage - inconsistent allocation"
+                            >
+                              High variance
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {st.station_id} · {st.department ?? "No dept"}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-xs text-slate-300 text-right">
-                      <div>Used by {refs.length} service line{refs.length !== 1 ? "s" : ""}</div>
-                      <div>
-                        Actual hrs — Min: {min.toFixed(1)} / Avg: {avg.toFixed(1)} / Max: {max.toFixed(1)}
+
+                    {/* Station Totals */}
+                    <div className="text-xs text-right space-y-1 shrink-0">
+                      <div className="text-slate-300">
+                        <span title="Total planned hours across all service lines">Planned: {totalPlanned.toFixed(1)}</span>
+                        {" · "}
+                        <span title="Total actual hours across all service lines">Actual: {totalActual.toFixed(1)}</span>
+                        {" · "}
+                        <span
+                          className={`font-medium ${totalContribution === 0 ? "text-white" : totalContribution > 0 ? "text-amber-400" : "text-emerald-400"}`}
+                          title="Net contribution (actual - planned)"
+                        >
+                          {totalContribution >= 0 ? "+" : ""}{totalContribution.toFixed(1)} hrs ({contributionPct >= 0 ? "+" : ""}{contributionPct.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="text-slate-500">
+                        <span title="Usage statistics across service lines">
+                          {refs.length} service line{refs.length !== 1 ? "s" : ""}
+                          {refs.length > 1 && ` · Min: ${min.toFixed(1)} / Avg: ${avg.toFixed(1)} / Max: ${max.toFixed(1)}`}
+                          {varianceRatio > 0.3 && refs.length > 1 && (
+                            <span className="text-amber-400" title="Variance ratio: (max-min)/avg - high values indicate inconsistent usage"> · VR: {varianceRatio.toFixed(2)}</span>
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Usage Table */}
                   {refs.length === 0 ? (
                     <div className="text-xs text-slate-500">No service lines reference this station.</div>
                   ) : (
@@ -214,12 +386,14 @@ export default async function StationsAdminPage() {
           </div>
         </div>
 
+        {/* Missing References */}
         <div className="rounded-lg border border-slate-800 bg-slate-900/70">
-          <div className="border-b border-slate-800 px-4 py-3 text-sm font-semibold text-white">
-            Missing references
+          <div className="border-b border-slate-800 px-4 py-3">
+            <div className="text-sm font-semibold text-white">Missing References</div>
+            <div className="text-xs text-slate-500">Stations referenced by service lines but not found in catalog</div>
           </div>
           {missingRefs.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-slate-400">None detected.</div>
+            <div className="px-4 py-3 text-sm text-slate-400">None detected — all references are valid.</div>
           ) : (
             <div className="divide-y divide-slate-800">
               {missingRefs.map((m, idx) => (
@@ -231,8 +405,12 @@ export default async function StationsAdminPage() {
             </div>
           )}
         </div>
+
+        {/* Footer disclaimer */}
+        <div className="text-xs text-slate-500 text-center">
+          Data reflects current catalog state with scenario overlays applied. Contribution = Actual − Planned hours.
+        </div>
       </div>
     </main>
   );
 }
-
