@@ -1,0 +1,53 @@
+{
+  "snapshot_id": "2024-12-29",
+  "period": "2024-12-29",
+  "period_type": "weekly",
+  "stations": [
+    {
+      "station_id": "SALES_MKTG",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 40, "actual_hrs": 38, "labor_variance": -2 },
+        "world_class": { "internal_qa_score": 8.2, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "deals_closed": 14 }
+      },
+      "rag_status": "green"
+    },
+    {
+      "station_id": "CONTENT_CREATIVE",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 50, "actual_hrs": 46, "labor_variance": -4 },
+        "world_class": { "internal_qa_score": 8.5, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "spots_produced": 16 }
+      },
+      "rag_status": "green"
+    },
+    {
+      "station_id": "MEDIA_BUY",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 30, "actual_hrs": 28, "labor_variance": -2 },
+        "world_class": { "internal_qa_score": 8.1, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "spots_scheduled": 48 }
+      },
+      "rag_status": "green"
+    },
+    {
+      "station_id": "ACCOUNT_MGMT",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 25, "actual_hrs": 22, "labor_variance": -3 },
+        "world_class": { "internal_qa_score": 8.5, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "csat": 4.6 }
+      },
+      "rag_status": "green"
+    },
+    {
+      "station_id": "OPS_PM",
+      "metrics": {
+        "fair_pricing": { "planned_hrs": 20, "actual_hrs": 17, "labor_variance": -3 },
+        "world_class": { "internal_qa_score": 8.3, "standard_met": true, "industry_benchmark": 8 },
+        "performance_proof": { "on_time_pct": 95 }
+      },
+      "rag_status": "green"
+    }
+  ],
+  "computed_at": "2024-12-29T00:00:00Z"
+}

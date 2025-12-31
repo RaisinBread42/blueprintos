@@ -7,6 +7,7 @@
     {
       "station_id": "SALES_MKTG",
       "name": "Sales & Marketing",
+      "description": "Handles client acquisition, proposal development, and closing deals for advertising packages across all properties.",
       "department": "Sales",
       "data_source": "mock",
       "metrics": {
@@ -30,6 +31,7 @@
     {
       "station_id": "CONTENT_CREATIVE",
       "name": "Content & Creative",
+      "description": "Produces creative assets including radio spots, sponsored articles, graphics, and multimedia content for client campaigns.",
       "department": "Creative",
       "data_source": "mock",
       "metrics": {
@@ -53,6 +55,7 @@
     {
       "station_id": "ACCOUNT_MGMT",
       "name": "Account Management",
+      "description": "Maintains client relationships, handles renewals, resolves issues, and ensures client satisfaction throughout campaigns.",
       "department": "Account Management",
       "data_source": "mock",
       "metrics": {

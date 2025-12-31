@@ -14,6 +14,7 @@ import type { ServiceLine, Station, TrackEdge } from "@/types";
 export interface StationNodeData {
   station_id: string;
   name: string;
+  description?: string;
   department?: string;
   data_source: "mock" | "api";
   metrics: Station["metrics"];
@@ -43,6 +44,7 @@ export function stationToNode(station: Station): Node<StationNodeData> {
     data: {
       station_id: station.station_id,
       name: station.name,
+      description: station.description,
       department: station.department,
       data_source: station.data_source,
       metrics: station.metrics,
@@ -89,6 +91,7 @@ export function nodeToStation(node: Node<StationNodeData>): Station {
   return {
     station_id: node.data.station_id,
     name: node.data.name,
+    description: node.data.description,
     department: node.data.department,
     data_source: node.data.data_source,
     metrics: node.data.metrics,

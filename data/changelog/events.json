@@ -1,0 +1,31 @@
+{
+  "events": [
+    {
+      "id": "evt-003",
+      "date": "2024-12-22",
+      "type": "process_change",
+      "title": "Streamlined radio spot approval",
+      "description": "Reduced approval steps from 3 to 2, eliminating redundant legal review for repeat clients.",
+      "affected_stations": ["CONTENT_CREATIVE", "ACCOUNT_MGMT"],
+      "expected_impact": "Reduce creative hours by 10%"
+    },
+    {
+      "id": "evt-002",
+      "date": "2024-12-15",
+      "type": "tool_change",
+      "title": "Adopted new scheduling software",
+      "description": "Migrated from spreadsheet-based scheduling to automated media planning tool.",
+      "affected_stations": ["MEDIA_BUY", "OPS_PM"],
+      "expected_impact": "Reduce scheduling time by 15%"
+    },
+    {
+      "id": "evt-001",
+      "date": "2024-12-08",
+      "type": "team_change",
+      "title": "Added senior sales rep",
+      "description": "Hired experienced sales representative to handle enterprise accounts.",
+      "affected_stations": ["SALES_MKTG"],
+      "expected_impact": "Increase deal close rate"
+    }
+  ]
+}

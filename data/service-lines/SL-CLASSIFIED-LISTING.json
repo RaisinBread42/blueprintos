@@ -7,6 +7,7 @@
     {
       "station_id": "SALES_MKTG",
       "name": "Sales & Marketing",
+      "description": "Handles client acquisition, proposal development, and closing deals for advertising packages across all properties.",
       "department": "Sales",
       "data_source": "mock",
       "metrics": {
@@ -30,6 +31,7 @@
     {
       "station_id": "OPS_PM",
       "name": "Operations / PM",
+      "description": "Coordinates project timelines, manages workflow between teams, and ensures on-time delivery of client deliverables.",
       "department": "Operations",
       "data_source": "mock",
       "metrics": {
@@ -53,6 +55,7 @@
     {
       "station_id": "ACCOUNT_MGMT",
       "name": "Account Management",
+      "description": "Maintains client relationships, handles renewals, resolves issues, and ensures client satisfaction throughout campaigns.",
       "department": "Account Management",
       "data_source": "mock",
       "metrics": {

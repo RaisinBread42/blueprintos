@@ -143,6 +143,7 @@ export interface StationMetrics {
 export interface Station {
   station_id: string;
   name: string;
+  description?: string;
   department?: string;
   metrics: StationMetrics;
   data_source: DataSourceType;
@@ -372,5 +373,67 @@ export interface JourneySnapshot {
   edges: AttributionEdge[];
   computed_at: string;
   insights: JourneyInsights;
+}
+
+// =============================================================================
+// Station Snapshots - Weekly/Monthly Metric Tracking
+// =============================================================================
+
+/**
+ * Period type for station snapshots
+ */
+export type StationSnapshotPeriodType = "weekly" | "monthly";
+
+/**
+ * Individual station metrics record within a snapshot
+ */
+export interface StationMetricRecord {
+  station_id: string;
+  metrics: StationMetrics;
+  rag_status: RAGStatus;
+}
+
+/**
+ * Station Snapshot - captures all station metrics at a point in time
+ */
+export interface StationSnapshot {
+  snapshot_id: string;
+  period: string;
+  period_type: StationSnapshotPeriodType;
+  stations: StationMetricRecord[];
+  computed_at: string;
+}
+
+// =============================================================================
+// Changelog - Track Changes for Impact Correlation
+// =============================================================================
+
+/**
+ * Type of change event
+ */
+export type ChangelogEventType =
+  | "process_change"
+  | "team_change"
+  | "tool_change"
+  | "policy_change";
+
+/**
+ * Changelog Event - tracks a change made to operations
+ */
+export interface ChangelogEvent {
+  id: string;
+  date: string;
+  type: ChangelogEventType;
+  title: string;
+  description?: string;
+  affected_stations: string[];
+  expected_impact?: string;
+}
+
+/**
+ * Changelog - collection of change events
+ */
+export interface Changelog {
+  events: ChangelogEvent[];
 }
 

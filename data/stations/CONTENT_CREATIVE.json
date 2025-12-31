@@ -1,6 +1,7 @@
 {
   "station_id": "CONTENT_CREATIVE",
   "name": "Content & Creative",
+  "description": "Produces creative assets including radio spots, sponsored articles, graphics, and multimedia content for client campaigns.",
   "department": "Creative",
   "data_source": "mock",
   "metrics": {

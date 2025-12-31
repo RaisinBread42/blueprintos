@@ -1,6 +1,7 @@
 {
   "station_id": "ACCOUNT_MGMT",
   "name": "Account Management",
+  "description": "Maintains client relationships, handles renewals, resolves issues, and ensures client satisfaction throughout campaigns.",
   "department": "Account Management",
   "data_source": "mock",
   "metrics": {

@@ -58,6 +58,7 @@ function createDefaultStationData(id: string): StationNodeData {
   return {
     station_id: id,
     name: "New Station",
+    description: undefined,
     department: undefined,
     data_source: "mock",
     metrics: {
@@ -312,6 +313,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     const payload: Station = {
       station_id: data.station_id,
       name: data.name,
+      description: data.description,
       department: data.department,
       data_source: data.data_source,
       metrics: data.metrics,

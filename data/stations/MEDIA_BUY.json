@@ -1,6 +1,7 @@
 {
   "station_id": "MEDIA_BUY",
   "name": "Media Planning & Buying",
+  "description": "Plans and schedules radio airtime, manages ad rotations, and optimizes media placement across Stingray stations.",
   "department": "Media Buying",
   "data_source": "mock",
   "metrics": {

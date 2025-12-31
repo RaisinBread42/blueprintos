@@ -1,6 +1,7 @@
 {
   "station_id": "OPS_PM",
   "name": "Operations / PM",
+  "description": "Coordinates project timelines, manages workflow between teams, and ensures on-time delivery of client deliverables.",
   "department": "Operations",
   "data_source": "mock",
   "metrics": {

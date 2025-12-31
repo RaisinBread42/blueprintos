@@ -1,6 +1,7 @@
 {
   "station_id": "SALES_MKTG",
   "name": "Sales & Marketing",
+  "description": "Handles client acquisition, proposal development, and closing deals for advertising packages across all properties.",
   "department": "Sales and Marketing",
   "data_source": "mock",
   "metrics": {

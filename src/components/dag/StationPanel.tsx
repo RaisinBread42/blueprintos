@@ -140,6 +140,21 @@ export function StationPanel({
               />
             </div>
 
+            {/* Description (editable) */}
+            <div className="space-y-1.5">
+              <Label htmlFor="station-desc" className="text-slate-400 text-xs">
+                Description
+              </Label>
+              <textarea
+                id="station-desc"
+                value={station.description || ""}
+                onChange={(e) => onUpdate({ description: e.target.value || undefined })}
+                placeholder="What does this station do?"
+                rows={3}
+                className="w-full rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-600 focus:border-emerald-500 focus:ring-emerald-500/20 focus:outline-none px-3 py-2 text-sm resize-none"
+              />
+            </div>
+
             {/* Department (editable) */}
             <div className="space-y-1.5">
               <Label htmlFor="station-dept" className="text-slate-400 text-xs">
