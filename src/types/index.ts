@@ -343,6 +343,12 @@ export interface GapOpportunity {
   supply_count: number;
   gap_score: number;
   recommended_action: string;
+  /** Optional category for grouping (e.g., "vehicles", "real-estate") */
+  category?: string;
+  /** Optional trend indicator: "rising", "stable", "falling" */
+  trend?: "rising" | "stable" | "falling";
+  /** Optional revenue potential estimate */
+  revenue_potential?: number;
 }
 
 /**

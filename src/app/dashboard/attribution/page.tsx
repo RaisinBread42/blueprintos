@@ -15,11 +15,14 @@ import {
   Gift,
   BarChart3,
   ArrowUpRight,
+  PieChart,
 } from "lucide-react";
-import type { JourneySnapshot } from "@/types";
+import type { JourneySnapshot, GapOpportunity } from "@/types";
 import { AttributionSankey } from "@/components/dashboard/AttributionSankey";
+import { GapAnalysis } from "@/components/dashboard/GapAnalysis";
+import { getMockGapOpportunities } from "@/lib/attribution/gaps";
 
-type ViewTab = "current" | "ideal";
+type ViewTab = "current" | "ideal" | "gaps";
 
 // Synergy-focused recommendations
 const TRACKING_RECOMMENDATIONS = [
@@ -101,6 +104,7 @@ const SYNERGY_METRICS = {
 export default function AttributionDashboardPage() {
   const [snapshots, setSnapshots] = useState<JourneySnapshot[]>([]);
   const [idealSnapshot, setIdealSnapshot] = useState<JourneySnapshot | null>(null);
+  const [gapOpportunities, setGapOpportunities] = useState<GapOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
@@ -122,6 +126,7 @@ export default function AttributionDashboardPage() {
 
         setSnapshots(real);
         setIdealSnapshot(ideal ?? null);
+        setGapOpportunities(getMockGapOpportunities());
 
         if (real.length > 0) {
           setSelectedPeriod(real[0].snapshot_id);
@@ -216,6 +221,17 @@ export default function AttributionDashboardPage() {
           >
             <Target className="h-4 w-4" />
             Multi-Platform Vision
+          </button>
+          <button
+            onClick={() => setActiveTab("gaps")}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === "gaps"
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/50"
+                : "bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:text-white"
+            }`}
+          >
+            <PieChart className="h-4 w-4" />
+            Gap Analysis
           </button>
         </div>
 
@@ -528,6 +544,55 @@ export default function AttributionDashboardPage() {
               >
                 <Lightbulb className="h-4 w-4" />
                 Start Building Synergy Tracking
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Gap Analysis View */}
+        {activeTab === "gaps" && (
+          <div className="space-y-6">
+            {/* Gap Analysis Banner */}
+            <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <PieChart className="h-5 w-5 text-purple-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-purple-200 font-medium text-sm">
+                    Demand vs Supply Analysis
+                  </p>
+                  <p className="text-purple-200/70 text-sm mt-1">
+                    Identify high-demand categories with limited supply on eCayTrade.
+                    Target these gaps with cross-platform seller recruitment campaigns.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Gap Analysis Component */}
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
+              <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-400" />
+                eCayTrade Category Gaps
+              </h2>
+              <GapAnalysis gaps={gapOpportunities} />
+            </div>
+
+            {/* Action CTA */}
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-6">
+              <h3 className="text-white font-medium mb-2">
+                Turn Gaps into Revenue
+              </h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Use these insights to create targeted campaigns: Radio ads recruiting
+                solar panel sellers, CT articles about EV market opportunities,
+                cross-platform bundles for high-gap categories.
+              </p>
+              <button
+                onClick={() => setActiveTab("ideal")}
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 transition-colors"
+              >
+                <Target className="h-4 w-4" />
+                See Multi-Platform Strategy
               </button>
             </div>
           </div>

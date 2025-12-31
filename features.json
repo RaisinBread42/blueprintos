@@ -298,14 +298,26 @@
       "id": "feat-011",
       "title": "Gap Analysis Engine",
       "description": "Compute demand vs supply gaps from touchpoint data. Display gap opportunity cards on attribution dashboard with recommended actions.",
-      "status": "backlog",
-      "priority": "low",
+      "status": "complete",
+      "priority": "medium",
       "complexity": "M",
       "createdAt": "2025-12-30T00:00:00Z",
-      "phases": {},
-      "files": [],
+      "phases": {
+        "planning": { "completedAt": "2025-12-30T19:30:00Z" },
+        "accepted": { "completedAt": "2025-12-30T19:30:00Z" },
+        "implemented": { "completedAt": "2025-12-30T19:45:00Z" },
+        "verified": { "completedAt": "2025-12-30T19:45:00Z" },
+        "committed": { "completedAt": "2025-12-30T19:45:00Z" }
+      },
+      "files": [
+        "src/types/index.ts",
+        "src/lib/attribution/gaps.ts",
+        "src/lib/attribution/gaps.test.ts",
+        "src/components/dashboard/GapAnalysis.tsx",
+        "src/app/dashboard/attribution/page.tsx"
+      ],
       "dependencies": ["feat-009"],
-      "notes": "Identifies high-demand, low-supply opportunities (e.g., 500 searches, 10 listings). Feeds into Sales Engine targeting."
+      "notes": "Mock data for 10 eCayTrade categories with gap scoring, trend indicators, and revenue potential estimates. New 'Gap Analysis' tab on attribution dashboard. 19 unit tests (142 total)."
     },
     {
       "id": "feat-012",
