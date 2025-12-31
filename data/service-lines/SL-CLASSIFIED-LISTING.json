@@ -1,0 +1,92 @@
+{
+  "service_line_id": "SL-CLASSIFIED-LISTING",
+  "name": "Classified Listings",
+  "description": "Premium listings and advertising on eCayTrade (real estate, vehicles, jobs)",
+  "created_at": "2025-12-31T00:00:00.000Z",
+  "nodes": [
+    {
+      "station_id": "SALES_MKTG",
+      "name": "Sales & Marketing",
+      "department": "Sales",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 2,
+          "actual_hrs": 2,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 8.0,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "deals_closed": 25
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 0, "y": 0 }
+    },
+    {
+      "station_id": "OPS_PM",
+      "name": "Operations / PM",
+      "department": "Operations",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 3,
+          "actual_hrs": 3,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 8.2,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "listings_processed": 30
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 200, "y": 0 }
+    },
+    {
+      "station_id": "ACCOUNT_MGMT",
+      "name": "Account Management",
+      "department": "Account Management",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 2,
+          "actual_hrs": 2,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 8.3,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "csat": 4.5
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 400, "y": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "SALES_MKTG->OPS_PM",
+      "source_station_id": "SALES_MKTG",
+      "target_station_id": "OPS_PM",
+      "weight": { "cost": 1, "time": 1 }
+    },
+    {
+      "id": "OPS_PM->ACCOUNT_MGMT",
+      "source_station_id": "OPS_PM",
+      "target_station_id": "ACCOUNT_MGMT",
+      "weight": { "cost": 1, "time": 1 }
+    }
+  ],
+  "updated_at": "2025-12-31T00:00:00.000Z"
+}

@@ -1,0 +1,92 @@
+{
+  "service_line_id": "SL-SPONSORED-CONTENT",
+  "name": "Sponsored Content",
+  "description": "Sponsored articles and advertorials on Caymanian Times",
+  "created_at": "2025-12-31T00:00:00.000Z",
+  "nodes": [
+    {
+      "station_id": "SALES_MKTG",
+      "name": "Sales & Marketing",
+      "department": "Sales",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 3,
+          "actual_hrs": 3,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 8.1,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "deals_closed": 8
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 0, "y": 0 }
+    },
+    {
+      "station_id": "CONTENT_CREATIVE",
+      "name": "Content & Creative",
+      "department": "Creative",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 12,
+          "actual_hrs": 14,
+          "labor_variance": 2
+        },
+        "world_class": {
+          "internal_qa_score": 8.3,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "articles_published": 10
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 200, "y": 0 }
+    },
+    {
+      "station_id": "ACCOUNT_MGMT",
+      "name": "Account Management",
+      "department": "Account Management",
+      "data_source": "mock",
+      "metrics": {
+        "fair_pricing": {
+          "planned_hrs": 4,
+          "actual_hrs": 4,
+          "labor_variance": 0
+        },
+        "world_class": {
+          "internal_qa_score": 8.5,
+          "standard_met": true,
+          "industry_benchmark": 8
+        },
+        "performance_proof": {
+          "csat": 4.7
+        }
+      },
+      "rag_status": "green",
+      "position": { "x": 400, "y": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "SALES_MKTG->CONTENT_CREATIVE",
+      "source_station_id": "SALES_MKTG",
+      "target_station_id": "CONTENT_CREATIVE",
+      "weight": { "cost": 2, "time": 1 }
+    },
+    {
+      "id": "CONTENT_CREATIVE->ACCOUNT_MGMT",
+      "source_station_id": "CONTENT_CREATIVE",
+      "target_station_id": "ACCOUNT_MGMT",
+      "weight": { "cost": 1, "time": 2 }
+    }
+  ],
+  "updated_at": "2025-12-31T00:00:00.000Z"
+}
