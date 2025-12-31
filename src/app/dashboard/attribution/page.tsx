@@ -220,7 +220,7 @@ export default function AttributionDashboardPage() {
             }`}
           >
             <Target className="h-4 w-4" />
-            Multi-Platform Vision
+            Ecosystem Vision
           </button>
           <button
             onClick={() => setActiveTab("gaps")}
@@ -263,6 +263,66 @@ export default function AttributionDashboardPage() {
 
             {selectedSnapshot ? (
               <div className="space-y-6">
+                {/* Current Tracking Metrics */}
+                <div className="rounded-xl border border-slate-700/50 bg-slate-900/60 p-6 shadow-lg">
+                  <h2 className="text-lg font-medium text-white mb-2 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-slate-400" />
+                    Current Tracking Metrics
+                  </h2>
+                  <p className="text-slate-400 text-sm mb-6">
+                    Within-platform tracking data from your existing analytics
+                  </p>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-lg border border-slate-700/50 bg-slate-800/50 p-4">
+                      <p className="text-slate-400 text-xs uppercase tracking-wide mb-2">
+                        Total Actions
+                      </p>
+                      <p className="text-3xl font-bold text-white">
+                        {selectedSnapshot.edges
+                          .reduce((sum, e) => sum + e.metrics.users_flowed, 0)
+                          .toLocaleString()}
+                      </p>
+                      <p className="text-slate-500 text-xs mt-2">
+                        User flows tracked this period
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 p-4">
+                      <p className="text-emerald-400 text-xs uppercase tracking-wide mb-2">
+                        Avg Click-Through
+                      </p>
+                      <p className="text-3xl font-bold text-emerald-400">
+                        {selectedSnapshot.edges.length > 0
+                          ? (
+                              (selectedSnapshot.edges.reduce(
+                                (sum, e) => sum + e.metrics.click_through_rate,
+                                0
+                              ) /
+                                selectedSnapshot.edges.length) *
+                              100
+                            ).toFixed(1)
+                          : "0"}
+                        %
+                      </p>
+                      <p className="text-emerald-400/70 text-xs mt-2">
+                        Average conversion rate
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 relative">
+                      <div className="absolute -top-3 left-4 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                        MISSING
+                      </div>
+                      <p className="text-amber-400 text-xs uppercase tracking-wide mb-2">
+                        Cross-Platform
+                      </p>
+                      <p className="text-3xl font-bold text-amber-400">0%</p>
+                      <p className="text-amber-400/70 text-xs mt-2">
+                        Not yet enabled
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Current Limitation Banner */}
                 <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
                   <div className="flex items-start gap-3">
@@ -291,39 +351,6 @@ export default function AttributionDashboardPage() {
                     Within-Platform User Flows
                   </h2>
                   <AttributionSankey edges={selectedSnapshot.edges} height={350} />
-                </div>
-
-                {/* Quick Stats */}
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
-                    <p className="text-slate-400 text-sm">Total Tracked Actions</p>
-                    <p className="text-2xl font-semibold text-white mt-1">
-                      {selectedSnapshot.edges
-                        .reduce((sum, e) => sum + e.metrics.users_flowed, 0)
-                        .toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg">
-                    <p className="text-slate-400 text-sm">Avg Click-Through Rate</p>
-                    <p className="text-2xl font-semibold text-emerald-400 mt-1">
-                      {selectedSnapshot.edges.length > 0
-                        ? (
-                            (selectedSnapshot.edges.reduce(
-                              (sum, e) => sum + e.metrics.click_through_rate,
-                              0
-                            ) /
-                              selectedSnapshot.edges.length) *
-                            100
-                          ).toFixed(1)
-                        : "0"}
-                      %
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-lg">
-                    <p className="text-amber-400 text-sm">Cross-Platform Visibility</p>
-                    <p className="text-2xl font-semibold text-amber-400 mt-1">0%</p>
-                    <p className="text-amber-400/60 text-xs mt-1">Not yet enabled</p>
-                  </div>
                 </div>
 
                 {/* Gap Opportunities */}
@@ -362,7 +389,7 @@ export default function AttributionDashboardPage() {
           </>
         )}
 
-        {/* Multi-Platform Vision View */}
+        {/* Ecosystem Vision View */}
         {activeTab === "ideal" && (
           <div className="space-y-6">
             {/* Vision Banner */}
@@ -371,7 +398,7 @@ export default function AttributionDashboardPage() {
                 <Target className="h-5 w-5 text-blue-400 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-blue-200 font-medium text-sm">
-                    The Multi-Platform Advantage
+                    The Ecosystem Advantage
                   </p>
                   <p className="text-blue-200/70 text-sm mt-1">
                     When users engage across Radio + News + Marketplace, conversion rates
@@ -552,6 +579,56 @@ export default function AttributionDashboardPage() {
         {/* Gap Analysis View */}
         {activeTab === "gaps" && (
           <div className="space-y-6">
+            {/* Demand vs Supply Overview */}
+            <div className="rounded-xl border border-purple-500/30 bg-slate-900/60 p-6 shadow-lg">
+              <h2 className="text-lg font-medium text-white mb-2 flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-purple-400" />
+                Demand vs Supply Overview
+              </h2>
+              <p className="text-slate-400 text-sm mb-6">
+                Category gaps identified from eCayTrade search and listing data
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-4 relative">
+                  <div className="absolute -top-3 left-4 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                    URGENT
+                  </div>
+                  <p className="text-red-400 text-xs uppercase tracking-wide mb-2">
+                    Critical Gaps
+                  </p>
+                  <p className="text-3xl font-bold text-red-400">
+                    {gapOpportunities.filter((g) => g.gap_score >= 0.8).length}
+                  </p>
+                  <p className="text-red-400/70 text-xs mt-2">
+                    Immediate action needed
+                  </p>
+                </div>
+                <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4">
+                  <p className="text-amber-400 text-xs uppercase tracking-wide mb-2">
+                    High Priority
+                  </p>
+                  <p className="text-3xl font-bold text-amber-400">
+                    {gapOpportunities.filter((g) => g.gap_score >= 0.6 && g.gap_score < 0.8).length}
+                  </p>
+                  <p className="text-amber-400/70 text-xs mt-2">
+                    Strong opportunities
+                  </p>
+                </div>
+                <div className="rounded-lg border border-slate-700/50 bg-slate-800/50 p-4">
+                  <p className="text-slate-400 text-xs uppercase tracking-wide mb-2">
+                    Categories
+                  </p>
+                  <p className="text-3xl font-bold text-white">
+                    {gapOpportunities.length}
+                  </p>
+                  <p className="text-slate-500 text-xs mt-2">
+                    eCayTrade marketplace
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Gap Analysis Banner */}
             <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-4">
               <div className="flex items-start gap-3">

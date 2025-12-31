@@ -13,7 +13,6 @@ export interface CategoryData {
   touchpoint_id: string;
   search_demand: number;
   supply_count: number;
-  avg_listing_price?: number;
   trend?: "rising" | "stable" | "falling";
 }
 
@@ -38,44 +37,22 @@ export function computeGapScore(demand: number, supply: number): number {
 }
 
 /**
- * Estimate revenue potential based on gap and average price
- */
-export function estimateRevenuePotential(
-  demand: number,
-  supply: number,
-  avgPrice: number = 500
-): number {
-  const unmetDemand = Math.max(0, demand - supply);
-  // Assume 10% conversion rate and 5% commission
-  const potentialSales = unmetDemand * 0.1;
-  const commission = potentialSales * avgPrice * 0.05;
-  return Math.round(commission);
-}
-
-/**
  * Generate recommended action based on gap analysis
  */
 export function generateRecommendation(
   category: string,
-  gapScore: number,
-  trend: "rising" | "stable" | "falling" = "stable"
+  gapScore: number
 ): string {
   if (gapScore >= 0.8) {
-    return `Critical gap in ${category}. Launch targeted seller recruitment campaign immediately.`;
+    return `Improve ${category} supply - critical gap detected.`;
   }
   if (gapScore >= 0.6) {
-    if (trend === "rising") {
-      return `High demand for ${category} and growing. Prioritize seller onboarding + radio ads.`;
-    }
-    return `Significant opportunity in ${category}. Run cross-platform bundle campaign.`;
+    return `Improve ${category} supply - high demand detected.`;
   }
-  if (gapScore >= 0.4) {
-    return `Moderate gap in ${category}. Consider CT article series + eCayTrade promotion.`;
+  if (gapScore >= 0.3) {
+    return `Consider improving ${category} supply.`;
   }
-  if (gapScore >= 0.2) {
-    return `Minor gap in ${category}. Monitor trends and maintain current supply.`;
-  }
-  return `${category} well-supplied. Focus retention and quality over recruitment.`;
+  return `${category} supply is adequate.`;
 }
 
 /**
@@ -87,11 +64,6 @@ export function categoriesToGapOpportunities(
   return categories
     .map((cat) => {
       const gapScore = computeGapScore(cat.search_demand, cat.supply_count);
-      const revenuePotential = estimateRevenuePotential(
-        cat.search_demand,
-        cat.supply_count,
-        cat.avg_listing_price
-      );
 
       return {
         touchpoint_id: cat.touchpoint_id,
@@ -100,12 +72,7 @@ export function categoriesToGapOpportunities(
         supply_count: cat.supply_count,
         gap_score: Math.round(gapScore * 100) / 100,
         trend: cat.trend ?? "stable",
-        revenue_potential: revenuePotential,
-        recommended_action: generateRecommendation(
-          cat.category,
-          gapScore,
-          cat.trend
-        ),
+        recommended_action: generateRecommendation(cat.category, gapScore),
       };
     })
     .sort((a, b) => b.gap_score - a.gap_score);
@@ -120,7 +87,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-SOLAR-SEARCH",
     search_demand: 520,
     supply_count: 12,
-    avg_listing_price: 2500,
     trend: "rising",
   },
   {
@@ -128,7 +94,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-EV-SEARCH",
     search_demand: 340,
     supply_count: 8,
-    avg_listing_price: 35000,
     trend: "rising",
   },
   {
@@ -136,7 +101,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-BOAT-RENTAL-SEARCH",
     search_demand: 890,
     supply_count: 45,
-    avg_listing_price: 500,
     trend: "stable",
   },
   {
@@ -144,7 +108,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-COMMERCIAL-RE-SEARCH",
     search_demand: 210,
     supply_count: 18,
-    avg_listing_price: 850000,
     trend: "stable",
   },
   {
@@ -152,7 +115,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-USED-CARS-SEARCH",
     search_demand: 2100,
     supply_count: 380,
-    avg_listing_price: 18000,
     trend: "stable",
   },
   {
@@ -160,7 +122,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-HOME-SERVICES-SEARCH",
     search_demand: 780,
     supply_count: 95,
-    avg_listing_price: 200,
     trend: "rising",
   },
   {
@@ -168,7 +129,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-VACATION-RENTAL-SEARCH",
     search_demand: 1450,
     supply_count: 120,
-    avg_listing_price: 350,
     trend: "rising",
   },
   {
@@ -176,7 +136,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-RESTAURANT-EQUIP-SEARCH",
     search_demand: 180,
     supply_count: 65,
-    avg_listing_price: 1200,
     trend: "falling",
   },
   {
@@ -184,7 +143,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-FITNESS-SEARCH",
     search_demand: 320,
     supply_count: 280,
-    avg_listing_price: 400,
     trend: "stable",
   },
   {
@@ -192,7 +150,6 @@ export const MOCK_ECAYTRADE_CATEGORIES: CategoryData[] = [
     touchpoint_id: "ECAY-ELECTRONICS-SEARCH",
     search_demand: 1800,
     supply_count: 1250,
-    avg_listing_price: 300,
     trend: "stable",
   },
 ];

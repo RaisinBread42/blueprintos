@@ -7,16 +7,14 @@ import {
   Minus,
   AlertTriangle,
   Target,
-  DollarSign,
   Package,
   Search,
 } from "lucide-react";
 import type { GapOpportunity } from "@/types";
-import { categorizeGaps, totalRevenuePotential } from "@/lib/attribution/gaps";
+import { categorizeGaps } from "@/lib/attribution/gaps";
 
 interface GapAnalysisProps {
   gaps: GapOpportunity[];
-  showRevenue?: boolean;
 }
 
 function TrendIcon({ trend }: { trend?: "rising" | "stable" | "falling" }) {
@@ -97,23 +95,13 @@ function GapCard({ gap }: { gap: GapOpportunity }) {
         </div>
       </div>
 
-      {gap.revenue_potential && gap.revenue_potential > 0 && (
-        <div className="flex items-center gap-2 text-xs text-emerald-400 mb-2">
-          <DollarSign className="h-3 w-3" />
-          <span>
-            Est. monthly potential: ${gap.revenue_potential.toLocaleString()}
-          </span>
-        </div>
-      )}
-
       <p className="text-xs text-slate-400">{gap.recommended_action}</p>
     </div>
   );
 }
 
-export function GapAnalysis({ gaps, showRevenue = true }: GapAnalysisProps) {
+export function GapAnalysis({ gaps }: GapAnalysisProps) {
   const categorized = useMemo(() => categorizeGaps(gaps), [gaps]);
-  const totalPotential = useMemo(() => totalRevenuePotential(gaps), [gaps]);
 
   const criticalCount = categorized.critical.length;
   const highCount = categorized.high.length;
@@ -121,7 +109,7 @@ export function GapAnalysis({ gaps, showRevenue = true }: GapAnalysisProps) {
   return (
     <div className="space-y-4">
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-center">
           <p className="text-2xl font-bold text-red-400">{criticalCount}</p>
           <p className="text-xs text-red-400/70">Critical Gaps</p>
@@ -136,14 +124,6 @@ export function GapAnalysis({ gaps, showRevenue = true }: GapAnalysisProps) {
           </p>
           <p className="text-xs text-blue-400/70">Moderate</p>
         </div>
-        {showRevenue && (
-          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-center">
-            <p className="text-2xl font-bold text-emerald-400">
-              ${(totalPotential / 1000).toFixed(0)}k
-            </p>
-            <p className="text-xs text-emerald-400/70">Monthly Potential</p>
-          </div>
-        )}
       </div>
 
       {/* Critical Gaps */}

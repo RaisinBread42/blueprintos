@@ -292,7 +292,7 @@
         "data/attribution/snapshots/ideal-scenario.json"
       ],
       "dependencies": ["feat-009"],
-      "notes": "Synergy-focused dashboard with two tabs: Current State (within-platform tracking) and Multi-Platform Vision (aspirational cross-entity flows). Features: entity-level Sankey aggregation, inline user count + CTR% labels on links, synergy lift comparison (12% single → 34% multi → 52% rewards), bundle advantage cards, Stingray Rewards teaser, recommendations modal. Fixed: Sankey self-loop stack overflow, useMemo dependency re-render, gradient ID sanitization, mathematically correct funnel data (4k→2.4k→480→96)."
+      "notes": "Synergy-focused dashboard with three tabs: Current State (within-platform tracking), Ecosystem Vision (aspirational cross-entity flows), and Gap Analysis. Features: entity-level Sankey aggregation, inline user count + CTR% labels on links, synergy lift comparison (12% single → 34% multi → 52% rewards), bundle advantage cards, Stingray Rewards teaser, recommendations modal. Fixed: Sankey self-loop stack overflow, useMemo dependency re-render, gradient ID sanitization, mathematically correct funnel data (4k→2.4k→480→96)."
     },
     {
       "id": "feat-011",

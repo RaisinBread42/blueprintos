@@ -1,12 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
   computeGapScore,
-  estimateRevenuePotential,
   generateRecommendation,
   categoriesToGapOpportunities,
   getMockGapOpportunities,
   categorizeGaps,
-  totalRevenuePotential,
   MOCK_ECAYTRADE_CATEGORIES,
 } from "./gaps";
 
@@ -41,39 +39,30 @@ describe("computeGapScore", () => {
   });
 });
 
-describe("estimateRevenuePotential", () => {
-  it("returns 0 when supply meets demand", () => {
-    expect(estimateRevenuePotential(100, 100, 500)).toBe(0);
-    expect(estimateRevenuePotential(100, 200, 500)).toBe(0);
-  });
-
-  it("calculates revenue based on unmet demand", () => {
-    // 100 unmet demand * 10% conversion * $500 * 5% commission = $250
-    const revenue = estimateRevenuePotential(200, 100, 500);
-    expect(revenue).toBe(250);
-  });
-
-  it("uses default price when not specified", () => {
-    const revenue = estimateRevenuePotential(200, 100);
-    expect(revenue).toBeGreaterThan(0);
-  });
-});
-
 describe("generateRecommendation", () => {
-  it("returns critical message for high gap score", () => {
+  it("returns critical message for very high gap score", () => {
     const rec = generateRecommendation("Solar Panels", 0.9);
-    expect(rec).toContain("Critical");
+    expect(rec).toContain("critical");
     expect(rec).toContain("Solar Panels");
+    expect(rec).toContain("Improve");
   });
 
-  it("mentions growth for rising trends with high gaps", () => {
-    const rec = generateRecommendation("EVs", 0.7, "rising");
-    expect(rec).toContain("growing");
+  it("returns high demand message for high gap score", () => {
+    const rec = generateRecommendation("EVs", 0.7);
+    expect(rec).toContain("high demand");
+    expect(rec).toContain("EVs");
   });
 
-  it("returns low-priority message for well-supplied categories", () => {
+  it("returns consider message for moderate gap score", () => {
+    const rec = generateRecommendation("Boats", 0.4);
+    expect(rec).toContain("Consider");
+    expect(rec).toContain("Boats");
+  });
+
+  it("returns adequate message for low gap score", () => {
     const rec = generateRecommendation("Electronics", 0.1);
-    expect(rec).toContain("well-supplied");
+    expect(rec).toContain("adequate");
+    expect(rec).toContain("Electronics");
   });
 });
 
@@ -85,7 +74,6 @@ describe("categoriesToGapOpportunities", () => {
         touchpoint_id: "ECAY-TEST",
         search_demand: 500,
         supply_count: 50,
-        avg_listing_price: 1000,
       },
     ];
 
@@ -96,7 +84,6 @@ describe("categoriesToGapOpportunities", () => {
     expect(gaps[0].category).toBe("Test Category");
     expect(gaps[0].gap_score).toBeGreaterThan(0);
     expect(gaps[0].recommended_action).toBeTruthy();
-    expect(gaps[0].revenue_potential).toBeGreaterThan(0);
   });
 
   it("sorts by gap score descending", () => {
@@ -119,6 +106,20 @@ describe("categoriesToGapOpportunities", () => {
 
     expect(gaps[0].category).toBe("High Gap");
     expect(gaps[1].category).toBe("Low Gap");
+  });
+
+  it("uses stable trend as default", () => {
+    const categories = [
+      {
+        category: "Test",
+        touchpoint_id: "ECAY-TEST",
+        search_demand: 500,
+        supply_count: 50,
+      },
+    ];
+
+    const gaps = categoriesToGapOpportunities(categories);
+    expect(gaps[0].trend).toBe("stable");
   });
 });
 
@@ -176,18 +177,5 @@ describe("categorizeGaps", () => {
       categorized.low.length;
 
     expect(total).toBe(gaps.length);
-  });
-});
-
-describe("totalRevenuePotential", () => {
-  it("sums revenue potential from all gaps", () => {
-    const gaps = getMockGapOpportunities();
-    const total = totalRevenuePotential(gaps);
-
-    expect(total).toBeGreaterThan(0);
-  });
-
-  it("returns 0 for empty array", () => {
-    expect(totalRevenuePotential([])).toBe(0);
   });
 });
