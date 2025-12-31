@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clock, Calendar, GitBranch, Home } from "lucide-react";
+import { Clock, Calendar, GitBranch, Home, TrendingUp, AlertTriangle } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: Home, exact: true },
   { href: "/dashboard/time-saved", label: "Time Saved", icon: Clock },
+  { href: "/dashboard/conversions", label: "Conversions", icon: GitBranch },
+  { href: "/dashboard/ecosystem", label: "Ecosystem", icon: TrendingUp },
+  { href: "/dashboard/gaps", label: "Gaps", icon: AlertTriangle },
   { href: "/dashboard/timeline", label: "Timeline", icon: Calendar },
-  { href: "/dashboard/attribution", label: "Attribution", icon: GitBranch },
 ];
 
 export function DashboardNav() {

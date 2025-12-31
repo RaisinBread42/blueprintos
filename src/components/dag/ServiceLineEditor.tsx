@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Save, FolderOpen, Check, Loader2, FilePlus, Download, Upload, Copy } from "lucide-react";
+import { Plus, Save, FolderOpen, Check, Loader2, FilePlus, Download, Upload, Copy, ChevronDown, LayoutDashboard, Database, Menu } from "lucide-react";
 import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -34,6 +34,16 @@ import { StationPanel } from "./StationPanel";
 import { EdgePanel } from "./EdgePanel";
 import { PathfinderPanel } from "./PathfinderPanel";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/components/ui/dropdown-menu";
 import { computeServiceLineRollup } from "@/lib/rag/rollup";
 import { getRagDisplay } from "@/lib/rag/compute";
 import {
@@ -124,9 +134,6 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
   // Saving state
   const [saving, setSaving] = useState(false);
-
-  // Open dropdown state
-  const [openDropdownOpen, setOpenDropdownOpen] = useState(false);
 
   const [scenario, setScenario] = useState<ScenarioConfig>(defaultScenarioConfig);
   const [scenarioNames, setScenarioNames] = useState<string[]>([]);
@@ -509,7 +516,6 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
 
   // Load handler
   const handleLoad = useCallback(async (id: string) => {
-    setOpenDropdownOpen(false);
     if (id !== serviceLine.service_line_id) {
       await onLoad(id);
     }
@@ -716,12 +722,13 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
     <div className="flex h-full w-full">
       {/* Main canvas area */}
       <div className="relative flex-1">
-        {/* Header bar with service line info */}
-        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between border-b border-slate-800 bg-slate-950/90 px-4 py-3 backdrop-blur-sm">
+        {/* Header bar with service line info - 2 row layout */}
+        <div className="absolute left-0 right-0 top-0 z-10 border-b border-slate-800 bg-slate-950/90 px-4 py-2 backdrop-blur-sm">
+          {/* Row 1: Service line info */}
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors shrink-0"
               title="Back to Home"
             >
               <svg
@@ -738,9 +745,9 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 />
               </svg>
             </Link>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-500">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-500 shrink-0">
               <svg
-                className="h-5 w-5"
+                className="h-4 w-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -753,167 +760,153 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
                 />
               </svg>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-white">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-base font-semibold text-white">
                   {serviceLine.name}
                 </h1>
+                <span className="text-xs text-slate-500">({serviceLine.service_line_id})</span>
                 {activeScenarioName && activeScenarioName !== "default" && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-300">
-                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+                    <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    Scenario: {activeScenarioName}
+                    {activeScenarioName}
                   </span>
                 )}
                 {hasMissingStations && (
-                  <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-300">
-                    Missing station in catalog
+                  <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-300">
+                    Missing station
                   </span>
                 )}
                 {hasUnsavedChanges && (
-                  <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
+                  <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
                     Unsaved
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400">{serviceLine.service_line_id}</p>
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                  setHasUnsavedChanges(true);
-                }}
-                placeholder="Add a description..."
-                className="mt-1 w-full max-w-md bg-transparent text-xs text-slate-300 placeholder:text-slate-500 border-b border-transparent hover:border-slate-600 focus:border-cyan-500 focus:outline-none transition-colors"
-              />
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                <span>
-                  Total:{" "}
-                  <span className="text-slate-200 font-medium">
-                    {Math.round(rollup.total_planned_hrs * 10) / 10}h planned /{" "}
-                    {Math.round(rollup.total_actual_hrs * 10) / 10}h actual
+              <div className="flex items-center gap-2 mt-0.5">
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
+                  placeholder="Add a description..."
+                  className="flex-1 max-w-lg bg-transparent text-xs text-slate-300 placeholder:text-slate-500 border-b border-transparent hover:border-slate-600 focus:border-cyan-500 focus:outline-none transition-colors"
+                />
+                <div className="flex items-center gap-3 text-[11px] text-slate-400 shrink-0">
+                  <span>
+                    {Math.round(rollup.total_planned_hrs * 10) / 10}h / {Math.round(rollup.total_actual_hrs * 10) / 10}h
+                    <span className={`ml-1 ${rollup.variance_pct > 0 ? "text-amber-300" : "text-emerald-300"}`}>
+                      ({rollup.variance_pct > 0 ? "+" : ""}{Math.round(rollup.variance_pct * 10) / 10}%)
+                    </span>
                   </span>
-                  {" "}(
-                  <span className={rollup.variance_pct > 0 ? "text-amber-300" : "text-emerald-300"}>
-                    {rollup.variance_pct > 0 ? "+" : ""}
-                    {Math.round(rollup.variance_pct * 10) / 10}%
+                  <span>QA: {rollup.avg_qa_score.toFixed(1)}</span>
+                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full ${getRagDisplay(rollup.overall_rag).bg} ${getRagDisplay(rollup.overall_rag).color}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${getRagDisplay(rollup.overall_rag).bgSolid}`} />
+                    {getRagDisplay(rollup.overall_rag).label}
                   </span>
-                  )
-                </span>
-                <span>Avg QA: <span className="text-slate-200 font-medium">{rollup.avg_qa_score.toFixed(2)}</span></span>
-                <span>Standard: <span className="text-slate-200 font-medium">{rollup.stations_at_standard}/{rollup.total_stations}</span></span>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] ${getRagDisplay(rollup.overall_rag).bg} ${getRagDisplay(rollup.overall_rag).color}`}>
-                  <span className={`h-2 w-2 rounded-full ${getRagDisplay(rollup.overall_rag).bgSolid}`} />
-                  {getRagDisplay(rollup.overall_rag).label}
-                </span>
+                </div>
               </div>
             </div>
           </div>
-          {scenarioDirty && (
-            <div className="mt-1 text-[11px] text-amber-300">Scenario changes not saved</div>
-          )}
-            <div className="flex items-center gap-2 flex-wrap">
-            {/* Dashboard link */}
-            <Link
-              href="/dashboard"
-              className="hidden sm:inline-flex h-8 items-center justify-center rounded-lg border border-slate-700/50 px-3 text-sm text-slate-300 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-colors"
-              title="Open Dashboard"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/admin/stations"
-              className="hidden sm:inline-flex h-8 items-center justify-center rounded-lg border border-slate-700/50 px-3 text-sm text-slate-300 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-colors"
-              title="Station catalog & health"
-            >
-              Stations
-            </Link>
 
-            {/* New button */}
-            <Button
-              onClick={() => setShowNewDialog(true)}
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all"
-            >
-              <FilePlus className="h-4 w-4 mr-1" />
-              New
-            </Button>
-
-            {/* Duplicate button */}
-            <Button
-              onClick={() => {
-                setDuplicateId(`${serviceLine.service_line_id}-copy`);
-                setDuplicateName(`${serviceLine.name} (Copy)`);
-                setShowDuplicateDialog(true);
-              }}
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
-              title="Duplicate this service line"
-            >
-              <Copy className="h-4 w-4 mr-1" />
-              Duplicate
-            </Button>
-
-            {/* Open dropdown */}
-            <div className="relative">
-              <Button
-                onClick={() => setOpenDropdownOpen(!openDropdownOpen)}
-                variant="ghost"
-                size="sm"
-                className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
-              >
-                <FolderOpen className="h-4 w-4 mr-1" />
-                Open
-              </Button>
-              {openDropdownOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-10" 
-                    onClick={() => setOpenDropdownOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-1 z-20 w-64 rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl">
+          {/* Row 2: Action buttons */}
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-800/50">
+            {/* File Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+                >
+                  <Menu className="h-4 w-4 mr-1" />
+                  File
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-700">
+                <DropdownMenuItem
+                  onClick={() => setShowNewDialog(true)}
+                  className="text-slate-300 focus:bg-slate-800 focus:text-white"
+                >
+                  <FilePlus className="h-4 w-4 mr-2" />
+                  New Service Line
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setDuplicateId(`${serviceLine.service_line_id}-copy`);
+                    setDuplicateName(`${serviceLine.name} (Copy)`);
+                    setShowDuplicateDialog(true);
+                  }}
+                  className="text-slate-300 focus:bg-slate-800 focus:text-white"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                    <FolderOpen className="h-4 w-4 mr-2" />
+                    Open
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="bg-slate-900 border-slate-700 max-h-64 overflow-y-auto">
                     {serviceLines.length === 0 ? (
-                      <div className="px-3 py-2 text-sm text-slate-500">No service lines found</div>
+                      <DropdownMenuItem disabled className="text-slate-500">
+                        No service lines found
+                      </DropdownMenuItem>
                     ) : (
                       serviceLines.map((sl) => (
-                        <button
+                        <DropdownMenuItem
                           key={sl.service_line_id}
                           onClick={() => handleLoad(sl.service_line_id)}
-                          className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-800 flex items-center justify-between ${
+                          className={`${
                             sl.service_line_id === serviceLine.service_line_id
                               ? "text-emerald-400"
                               : "text-slate-300"
-                          }`}
+                          } focus:bg-slate-800 focus:text-white`}
                         >
-                          <div>
-                            <div className="font-medium">{sl.name}</div>
-                            <div className="text-xs text-slate-500">{sl.service_line_id}</div>
+                          <div className="flex items-center justify-between w-full">
+                            <div>
+                              <div className="font-medium">{sl.name}</div>
+                              <div className="text-xs text-slate-500">{sl.service_line_id}</div>
+                            </div>
+                            {sl.service_line_id === serviceLine.service_line_id && (
+                              <Check className="h-4 w-4 ml-2" />
+                            )}
                           </div>
-                          {sl.service_line_id === serviceLine.service_line_id && (
-                            <Check className="h-4 w-4" />
-                          )}
-                        </button>
+                        </DropdownMenuItem>
                       ))
                     )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Import button */}
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
-            >
-              <Upload className="h-4 w-4 mr-1" />
-              Import
-            </Button>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuItem
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-slate-300 focus:bg-slate-800 focus:text-white"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleExport}
+                  className="text-slate-300 focus:bg-slate-800 focus:text-white"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleExportScenario}
+                  className="text-emerald-300 focus:bg-slate-800 focus:text-emerald-200"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Scenario
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <input
               ref={fileInputRef}
               type="file"
@@ -922,27 +915,34 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               className="hidden"
             />
 
-            {/* Export button */}
-            <Button
-              onClick={handleExport}
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
-            >
-              <Download className="h-4 w-4 mr-1" />
-              Export
-            </Button>
-            {/* Export scenario view */}
-            <Button
-              onClick={handleExportScenario}
-              variant="ghost"
-              size="sm"
-              className="border border-emerald-700/60 text-emerald-200 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
-              title="Download scenario-adjusted snapshot (does not persist)"
-            >
-              <Download className="h-4 w-4 mr-1" />
-              Export Scenario
-            </Button>
+            {/* View Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+                >
+                  <LayoutDashboard className="h-4 w-4 mr-1" />
+                  View
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700">
+                <DropdownMenuItem asChild className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                  <Link href="/admin/stations">
+                    <Database className="h-4 w-4 mr-2" />
+                    Stations Catalog
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <div className="w-px h-6 bg-slate-700/50" />
 
@@ -970,7 +970,7 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               className="border border-slate-700/50 text-slate-400 bg-transparent hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all"
             >
               <Plus className="h-4 w-4 mr-1" />
-              Add Station
+              Add
             </Button>
 
             {/* Pathfinder button */}
@@ -990,106 +990,112 @@ function ServiceLineEditorInner({ serviceLine, serviceLines, onSave, onLoad, onC
               <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
-              Pathfinder
+              Path
             </Button>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500 ml-2">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
               <span>{nodes.length} stations</span>
               <span>•</span>
               <span>{edges.length} tracks</span>
             </div>
-            {scenarioDirty && (
-              <div className="text-[11px] text-amber-300">Scenario changes not saved</div>
-            )}
-          </div>
 
-          {/* Scenario sliders */}
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
-            {[
-              { key: "laborDelta", label: "Labor Δ (actual hrs)", min: -20, max: 20, unit: "hrs" },
-              { key: "timeDelta", label: "Time Δ (planned hrs)", min: -20, max: 20, unit: "hrs" },
-              { key: "qualityDelta", label: "Quality Δ (QA pts)", min: -5, max: 5, unit: "pts" },
-            ].map((s) => (
-              <div key={s.key} className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-slate-200">{s.label}</span>
-                  <span className="text-slate-400 font-mono">
+            {/* Scenario sliders - right aligned */}
+            <div className="flex items-center gap-2 ml-auto">
+              {[
+                { key: "laborDelta", label: "Labor", min: -20, max: 20, unit: "h" },
+                { key: "timeDelta", label: "Time", min: -20, max: 20, unit: "h" },
+                { key: "qualityDelta", label: "QA", min: -5, max: 5, unit: "pt" },
+              ].map((s) => (
+                <div key={s.key} className="flex items-center gap-1.5 bg-slate-900/50 border border-slate-800 rounded px-2 py-1">
+                  <span className="text-[10px] text-slate-400 w-8">{s.label}</span>
+                  <input
+                    type="range"
+                    min={s.min}
+                    max={s.max}
+                    step={1}
+                    value={scenario.global[s.key as keyof typeof scenario.global] as number}
+                    onChange={(e) =>
+                      setScenario((prev) => ({
+                        ...prev,
+                        global: {
+                          ...prev.global,
+                          [s.key]: parseInt(e.target.value, 10),
+                        },
+                      }))
+                    }
+                    onMouseUp={() => {
+                      setScenarioDirty(true);
+                      setHasUnsavedChanges(true);
+                    }}
+                    onTouchEnd={() => {
+                      setScenarioDirty(true);
+                      setHasUnsavedChanges(true);
+                    }}
+                    className="w-16 accent-emerald-500"
+                  />
+                  <span className="text-[10px] text-slate-300 font-mono w-10 text-right">
                     {scenario.global[s.key as keyof typeof scenario.global] >= 0 ? "+" : ""}
-                    {scenario.global[s.key as keyof typeof scenario.global]} {s.unit}
+                    {scenario.global[s.key as keyof typeof scenario.global]}{s.unit}
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min={s.min}
-                  max={s.max}
-                  step={1}
-                  value={scenario.global[s.key as keyof typeof scenario.global] as number}
-                  onChange={(e) =>
-                    setScenario((prev) => ({
-                      ...prev,
-                      global: {
-                        ...prev.global,
-                        [s.key]: parseInt(e.target.value, 10),
-                      },
-                    }))
-                  }
-                  onMouseUp={() => {
-                    setScenarioDirty(true);
-                    setHasUnsavedChanges(true);
-                  }}
-                  onTouchEnd={() => {
-                    setScenarioDirty(true);
-                    setHasUnsavedChanges(true);
-                  }}
-                  className="w-full accent-emerald-500"
-                />
-              </div>
-            ))}
-          </div>
+              ))}
 
-          {/* Scenario actions */}
-          <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border border-emerald-700/60 text-emerald-100 bg-transparent hover:bg-emerald-900/60 hover:text-white hover:border-emerald-500/80 transition-all"
-              onClick={() => {
-                setScenarioModalMode("save");
-                setScenarioNameInput("");
-                setScenarioModalOpen(true);
-              }}
-              title="Save slider deltas as a named scenario on the server"
-            >
-              Save Slider Scenario
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
-              onClick={() => {
-                setScenarioModalMode("load");
-                setScenarioNameInput(scenarioNames[0] ?? "");
-                setScenarioModalOpen(true);
-              }}
-              title="Load a saved slider scenario for this service line"
-            >
-              Load Slider Scenario
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border border-slate-700/60 text-slate-200 bg-transparent hover:bg-slate-800 hover:text-white hover:border-slate-500/80 transition-all"
-              onClick={() => {
-                setScenario(defaultScenarioConfig);
-                setScenarioDirty(true);
-                fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
-                  method: "DELETE",
-                });
-              }}
-              title="Reset scenario deltas to zero"
-            >
-              Reset
-            </Button>
+              {/* Scenario dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 border border-slate-700/50 text-slate-400 bg-transparent hover:bg-slate-700 hover:text-white hover:border-slate-600 transition-all"
+                  >
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <ChevronDown className="h-3 w-3 ml-0.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setScenarioModalMode("save");
+                      setScenarioNameInput("");
+                      setScenarioModalOpen(true);
+                    }}
+                    className="text-slate-300 focus:bg-slate-800 focus:text-white text-xs"
+                  >
+                    <Save className="h-3 w-3 mr-2" />
+                    Save Scenario
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setScenarioModalMode("load");
+                      setScenarioNameInput(scenarioNames[0] ?? "");
+                      setScenarioModalOpen(true);
+                    }}
+                    className="text-slate-300 focus:bg-slate-800 focus:text-white text-xs"
+                  >
+                    <FolderOpen className="h-3 w-3 mr-2" />
+                    Load Scenario
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-700" />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setScenario(defaultScenarioConfig);
+                      setScenarioDirty(true);
+                      fetch(`/api/scenarios/${encodeURIComponent(serviceLine.service_line_id)}`, {
+                        method: "DELETE",
+                      });
+                    }}
+                    className="text-slate-300 focus:bg-slate-800 focus:text-white text-xs"
+                  >
+                    <svg className="h-3 w-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Reset to Zero
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 

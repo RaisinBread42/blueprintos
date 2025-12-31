@@ -1,233 +1,178 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChartComponent } from "@/components/charts/LineChartComponent";
-import { CheckCircle2, Code2, Palette, BarChart3, Zap, FileCode, ArrowRight } from "lucide-react";
+import {
+  Clock,
+  GitBranch,
+  TrendingUp,
+  AlertTriangle,
+  Calendar,
+  LayoutDashboard,
+  ArrowRight,
+} from "lucide-react";
 
-const sampleChartData = [
-  { name: "Jan", performance: 65, efficiency: 78 },
-  { name: "Feb", performance: 72, efficiency: 82 },
-  { name: "Mar", performance: 78, efficiency: 85 },
-  { name: "Apr", performance: 85, efficiency: 88 },
-  { name: "May", performance: 82, efficiency: 92 },
-  { name: "Jun", performance: 90, efficiency: 95 },
+const goalCards = [
+  {
+    title: "Track Time Saved",
+    description:
+      "See hours saved per station over time. Understand where efficiency gains are happening and correlate with process changes.",
+    href: "/dashboard/time-saved",
+    icon: Clock,
+    color: "emerald",
+  },
+  {
+    title: "Platform Conversions",
+    description:
+      "Visualize how work flows through each platform with Sankey diagrams. Identify bottlenecks and optimize handoffs.",
+    href: "/dashboard/conversions",
+    icon: GitBranch,
+    color: "blue",
+  },
+  {
+    title: "Ecosystem Lift",
+    description:
+      "Map cross-platform customer journeys to understand synergies. See which combinations drive the best outcomes.",
+    href: "/dashboard/ecosystem",
+    icon: TrendingUp,
+    color: "violet",
+  },
+  {
+    title: "Gaps for Improvement",
+    description:
+      "Identify underperforming stations and missing connections. Get actionable recommendations for quick wins.",
+    href: "/dashboard/gaps",
+    icon: AlertTriangle,
+    color: "amber",
+  },
+  {
+    title: "Change Timeline",
+    description:
+      "Track process changes, team updates, and tool rollouts. Correlate changes with metric improvements over time.",
+    href: "/dashboard/timeline",
+    icon: Calendar,
+    color: "rose",
+  },
+  {
+    title: "Service Overview",
+    description:
+      "High-level health check across all service lines. Monitor RAG status, variance, and QA scores at a glance.",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    color: "slate",
+  },
 ];
 
-const techStack = [
-  {
-    icon: Code2,
-    title: "Next.js 14",
-    description: "App Router with React Server Components",
-    version: "14.2.35",
+const colorStyles: Record<string, { bg: string; border: string; icon: string; hover: string }> = {
+  emerald: {
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20 hover:border-emerald-500/40",
+    icon: "text-emerald-400",
+    hover: "group-hover:bg-emerald-500/20",
   },
-  {
-    icon: FileCode,
-    title: "TypeScript",
-    description: "Full type safety with strict mode",
-    version: "5.x",
+  blue: {
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20 hover:border-blue-500/40",
+    icon: "text-blue-400",
+    hover: "group-hover:bg-blue-500/20",
   },
-  {
-    icon: Palette,
-    title: "Tailwind CSS",
-    description: "Utility-first CSS framework",
-    version: "3.4.19",
+  violet: {
+    bg: "bg-violet-500/10",
+    border: "border-violet-500/20 hover:border-violet-500/40",
+    icon: "text-violet-400",
+    hover: "group-hover:bg-violet-500/20",
   },
-  {
-    icon: Zap,
-    title: "shadcn/ui",
-    description: "Beautifully designed components",
-    version: "latest",
+  amber: {
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20 hover:border-amber-500/40",
+    icon: "text-amber-400",
+    hover: "group-hover:bg-amber-500/20",
   },
-  {
-    icon: BarChart3,
-    title: "Recharts",
-    description: "Composable charting library",
-    version: "3.6.0",
+  rose: {
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20 hover:border-rose-500/40",
+    icon: "text-rose-400",
+    hover: "group-hover:bg-rose-500/20",
   },
-];
-
-const workflowSteps = [
-  { step: 1, name: "Plan", description: "Analyze & propose approach" },
-  { step: 2, name: "Review", description: "Get feedback & refine" },
-  { step: 3, name: "Accept", description: "Approve the plan" },
-  { step: 4, name: "Implement", description: "Write & validate code" },
-  { step: 5, name: "Verify", description: "Manual testing" },
-  { step: 6, name: "Commit", description: "Version control" },
-];
+  slate: {
+    bg: "bg-slate-500/10",
+    border: "border-slate-500/20 hover:border-slate-500/40",
+    icon: "text-slate-400",
+    hover: "group-hover:bg-slate-500/20",
+  },
+};
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFmMjkzNyIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-          <div className="text-center">
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
-              <CheckCircle2 className="h-4 w-4" />
-              <span>Project initialized successfully</span>
-            </div>
-
-            <h1 className="font-display bg-gradient-to-r from-white via-emerald-200 to-emerald-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-7xl">
-              Blueprintos
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-400">
-              A modern Next.js starter with TypeScript, Tailwind CSS, shadcn/ui, and Recharts.
-              Built with a structured developer workflow for quality and traceability.
-            </p>
-
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-white">Blueprintos</h1>
+            <nav className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
-                <Link href="/editor">
-                  Open Editor
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
-              >
-                <Link href="/dashboard">
-                  Dashboard
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
-              >
-                <Link href="https://github.com/RaisinBread42/blueprintos" target="_blank">
-                  View on GitHub
-                </Link>
-              </Button>
-            </div>
+                Dashboard
+              </Link>
+            </nav>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Tech Stack Section */}
-      <section className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8">
+      {/* Hero */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Tech Stack</h2>
-          <p className="mt-4 text-lg text-slate-400">
-            Built with modern, production-ready technologies
+          <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
+            What do you want to achieve?
+          </h2>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            Select a goal below to get started. Each view is designed to help you answer specific
+            questions about your operations.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {techStack.map((tech) => (
-            <Card
-              key={tech.title}
-              className="group border-slate-800 bg-slate-900/50 backdrop-blur-sm transition-all hover:border-emerald-500/50 hover:bg-slate-900/80"
-            >
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="rounded-lg bg-emerald-500/10 p-3 text-emerald-500 group-hover:bg-emerald-500/20 transition-colors">
-                    <tech.icon className="h-6 w-6" />
+        {/* Goal Cards Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {goalCards.map((card) => {
+            const styles = colorStyles[card.color];
+            const Icon = card.icon;
+
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className={`group relative rounded-xl border ${styles.border} bg-slate-900/50 p-6 transition-all hover:bg-slate-900/80`}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`rounded-lg ${styles.bg} ${styles.hover} p-3 transition-colors`}
+                  >
+                    <Icon className={`h-6 w-6 ${styles.icon}`} />
                   </div>
-                  <div>
-                    <CardTitle className="text-white">{tech.title}</CardTitle>
-                    <span className="text-xs text-emerald-500 font-mono">v{tech.version}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                      {card.title}
+                      <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-1 transition-all" />
+                    </h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      {card.description}
+                    </p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-slate-400">{tech.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+              </Link>
+            );
+          })}
         </div>
-      </section>
-
-      {/* Workflow Section */}
-      <section className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Developer Workflow</h2>
-          <p className="mt-4 text-lg text-slate-400">
-            Structured phases ensure quality at every step
-          </p>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-4">
-          {workflowSteps.map((step, index) => (
-            <div key={step.step} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500 font-bold text-lg border border-emerald-500/30">
-                  {step.step}
-                </div>
-                <span className="mt-2 text-sm font-medium text-white">{step.name}</span>
-                <span className="text-xs text-slate-500 text-center max-w-24">
-                  {step.description}
-                </span>
-              </div>
-              {index < workflowSteps.length - 1 && (
-                <div className="mx-4 h-0.5 w-8 bg-gradient-to-r from-emerald-500/50 to-emerald-500/20 hidden sm:block" />
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Chart Demo Section */}
-      <section className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Recharts Integration</h2>
-          <p className="mt-4 text-lg text-slate-400">
-            Beautiful, responsive charts out of the box
-          </p>
-        </div>
-
-        <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">Performance Metrics</CardTitle>
-            <CardDescription className="text-slate-400">
-              Sample chart demonstrating Recharts integration
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LineChartComponent
-              data={sampleChartData}
-              lines={[
-                { dataKey: "performance", stroke: "#10b981", name: "Performance" },
-                { dataKey: "efficiency", stroke: "#6366f1", name: "Efficiency" },
-              ]}
-              height={350}
-            />
-          </CardContent>
-        </Card>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-slate-800 bg-slate-950">
-        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-slate-500">
-              Built with the CLAUDE.md workflow system
-            </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-sm text-slate-500 hover:text-emerald-500 transition-colors">
-                CLAUDE.md
-              </a>
-              <a href="#" className="text-sm text-slate-500 hover:text-emerald-500 transition-colors">
-                PROGRESS.md
-              </a>
-              <a href="#" className="text-sm text-slate-500 hover:text-emerald-500 transition-colors">
-                features.json
-              </a>
-            </div>
-          </div>
+        <div className="mx-auto max-w-6xl px-6 py-6">
+          <p className="text-sm text-slate-500 text-center">
+            Blueprintos — Operational visibility for media teams
+          </p>
         </div>
       </footer>
     </main>
