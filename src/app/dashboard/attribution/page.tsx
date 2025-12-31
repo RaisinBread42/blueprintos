@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { JourneySnapshot, GapOpportunity } from "@/types";
 import { AttributionSankey } from "@/components/dashboard/AttributionSankey";
+import { GapAnalysis } from "@/components/dashboard/GapAnalysis";
 import { getMockGapOpportunities } from "@/lib/attribution/gaps";
 
 type ViewTab = "current" | "ideal" | "gaps";
@@ -578,56 +579,6 @@ export default function AttributionDashboardPage() {
         {/* Gap Analysis View */}
         {activeTab === "gaps" && (
           <div className="space-y-6">
-            {/* Demand vs Supply Overview */}
-            <div className="rounded-xl border border-purple-500/30 bg-slate-900/60 p-6 shadow-lg">
-              <h2 className="text-lg font-medium text-white mb-2 flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-purple-400" />
-                Demand vs Supply Overview
-              </h2>
-              <p className="text-slate-400 text-sm mb-6">
-                Category gaps identified from eCayTrade search and listing data
-              </p>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-4 relative">
-                  <div className="absolute -top-3 left-4 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                    URGENT
-                  </div>
-                  <p className="text-red-400 text-xs uppercase tracking-wide mb-2">
-                    Critical Gaps
-                  </p>
-                  <p className="text-3xl font-bold text-red-400">
-                    {gapOpportunities.filter((g) => g.gap_score >= 0.8).length}
-                  </p>
-                  <p className="text-red-400/70 text-xs mt-2">
-                    Immediate action needed
-                  </p>
-                </div>
-                <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4">
-                  <p className="text-amber-400 text-xs uppercase tracking-wide mb-2">
-                    High Priority
-                  </p>
-                  <p className="text-3xl font-bold text-amber-400">
-                    {gapOpportunities.filter((g) => g.gap_score >= 0.6 && g.gap_score < 0.8).length}
-                  </p>
-                  <p className="text-amber-400/70 text-xs mt-2">
-                    Strong opportunities
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700/50 bg-slate-800/50 p-4">
-                  <p className="text-slate-400 text-xs uppercase tracking-wide mb-2">
-                    Categories
-                  </p>
-                  <p className="text-3xl font-bold text-white">
-                    {gapOpportunities.length}
-                  </p>
-                  <p className="text-slate-500 text-xs mt-2">
-                    eCayTrade marketplace
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Gap Analysis Banner */}
             <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-4">
               <div className="flex items-start gap-3">
@@ -642,6 +593,15 @@ export default function AttributionDashboardPage() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Gap Analysis Component */}
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
+              <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-400" />
+                eCayTrade Category Gaps
+              </h2>
+              <GapAnalysis gaps={gapOpportunities} />
             </div>
 
             {/* Action CTA */}
