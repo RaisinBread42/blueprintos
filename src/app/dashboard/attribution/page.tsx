@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import type { JourneySnapshot, GapOpportunity } from "@/types";
 import { AttributionSankey } from "@/components/dashboard/AttributionSankey";
-import { GapAnalysis } from "@/components/dashboard/GapAnalysis";
 import { getMockGapOpportunities } from "@/lib/attribution/gaps";
 
 type ViewTab = "current" | "ideal" | "gaps";
@@ -643,15 +642,6 @@ export default function AttributionDashboardPage() {
                   </p>
                 </div>
               </div>
-            </div>
-
-            {/* Gap Analysis Component */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
-              <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-400" />
-                eCayTrade Category Gaps
-              </h2>
-              <GapAnalysis gaps={gapOpportunities} />
             </div>
 
             {/* Action CTA */}
