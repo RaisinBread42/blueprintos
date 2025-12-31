@@ -108,24 +108,6 @@ export function GapAnalysis({ gaps }: GapAnalysisProps) {
 
   return (
     <div className="space-y-4">
-      {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-center">
-          <p className="text-2xl font-bold text-red-400">{criticalCount}</p>
-          <p className="text-xs text-red-400/70">Critical Gaps</p>
-        </div>
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-center">
-          <p className="text-2xl font-bold text-amber-400">{highCount}</p>
-          <p className="text-xs text-amber-400/70">High Priority</p>
-        </div>
-        <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-3 text-center">
-          <p className="text-2xl font-bold text-blue-400">
-            {categorized.moderate.length}
-          </p>
-          <p className="text-xs text-blue-400/70">Moderate</p>
-        </div>
-      </div>
-
       {/* Critical Gaps */}
       {criticalCount > 0 && (
         <div>
